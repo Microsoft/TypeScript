@@ -28,6 +28,26 @@
     "engines": {
         "node": ">=4.2.0"
     },
+    "scripts": {
+        "precommit": "lint-staged",
+        "pretest": "jake tests",
+        "test": "jake runtests-parallel",
+        "build": "npm run build:compiler && npm run build:tests",
+        "build:compiler": "jake local",
+        "build:tests": "jake tests",
+        "start": "node lib/tsc",
+        "clean": "jake clean",
+        "gulp": "gulp",
+        "jake": "jake",
+        "lint": "jake lint",
+        "setup-hooks": "node scripts/link-hooks.js"
+    },
+    "lint-staged": {
+        "src/**/*.ts": [
+            "prettier --write",
+            "git add"
+        ]
+    },
     "devDependencies": {
         "@types/browserify": "latest",
         "@types/chai": "latest",
@@ -54,6 +74,7 @@
         "browser-resolve": "^1.11.2",
         "browserify": "latest",
         "chai": "latest",
+        "colors": "latest",
         "convert-source-map": "latest",
         "del": "latest",
         "gulp": "3.X",
@@ -64,13 +85,16 @@
         "gulp-newer": "latest",
         "gulp-sourcemaps": "latest",
         "gulp-typescript": "latest",
+        "husky": "^0.14.3",
         "istanbul": "latest",
         "jake": "latest",
+        "lint-staged": "^4.2.2",
         "merge2": "latest",
         "minimist": "latest",
         "mkdirp": "latest",
         "mocha": "latest",
         "mocha-fivemat-progress-reporter": "latest",
+        "prettier-miscellaneous": "latest",
         "q": "latest",
         "run-sequence": "latest",
         "sorcery": "latest",
@@ -78,21 +102,7 @@
         "travis-fold": "latest",
         "ts-node": "latest",
         "tslint": "latest",
-        "colors": "latest",
         "typescript": "next"
-    },
-    "scripts": {
-        "pretest": "jake tests",
-        "test": "jake runtests-parallel",
-        "build": "npm run build:compiler && npm run build:tests",
-        "build:compiler": "jake local",
-        "build:tests": "jake tests",
-        "start": "node lib/tsc",
-        "clean": "jake clean",
-        "gulp": "gulp",
-        "jake": "jake",
-        "lint": "jake lint",
-        "setup-hooks": "node scripts/link-hooks.js"
     },
     "browser": {
         "fs": false,
