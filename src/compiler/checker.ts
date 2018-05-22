@@ -429,6 +429,7 @@ namespace ts {
         let autoArrayType: Type;
         let anyReadonlyArrayType: Type;
         let deferredGlobalNonNullableTypeAlias: Symbol;
+        let deferredGlobalTypefactsNamespace: Symbol;
 
         // The library files are only loaded when the feature is used.
         // This allows users to just specify library files they want to used through --lib
@@ -482,6 +483,29 @@ namespace ts {
         const diagnostics = createDiagnosticCollection();
         // Suggestion diagnostics must have a file. Keyed by source file name.
         const suggestionDiagnostics = createMultiMap<DiagnosticWithLocation>();
+
+        const typeFactsKeysWithTypes = [
+            ["EQString", TypeFacts.TypeofEQString],
+            ["EQNumber", TypeFacts.TypeofEQNumber],
+            ["EQBoolean", TypeFacts.TypeofEQBoolean],
+            ["EQSymbol", TypeFacts.TypeofEQSymbol],
+            ["EQObject", TypeFacts.TypeofEQObject],
+            ["EQFunction", TypeFacts.TypeofEQFunction],
+            ["NEString", TypeFacts.TypeofNEString],
+            ["NENumber", TypeFacts.TypeofNENumber],
+            ["NEBoolean", TypeFacts.TypeofNEBoolean],
+            ["NESymbol", TypeFacts.TypeofNESymbol],
+            ["NEObject", TypeFacts.TypeofNEObject],
+            ["NEFunction", TypeFacts.TypeofNEFunction],
+            ["EQUndefined", TypeFacts.EQUndefined],
+            ["EQNull", TypeFacts.EQNull],
+            ["EQUndefinedOrNull", TypeFacts.EQUndefinedOrNull],
+            ["NEUndefined", TypeFacts.NEUndefined],
+            ["NENull", TypeFacts.NENull],
+            ["NEUndefinedOrNull", TypeFacts.NEUndefinedOrNull],
+            ["Truthy", TypeFacts.Truthy],
+            ["Falsy", TypeFacts.Falsy],
+        ] as [__String, TypeFacts][];
 
         const enum TypeFacts {
             None = 0,
@@ -8577,6 +8601,14 @@ namespace ts {
             if (includes & TypeFlags.EmptyObject && !(includes & TypeFlags.Object)) {
                 typeSet.push(emptyObjectType);
             }
+            if (typeSet.length === 0) {
+                if (includes & TypeFlags.Null) {
+                    typeSet.push(nullType);
+                }
+                if (includes & TypeFlags.Undefined) {
+                    typeSet.push(undefinedType);
+                }
+            }
             if (typeSet.length === 1) {
                 return typeSet[0];
             }
@@ -8594,6 +8626,7 @@ namespace ts {
                 return getUnionType(map(unionType.types, t => getIntersectionType(replaceElement(typeSet, unionIndex, t))),
                     UnionReduction.Literal, aliasSymbol, aliasTypeArguments);
             }
+            Debug.assert(typeSet.length > 1, "Intersection type must have more than one member");
             const id = getTypeListId(typeSet);
             let type = intersectionTypes.get(id);
             if (!type) {
@@ -13162,7 +13195,35 @@ namespace ts {
             return TypeFacts.All;
         }
 
+        function getGlobalTypeFactsNamespace() {
+            if (!deferredGlobalTypefactsNamespace) {
+                deferredGlobalTypefactsNamespace = getGlobalSymbol("TypeFacts" as __String, SymbolFlags.Namespace, /*diagnostic*/ undefined) || unknownSymbol;
+            }
+            return deferredGlobalTypefactsNamespace;
+        }
+
+        function getFactType(ns: Symbol, factName: __String, type: Type): Type {
+            const alias = getExportOfModule(ns, factName, /*dontResolveAlias*/ false) || unknownSymbol;
+            if (!(alias.flags & SymbolFlags.TypeAlias)) {
+                return type; // Either invalid type or unknown symbol
+            }
+            return getTypeAliasInstantiation(alias, [type]);
+        }
+
         function getTypeWithFacts(type: Type, include: TypeFacts) {
+            const ns = getGlobalTypeFactsNamespace();
+            if (ns === unknownSymbol) {
+                return filterTypeWithFacts(type, include);
+            }
+            for (const [name, flag] of typeFactsKeysWithTypes) {
+                if (include & flag) {
+                    type = getFactType(ns, name, type);
+                }
+            }
+            return type;
+        }
+
+        function filterTypeWithFacts(type: Type, include: TypeFacts) {
             return filterType(type, t => (getTypeFacts(t) & include) !== 0);
         }
 

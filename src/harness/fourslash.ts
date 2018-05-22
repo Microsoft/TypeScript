@@ -3352,7 +3352,7 @@ Actual: ${stringify(fullActual)}`);
                 return ts.createTextSpanFromRange(ranges[index]);
             }
             else {
-                this.raiseError("Supplied span index: " + index + " does not exist in range list of size: " + (ranges ? 0 : ranges.length));
+                this.raiseError("Supplied span index: " + index + " does not exist in range list of size: " + (!ranges ? 0 : ranges.length));
             }
         }
 
