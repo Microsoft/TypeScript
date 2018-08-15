@@ -3672,6 +3672,12 @@
         "code": 6205
     },
 
+    "Do not emit insignificant whitespace or insignificant trailing semicolons to output.": {
+        "category": "Message",
+        "code": 6206
+    },
+
+
     "Projects to reference": {
         "category": "Message",
         "code": 6300
