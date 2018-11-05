@@ -314,6 +314,7 @@ namespace ts {
         IndexedAccessType,
         MappedType,
         LiteralType,
+        PlaceholderType,
         ImportType,
         // Binding patterns
         ObjectBindingPattern,
@@ -1103,6 +1104,10 @@ namespace ts {
 
     export interface TypeNode extends Node {
         _typeNodeBrand: any;
+    }
+
+    export interface PlaceholderTypeNode extends TypeNode {
+        kind: SyntaxKind.PlaceholderType;
     }
 
     export interface KeywordTypeNode extends TypeNode {

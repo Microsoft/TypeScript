@@ -2888,7 +2888,7 @@ namespace ts {
             if (parseOptional(SyntaxKind.DotToken)) {
                 node.qualifier = parseEntityName(/*allowReservedWords*/ true, Diagnostics.Type_expected);
             }
-            node.typeArguments = tryParseTypeArguments();
+            node.typeArguments = tryParseTypeArguments(/*isInferencePosition*/ false);
             return finishNode(node);
         }
 
@@ -3175,6 +3175,25 @@ namespace ts {
                 nextToken();
                 return id;
             }
+        }
+
+        function isEndOfTypeArgument(): boolean {
+            nextToken();
+            switch (token()) {
+                case SyntaxKind.CommaToken:
+                case SyntaxKind.GreaterThanToken:
+                    return true;
+            }
+            return false;
+        }
+
+        function parsePlaceholderOrType(): TypeNode {
+            if (token() === SyntaxKind.Identifier && scanner.getTokenText() === "_" && lookAhead(isEndOfTypeArgument)) {
+                const node = <PlaceholderTypeNode>createNode(SyntaxKind.PlaceholderType);
+                nextToken();
+                return finishNode(node);
+            }
+            return parseType();
         }
 
         function parseType(): TypeNode {
@@ -4314,7 +4333,7 @@ namespace ts {
             }
 
             const tagName = parseJsxElementName();
-            const typeArguments = tryParseTypeArguments();
+            const typeArguments = tryParseTypeArguments(/*isInferencePosition*/ true);
             const attributes = parseJsxAttributes();
 
             let node: JsxOpeningLikeElement;
@@ -4566,7 +4585,7 @@ namespace ts {
                 return undefined;
             }
 
-            const typeArguments = parseDelimitedList(ParsingContext.TypeArguments, parseType);
+            const typeArguments = parseDelimitedList(ParsingContext.TypeArguments, parsePlaceholderOrType);
             if (!parseExpected(SyntaxKind.GreaterThanToken)) {
                 // If it doesn't have the closing `>` then it's definitely not an type argument list.
                 return undefined;
@@ -5896,13 +5915,13 @@ namespace ts {
         function parseExpressionWithTypeArguments(): ExpressionWithTypeArguments {
             const node = <ExpressionWithTypeArguments>createNode(SyntaxKind.ExpressionWithTypeArguments);
             node.expression = parseLeftHandSideExpressionOrHigher();
-            node.typeArguments = tryParseTypeArguments();
+            node.typeArguments = tryParseTypeArguments(/*isInferencePosition*/ false);
             return finishNode(node);
         }
 
-        function tryParseTypeArguments(): NodeArray<TypeNode> | undefined {
+        function tryParseTypeArguments(isInferencePosition: boolean): NodeArray<TypeNode> | undefined {
             return token() === SyntaxKind.LessThanToken
-               ? parseBracketedList(ParsingContext.TypeArguments, parseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken)
+               ? parseBracketedList(ParsingContext.TypeArguments, isInferencePosition ? parsePlaceholderOrType : parseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken)
                : undefined;
         }
 
@@ -6819,7 +6838,7 @@ namespace ts {
                     const usedBrace = parseOptional(SyntaxKind.OpenBraceToken);
                     const node = createNode(SyntaxKind.ExpressionWithTypeArguments) as ExpressionWithTypeArguments & { expression: Identifier | PropertyAccessEntityNameExpression };
                     node.expression = parsePropertyAccessEntityNameExpression();
-                    node.typeArguments = tryParseTypeArguments();
+                    node.typeArguments = tryParseTypeArguments(/*isInferencePosition*/ false);
                     const res = finishNode(node);
                     if (usedBrace) {
                         parseExpected(SyntaxKind.CloseBraceToken);

@@ -414,6 +414,8 @@ namespace ts {
                 case SyntaxKind.IndexedAccessType:
                 case SyntaxKind.MappedType:
                 case SyntaxKind.LiteralType:
+                case SyntaxKind.PlaceholderType:
+                case SyntaxKind.InferType:
                     // TypeScript type nodes are elided.
 
                 case SyntaxKind.IndexSignature:

@@ -450,6 +450,7 @@ namespace ts {
         const markerSubType = <TypeParameter>createType(TypeFlags.TypeParameter);
         markerSubType.constraint = markerSuperType;
         const markerOtherType = <TypeParameter>createType(TypeFlags.TypeParameter);
+        const declaredSyntheticInferType = <TypeParameter>createType(TypeFlags.TypeParameter);
 
         const noTypePredicate = createIdentifierTypePredicate("<<unresolved>>", 0, anyType);
 
@@ -10078,6 +10079,8 @@ namespace ts {
                     return neverType;
                 case SyntaxKind.ObjectKeyword:
                     return node.flags & NodeFlags.JavaScriptFile ? anyType : nonPrimitiveType;
+                case SyntaxKind.PlaceholderType:
+                    return declaredSyntheticInferType;
                 case SyntaxKind.ThisType:
                 case SyntaxKind.ThisKeyword:
                     return getTypeFromThisTypeNode(node as ThisExpression | ThisTypeNode);
@@ -19206,6 +19209,10 @@ namespace ts {
             const isJavascript = isInJSFile(signature.declaration);
             const typeParameters = signature.typeParameters!;
             const typeArgumentTypes = fillMissingTypeArguments(map(typeArgumentNodes, getTypeFromTypeNode), typeParameters, getMinTypeArgumentCount(typeParameters), isJavascript);
+            if (some(typeArgumentTypes, isSyntheticInferType)) {
+                // Do validation once partial inference is complete
+                return typeArgumentTypes;
+            }
             let mapper: TypeMapper | undefined;
             for (let i = 0; i < typeArgumentNodes.length; i++) {
                 Debug.assert(typeParameters[i] !== undefined, "Should not call checkTypeArguments with too many type arguments");
@@ -19228,6 +19235,10 @@ namespace ts {
                 }
             }
             return typeArgumentTypes;
+        }
+
+        function isSyntheticInferType(type: Type) {
+            return type === declaredSyntheticInferType;
         }
 
         function getJsxReferenceKind(node: JsxOpeningLikeElement): JsxReferenceKind {
@@ -19650,10 +19661,34 @@ namespace ts {
                     let inferenceContext: InferenceContext | undefined;
 
                     if (candidate.typeParameters) {
-                        let typeArgumentTypes: Type[] | undefined;
+                        let typeArgumentTypes: Type[];
+                        const isJavascript = isInJSFile(candidate.declaration);
                         if (typeArguments) {
-                            typeArgumentTypes = checkTypeArguments(candidate, typeArguments, /*reportErrors*/ false);
-                            if (!typeArgumentTypes) {
+                            let typeArgumentResult = checkTypeArguments(candidate, typeArguments, /*reportErrors*/ false);
+                            if (typeArgumentResult) {
+                                if (some(typeArgumentResult, isSyntheticInferType)) {
+                                    // There are implied inferences we must make, despite having type arguments
+                                    const originalParams = candidate.typeParameters;
+                                    const withOriginalArgs = map(typeArgumentResult, (r, i) => isSyntheticInferType(r) ? originalParams[i] : r);
+                                    const uninferedInstantiation = getSignatureInstantiation(candidate, withOriginalArgs, isJavascript);
+                                    inferenceContext = createInferenceContext(originalParams, uninferedInstantiation, isInJSFile(node) ? InferenceFlags.AnyDefault : InferenceFlags.None);
+                                    for (let i = 0; i < inferenceContext.inferences.length; i++) {
+                                        const correspondingArgument = typeArgumentResult[i];
+                                        if (!isSyntheticInferType(correspondingArgument)) {
+                                            const inference = inferenceContext.inferences[i];
+                                            inference.inferredType = correspondingArgument;
+                                            inference.isFixed = true;
+                                            inference.priority = 0;
+                                        }
+                                    }
+                                    typeArgumentResult = inferTypeArguments(node, uninferedInstantiation, args, excludeArgument, inferenceContext);
+                                }
+                            }
+
+                            if (typeArgumentResult) {
+                                typeArgumentTypes = typeArgumentResult;
+                            }
+                            else {
                                 candidateForTypeArgumentError = candidate;
                                 continue;
                             }
@@ -19662,7 +19697,7 @@ namespace ts {
                             inferenceContext = createInferenceContext(candidate.typeParameters, candidate, /*flags*/ isInJSFile(node) ? InferenceFlags.AnyDefault : InferenceFlags.None);
                             typeArgumentTypes = inferTypeArguments(node, candidate, args, excludeArgument, inferenceContext);
                         }
-                        checkCandidate = getSignatureInstantiation(candidate, typeArgumentTypes, isInJSFile(candidate.declaration));
+                        checkCandidate = getSignatureInstantiation(candidate, typeArgumentTypes, isJavascript);
                         // If the original signature has a generic rest type, instantiation may produce a
                         // signature with different arity and we need to perform another arity check.
                         if (getNonArrayRestType(candidate) && !hasCorrectArity(node, args, checkCandidate, signatureHelpTrailingComma)) {
@@ -24396,7 +24431,7 @@ namespace ts {
 
             if (node.kind === SyntaxKind.InferType) {
                 const { typeParameter } = node;
-                if (isTypeParameterUnused(typeParameter)) {
+                if (typeParameter && isTypeParameterUnused(typeParameter)) {
                     addDiagnostic(node, UnusedKind.Parameter, createDiagnosticForNode(node, Diagnostics._0_is_declared_but_its_value_is_never_read, idText(typeParameter.name)));
                 }
             }

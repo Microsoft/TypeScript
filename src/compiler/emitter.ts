@@ -684,6 +684,8 @@ namespace ts {
                         return emitIntersectionType(<IntersectionTypeNode>node);
                     case SyntaxKind.ConditionalType:
                         return emitConditionalType(<ConditionalTypeNode>node);
+                    case SyntaxKind.PlaceholderType:
+                        return emitPlaceholderType();
                     case SyntaxKind.InferType:
                         return emitInferType(<InferTypeNode>node);
                     case SyntaxKind.ParenthesizedType:
@@ -1389,6 +1391,10 @@ namespace ts {
             writePunctuation(":");
             writeSpace();
             emit(node.falseType);
+        }
+
+        function emitPlaceholderType() {
+            write("_");
         }
 
         function emitInferType(node: InferTypeNode) {
