@@ -3913,6 +3913,8 @@ namespace ts {
         wildcardInstantiation?: Type;    // Instantiation with type parameters mapped to wildcard type
         /* @internal */
         immediateBaseConstraint?: Type;  // Immediate base constraint cache
+        /* @internal */
+        instantiableToNever?: boolean;   // Flag set by `canBeNever`
     }
 
     /* @internal */

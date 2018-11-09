@@ -1,0 +1,97 @@
+=== tests/cases/compiler/thisConditionalInferenceInClassBody.ts ===
+type Wrapped<T> = { ___secret: T };
+>Wrapped : Symbol(Wrapped, Decl(thisConditionalInferenceInClassBody.ts, 0, 0))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 0, 13))
+>___secret : Symbol(___secret, Decl(thisConditionalInferenceInClassBody.ts, 0, 19))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 0, 13))
+
+type Unwrap<T> = T extends Wrapped<infer U> ? U : T;
+>Unwrap : Symbol(Unwrap, Decl(thisConditionalInferenceInClassBody.ts, 0, 35))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 1, 12))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 1, 12))
+>Wrapped : Symbol(Wrapped, Decl(thisConditionalInferenceInClassBody.ts, 0, 0))
+>U : Symbol(U, Decl(thisConditionalInferenceInClassBody.ts, 1, 40))
+>U : Symbol(U, Decl(thisConditionalInferenceInClassBody.ts, 1, 40))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 1, 12))
+
+declare function set<T, K extends keyof T>(obj: T, key: K, value: Unwrap<T[K]>): Unwrap<T[K]>;
+>set : Symbol(set, Decl(thisConditionalInferenceInClassBody.ts, 1, 52))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 3, 21))
+>K : Symbol(K, Decl(thisConditionalInferenceInClassBody.ts, 3, 23))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 3, 21))
+>obj : Symbol(obj, Decl(thisConditionalInferenceInClassBody.ts, 3, 43))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 3, 21))
+>key : Symbol(key, Decl(thisConditionalInferenceInClassBody.ts, 3, 50))
+>K : Symbol(K, Decl(thisConditionalInferenceInClassBody.ts, 3, 23))
+>value : Symbol(value, Decl(thisConditionalInferenceInClassBody.ts, 3, 58))
+>Unwrap : Symbol(Unwrap, Decl(thisConditionalInferenceInClassBody.ts, 0, 35))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 3, 21))
+>K : Symbol(K, Decl(thisConditionalInferenceInClassBody.ts, 3, 23))
+>Unwrap : Symbol(Unwrap, Decl(thisConditionalInferenceInClassBody.ts, 0, 35))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 3, 21))
+>K : Symbol(K, Decl(thisConditionalInferenceInClassBody.ts, 3, 23))
+
+class Foo {
+>Foo : Symbol(Foo, Decl(thisConditionalInferenceInClassBody.ts, 3, 94))
+
+    prop: Wrapped<string>;
+>prop : Symbol(Foo.prop, Decl(thisConditionalInferenceInClassBody.ts, 5, 11))
+>Wrapped : Symbol(Wrapped, Decl(thisConditionalInferenceInClassBody.ts, 0, 0))
+
+    method() {
+>method : Symbol(Foo.method, Decl(thisConditionalInferenceInClassBody.ts, 6, 26))
+
+        set(this, 'prop', 'hi'); // <-- type error
+>set : Symbol(set, Decl(thisConditionalInferenceInClassBody.ts, 1, 52))
+>this : Symbol(Foo, Decl(thisConditionalInferenceInClassBody.ts, 3, 94))
+    }
+}
+
+set(new Foo(), 'prop', 'hi'); // <-- typechecks
+>set : Symbol(set, Decl(thisConditionalInferenceInClassBody.ts, 1, 52))
+>Foo : Symbol(Foo, Decl(thisConditionalInferenceInClassBody.ts, 3, 94))
+
+type InferBecauseWhyNot<T> = [T] extends [(p: infer P1) => any] ? P1 | T : never;
+>InferBecauseWhyNot : Symbol(InferBecauseWhyNot, Decl(thisConditionalInferenceInClassBody.ts, 13, 29))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 15, 24))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 15, 24))
+>p : Symbol(p, Decl(thisConditionalInferenceInClassBody.ts, 15, 43))
+>P1 : Symbol(P1, Decl(thisConditionalInferenceInClassBody.ts, 15, 51))
+>P1 : Symbol(P1, Decl(thisConditionalInferenceInClassBody.ts, 15, 51))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 15, 24))
+
+function f<Q extends (arg: any) => any>(x: Q): InferBecauseWhyNot<Q> {
+>f : Symbol(f, Decl(thisConditionalInferenceInClassBody.ts, 15, 81))
+>Q : Symbol(Q, Decl(thisConditionalInferenceInClassBody.ts, 17, 11))
+>arg : Symbol(arg, Decl(thisConditionalInferenceInClassBody.ts, 17, 22))
+>x : Symbol(x, Decl(thisConditionalInferenceInClassBody.ts, 17, 40))
+>Q : Symbol(Q, Decl(thisConditionalInferenceInClassBody.ts, 17, 11))
+>InferBecauseWhyNot : Symbol(InferBecauseWhyNot, Decl(thisConditionalInferenceInClassBody.ts, 13, 29))
+>Q : Symbol(Q, Decl(thisConditionalInferenceInClassBody.ts, 17, 11))
+
+    return x;
+>x : Symbol(x, Decl(thisConditionalInferenceInClassBody.ts, 17, 40))
+}
+
+type InferBecauseWhyNotDistributive<T> = T extends (p: infer P1) => any ? P1 | T : never;
+>InferBecauseWhyNotDistributive : Symbol(InferBecauseWhyNotDistributive, Decl(thisConditionalInferenceInClassBody.ts, 19, 1))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 21, 36))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 21, 36))
+>p : Symbol(p, Decl(thisConditionalInferenceInClassBody.ts, 21, 52))
+>P1 : Symbol(P1, Decl(thisConditionalInferenceInClassBody.ts, 21, 60))
+>P1 : Symbol(P1, Decl(thisConditionalInferenceInClassBody.ts, 21, 60))
+>T : Symbol(T, Decl(thisConditionalInferenceInClassBody.ts, 21, 36))
+
+function f2<Q extends (arg: any) => any>(x: Q): InferBecauseWhyNotDistributive<Q> {
+>f2 : Symbol(f2, Decl(thisConditionalInferenceInClassBody.ts, 21, 89))
+>Q : Symbol(Q, Decl(thisConditionalInferenceInClassBody.ts, 23, 12))
+>arg : Symbol(arg, Decl(thisConditionalInferenceInClassBody.ts, 23, 23))
+>x : Symbol(x, Decl(thisConditionalInferenceInClassBody.ts, 23, 41))
+>Q : Symbol(Q, Decl(thisConditionalInferenceInClassBody.ts, 23, 12))
+>InferBecauseWhyNotDistributive : Symbol(InferBecauseWhyNotDistributive, Decl(thisConditionalInferenceInClassBody.ts, 19, 1))
+>Q : Symbol(Q, Decl(thisConditionalInferenceInClassBody.ts, 23, 12))
+
+    return x; // should fail, as when Q = never, InferBecauseWhyNotDistributive<Q> = never,
+>x : Symbol(x, Decl(thisConditionalInferenceInClassBody.ts, 23, 41))
+}
+
