@@ -10,7 +10,4 @@
 ////    public static a/*property2*/
 ////}
 
-test.markers().forEach((m) => {
-    goTo.position(m.position, m.fileName);
-    verify.completionListIsEmpty();
-});
+verify.completions({ marker: test.markers(), exact: completion.classElementKeywords, isNewIdentifierLocation: true });

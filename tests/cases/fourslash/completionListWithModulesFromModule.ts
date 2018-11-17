@@ -1,5 +1,7 @@
 /// <reference path='fourslash.ts'/>
 
+// @noLib: true
+
 ////namespace mod1 {
 ////    var mod1var = 1;
 ////    function mod1fn() {
@@ -191,6 +193,7 @@
 ////        sifn(shadow: any): any;
 ////    }
 ////    /*shadowNamespaceWithNoExport*/
+////    var tmp: /*shadowNamespaceWithNoExportType*/
 ////}
 ////
 ////namespace mod4 {
@@ -214,12 +217,14 @@
 ////		sifn(shadow: any): any;
 ////	}
 ////    /*shadowNamespaceWithExport*/
+////    var tmp: /*shadowNamespaceWithExportType*/
 ////}
 ////
 ////namespace mod5 {
 ////    import Mod1 = mod1;
 ////    import iMod1 = mod1.mod1emod;
 ////    /*namespaceWithImport*/
+////    var tmp: /*namespaceWithImportType*/
 ////}
 ////
 ////function shwfn() {
@@ -245,82 +250,55 @@
 ////
 ////var shwvar = 1;
 
-function sharedNegativeVerify()
-{
-    verify.not.completionListContains('sfvar');
-    verify.not.completionListContains('sffn');
-    verify.not.completionListContains('scvar');
-    verify.not.completionListContains('scfn');
-    verify.not.completionListContains('scpfn');
-    verify.not.completionListContains('scpvar');
-    verify.not.completionListContains('scsvar');
-    verify.not.completionListContains('scsfn');
-    verify.not.completionListContains('sivar');
-    verify.not.completionListContains('sifn');
-    verify.not.completionListContains('mod1exvar');
-    verify.not.completionListContains('mod2eexvar');
-}
+const commonValues: ReadonlyArray<FourSlashInterface.ExpectedCompletionEntry> =
+    [1, 2, 3, 4, 5].map(n => ({ name: `mod${n}`, text: `namespace mod${n}` }));
+const commonTypes: ReadonlyArray<FourSlashInterface.ExpectedCompletionEntry> =
+    [1, 2, 4].map(n => ({ name: `mod${n}`, text: `namespace mod${n}` }));
 
-function goToMarkAndVerifyShadow()
-{
-    sharedNegativeVerify();
-    verify.not.completionListContains('mod2var');
-    verify.not.completionListContains('mod2fn');
-    verify.not.completionListContains('mod2cls');
-    verify.not.completionListContains('mod2int');
-    verify.not.completionListContains('mod2mod');
-    verify.not.completionListContains('mod2evar');
-    verify.not.completionListContains('mod2efn');
-    verify.not.completionListContains('mod2ecls');
-    verify.not.completionListContains('mod2eint');
-    verify.not.completionListContains('mod2emod');
-}
-
-// from a shadow namespace with no export
-goTo.marker('shadowNamespaceWithNoExport');
-verify.completionListContains('shwvar', 'var shwvar: string');
-verify.completionListContains('shwfn', 'function shwfn(shadow: any): void');
-verify.completionListContains('shwcls', 'class shwcls');
-verify.completionListContains('shwint', 'interface shwint');
-goToMarkAndVerifyShadow();
-
-// from a shadow namespace with export
-goTo.marker('shadowNamespaceWithExport');
-verify.completionListContains('shwvar', 'var mod4.shwvar: string');
-verify.completionListContains('shwfn', 'function mod4.shwfn(shadow: any): void');
-verify.completionListContains('shwcls', 'class mod4.shwcls');
-verify.completionListContains('shwint', 'interface mod4.shwint');
-goToMarkAndVerifyShadow();
-
-// from a namespace with import
-goTo.marker('namespaceWithImport');
-verify.completionListContains('mod1', 'namespace mod1');
-verify.completionListContains('mod2', 'namespace mod2');
-verify.completionListContains('mod3', 'namespace mod3');
-verify.completionListContains('shwvar', 'var shwvar: number');
-verify.completionListContains('shwfn', 'function shwfn(): void');
-verify.completionListContains('shwcls', 'class shwcls');
-verify.completionListContains('shwint', 'interface shwint');
-
-sharedNegativeVerify();
-
-verify.not.completionListContains('mod1var');
-verify.not.completionListContains('mod1fn');
-verify.not.completionListContains('mod1cls');
-verify.not.completionListContains('mod1int');
-verify.not.completionListContains('mod1mod');
-verify.not.completionListContains('mod1evar');
-verify.not.completionListContains('mod1efn');
-verify.not.completionListContains('mod1ecls');
-verify.not.completionListContains('mod1eint');
-verify.not.completionListContains('mod1emod');
-verify.not.completionListContains('mX');
-verify.not.completionListContains('mFunc');
-verify.not.completionListContains('mClass');
-verify.not.completionListContains('mInt');
-verify.not.completionListContains('mMod');
-verify.not.completionListContains('meX');
-verify.not.completionListContains('meFunc');
-verify.not.completionListContains('meClass');
-verify.not.completionListContains('meInt');
-verify.not.completionListContains('meMod');
+verify.completions(
+    {
+        marker: ["shadowNamespaceWithNoExport", "shadowNamespaceWithExport"],
+        exact: [
+            { name: "shwfn", text: "function shwfn(shadow: any): void" },
+            { name: "shwvar", text: "var shwvar: string" },
+            { name: "shwcls", text: "class shwcls" },
+            "tmp",
+            ...commonValues,
+            "undefined",
+            ...completion.statementKeywordsWithTypes,
+        ],
+    }, {
+        marker: ["shadowNamespaceWithNoExportType", "shadowNamespaceWithExportType"],
+        exact: [
+            { name: "shwcls", text: "class shwcls" },
+            { name: "shwint", text: "interface shwint" },
+            ...commonTypes,
+            ...completion.typeKeywords,
+        ]
+    },
+    {
+        marker: "namespaceWithImport",
+        exact: [
+            "Mod1",
+            "iMod1",
+            "tmp",
+            { name: "shwfn", text: "function shwfn(): void" },
+            ...commonValues,
+            { name: "shwcls", text: "class shwcls" },
+            { name: "shwvar", text: "var shwvar: number" },
+            "undefined",
+            ...completion.statementKeywordsWithTypes,
+        ],
+    },
+    {
+        marker: "namespaceWithImportType",
+        exact: [
+            "Mod1",
+            "iMod1",
+            ...commonTypes,
+            { name: "shwcls", text: "class shwcls" },
+            { name: "shwint", text: "interface shwint" },
+            ...completion.typeKeywords,
+        ],
+    }
+);

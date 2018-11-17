@@ -1,11 +1,18 @@
 /// <reference path='fourslash.ts' />
 
-////enum Foo {
-////    X, Y, '☆'
-////}
-////var x = Foo./**/
+// TODO: we should probably support this like we do in completionListInvalidMemberNames.ts
 
-goTo.marker();
-verify.memberListContains("X");
-verify.memberListContains("Y");
-verify.memberListCount(2);
+////declare var Symbol: SymbolConstructor;
+////interface SymbolConstructor {
+////    readonly hasInstance: symbol;
+////}
+////interface Function {
+////    [Symbol.hasInstance](value: any): boolean;
+////}
+////interface SomeInterface {
+////    (value: number): any;
+////}
+////var _ : SomeInterface;
+////_./**/
+
+verify.completions({ marker: "", exact: completion.functionMembersWithPrototype });

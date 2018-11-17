@@ -8,7 +8,4 @@
 
 ////var x = 0; enum /*enumName4*/
 
-test.markers().forEach((m) => {
-    goTo.position(m.position, m.fileName);
-    verify.completionListIsEmpty();
-});
+verify.completions({ marker: test.markers(), exact: undefined });

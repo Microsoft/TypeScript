@@ -6,17 +6,12 @@
         "0": {
             "kind": "JSDocParameterTag",
             "pos": 8,
-            "end": 29,
-            "atToken": {
-                "kind": "AtToken",
-                "pos": 8,
-                "end": 9
-            },
+            "end": 32,
             "tagName": {
                 "kind": "Identifier",
                 "pos": 9,
                 "end": 14,
-                "text": "param"
+                "escapedText": "param"
             },
             "typeExpression": {
                 "kind": "JSDocTypeExpression",
@@ -28,22 +23,17 @@
                     "end": 22
                 }
             },
-            "postParameterName": {
+            "name": {
                 "kind": "Identifier",
                 "pos": 24,
                 "end": 29,
-                "text": "name1"
+                "escapedText": "name1"
             },
-            "parameterName": {
-                "kind": "Identifier",
-                "pos": 24,
-                "end": 29,
-                "text": "name1"
-            },
-            "comment": ""
+            "isNameFirst": false,
+            "isBracketed": false
         },
         "length": 1,
         "pos": 8,
-        "end": 29
+        "end": 32
     }
 }

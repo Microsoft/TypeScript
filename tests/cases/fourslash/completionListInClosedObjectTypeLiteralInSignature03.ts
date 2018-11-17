@@ -7,12 +7,8 @@
 ////
 ////declare function foo<TString, TNumber>(obj: I<TString, TNumber>): { str: TString/*1*/ }
 
-goTo.marker("1");
-
-verify.memberListContains("I");
-verify.memberListContains("TString");
-verify.memberListContains("TNumber");  // REVIEW: Is this intended behavior?
-
-// Ideally the following shouldn't show up since they're not types.
-verify.memberListContains("foo");
-verify.memberListContains("obj");
+verify.completions({
+    marker: "1",
+    includes: ["I", "TString", "TNumber"],
+    excludes: ["foo", "obj"], // not types
+});

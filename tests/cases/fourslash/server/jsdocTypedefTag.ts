@@ -6,7 +6,7 @@
 //// /** @typedef {(string | number)} NumberLike */
 ////
 //// /**
-////  * @typedef Animal
+////  * @typedef Animal - think Giraffes
 ////  * @type {Object}
 ////  * @property {string} animalName
 ////  * @property {number} animalAge
@@ -36,7 +36,7 @@
 //// p.personName./*personName*/;
 //// p.personAge./*personAge*/;
 ////
-//// /** @type {Animal} */
+//// /** @type {/*AnimalType*/Animal} */
 //// var a;a./*animal*/;
 //// a.animalName./*animalName*/;
 //// a.animalAge./*animalAge*/;
@@ -51,38 +51,24 @@
 //// d.dogName./*dogName*/;
 //// d.dogAge./*dogAge*/;
 
-goTo.marker('numberLike');
-verify.memberListContains('charAt');
-verify.memberListContains('toExponential');
+verify.completions(
+    { marker: "numberLike", includes: ["charAt", "toExponential"] },
 
-goTo.marker('person');
-verify.memberListContains('personName');
-verify.memberListContains('personAge');
-goTo.marker('personName');
-verify.memberListContains('charAt');
-goTo.marker('personAge');
-verify.memberListContains('toExponential');
+    { marker: "person", includes: ["personName", "personAge"] },
+    { marker: "personName", includes: "charAt" },
+    { marker: "personAge", includes: "toExponential" },
 
-goTo.marker('animal');
-verify.memberListContains('animalName');
-verify.memberListContains('animalAge');
-goTo.marker('animalName');
-verify.memberListContains('charAt');
-goTo.marker('animalAge');
-verify.memberListContains('toExponential');
+    { marker: "animal", includes: ["animalName", "animalAge"] },
+    { marker: "animalName", includes: "charAt" },
+    { marker: "animalAge", includes: "toExponential" },
 
-goTo.marker('dog');
-verify.memberListContains('dogName');
-verify.memberListContains('dogAge');
-goTo.marker('dogName');
-verify.memberListContains('charAt');
-goTo.marker('dogAge');
-verify.memberListContains('toExponential');
+    { marker: "dog", includes: ["dogName", "dogAge"] },
+    { marker: "dogName", includes: "charAt" },
+    { marker: "dogAge", includes: "toExponential" },
 
-goTo.marker('cat');
-verify.memberListContains('catName');
-verify.memberListContains('catAge');
-goTo.marker('catName');
-verify.memberListContains('charAt');
-goTo.marker('catAge');
-verify.memberListContains('toExponential');
+    { marker: "cat", includes: ["catName", "catAge"] },
+    { marker: "catName", includes: "charAt" },
+    { marker: "catAge", includes: "toExponential" },
+);
+
+verify.quickInfoAt("AnimalType", "type Animal = {\n    animalName: string;\n    animalAge: number;\n}", "- think Giraffes");

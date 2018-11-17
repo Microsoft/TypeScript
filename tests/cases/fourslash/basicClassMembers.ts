@@ -7,6 +7,4 @@
 
 goTo.eof();
 edit.insert('t.');
-verify.memberListContains('x');
-verify.memberListContains('y');
-verify.not.memberListContains('z');
+verify.completions({ includes: ["x", "y"], excludes: "z" });

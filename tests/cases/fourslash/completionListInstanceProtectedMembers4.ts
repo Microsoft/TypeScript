@@ -22,13 +22,4 @@
 //// var c: C1;
 //// c./*1*/
 
-
-goTo.marker("1");
-verify.not.memberListContains('privateMethod');
-verify.not.memberListContains('privateProperty');
-verify.not.memberListContains('protectedMethod');
-verify.not.memberListContains('protectedProperty');
-verify.memberListContains('publicMethod');
-verify.memberListContains('publicProperty');
-verify.memberListContains('protectedOverriddenMethod');
-verify.memberListContains('protectedOverriddenProperty');
+verify.completions({ marker: "1", exact: ["protectedOverriddenMethod", "protectedOverriddenProperty", "publicMethod", "publicProperty"] });

@@ -11,7 +11,4 @@
 ////    }
 ////}
 
-
-goTo.marker();
-verify.memberListContains("y");
-verify.not.memberListContains("x");
+verify.completions({ marker: "", exact: ["y", "foo"] });

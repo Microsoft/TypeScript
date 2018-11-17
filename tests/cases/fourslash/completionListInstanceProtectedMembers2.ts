@@ -30,47 +30,29 @@
 ////    }
 ////}
 
-
-// Same class, everything is visible
-goTo.marker("1");
-verify.not.memberListContains('privateMethod');
-verify.not.memberListContains('privateProperty');
-verify.memberListContains('protectedMethod');
-verify.memberListContains('protectedProperty');
-verify.memberListContains('publicMethod');
-verify.memberListContains('publicProperty');
-verify.memberListContains('protectedOverriddenMethod');
-verify.memberListContains('protectedOverriddenProperty');
-
-// Can not access properties on super
-goTo.marker("2");
-verify.not.memberListContains('privateMethod');
-verify.not.memberListContains('privateProperty');
-verify.memberListContains('protectedMethod');
-verify.not.memberListContains('protectedProperty');
-verify.memberListContains('publicMethod');
-verify.not.memberListContains('publicProperty');
-verify.memberListContains('protectedOverriddenMethod');
-verify.not.memberListContains('protectedOverriddenProperty');
-
-// Can not access protected properties through base class
-goTo.marker("3");
-verify.not.memberListContains('privateMethod');
-verify.not.memberListContains('privateProperty');
-verify.not.memberListContains('protectedMethod');
-verify.not.memberListContains('protectedProperty');
-verify.memberListContains('publicMethod');
-verify.memberListContains('publicProperty');
-verify.not.memberListContains('protectedOverriddenMethod');
-verify.not.memberListContains('protectedOverriddenProperty');
-
-// Same class, everything is visible
-goTo.marker("4");
-verify.not.memberListContains('privateMethod');
-verify.not.memberListContains('privateProperty');
-verify.memberListContains('protectedMethod');
-verify.memberListContains('protectedProperty');
-verify.memberListContains('publicMethod');
-verify.memberListContains('publicProperty');
-verify.memberListContains('protectedOverriddenMethod');
-verify.memberListContains('protectedOverriddenProperty');
+verify.completions(
+    {
+        // Same class, everything is visible
+        marker: "1",
+        includes: ["protectedMethod", "protectedProperty", "publicMethod", "publicProperty", "protectedOverriddenMethod", "protectedOverriddenProperty"],
+        excludes: ["privateMethod", "privateProperty"],
+    },
+    {
+        // Can not access properties on super
+        marker: "2",
+        includes: ["protectedMethod", "publicMethod", "protectedOverriddenMethod"],
+        excludes: ["privateMethod", "privateProperty", "protectedProperty", "publicProperty", "protectedOverriddenProperty"],
+    },
+    {
+        // Can not access protected properties through base class
+        marker: "3",
+        includes: ["publicMethod", "publicProperty"],
+        excludes: ["privateMethod", "privateProperty", "protectedMethod", "protectedProperty", "protectedOverriddenMethod", "protectedOverriddenProperty"],
+    },
+    {
+        // Same class, everything is visible
+        marker: "4",
+        includes: ["protectedMethod", "protectedProperty", "publicMethod", "publicProperty", "protectedOverriddenMethod", "protectedOverriddenProperty"],
+        excludes: ["privateMethod", "privateProperty"],
+    },
+);

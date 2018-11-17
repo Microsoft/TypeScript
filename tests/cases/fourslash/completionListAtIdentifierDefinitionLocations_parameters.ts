@@ -10,20 +10,31 @@
 
 ////function testFunction(a, b/*parameterName4*/
 
-////class bar5{ constructor(public /*constructorParamter1*/
+////class bar5{ constructor(public /*constructorParameter1*/
 
-////class bar6{ constructor(public a/*constructorParamter2*/
+////class bar6{ constructor(public a/*constructorParameter2*/
 
-////class bar7{ constructor(protected a/*constructorParamter3*/
+////class bar7{ constructor(protected a/*constructorParameter3*/
 
-////class bar8{ constructor(private a/*constructorParamter4*/
+////class bar8{ constructor(private a/*constructorParameter4*/
 
-////class bar9{ constructor(.../*constructorParamter5*/
+////class bar9{ constructor(.../*constructorParameter5*/
 
-////class bar10{ constructor(...a/*constructorParamter6*/
+////class bar10{ constructor(...a/*constructorParameter6*/
 
-
-test.markers().forEach((m) => {
-    goTo.position(m.position, m.fileName);
-    verify.completionListIsEmpty();
-});
+verify.completions(
+    {
+        marker: [1,2,3,4].map(i => `parameterName${i}`),
+        exact: undefined,
+    },
+    {
+        marker: [1,2,3,4].map(i => `constructorParameter${i}`),
+        exact: completion.constructorParameterKeywords,
+        isNewIdentifierLocation: true,
+    },
+    {
+        marker: [5, 6].map(i => `constructorParameter${i}`),
+        exact: undefined,
+        isNewIdentifierLocation: true,
+    },
+);

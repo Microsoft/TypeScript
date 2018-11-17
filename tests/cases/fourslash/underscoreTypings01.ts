@@ -1,16 +1,16 @@
 /// <reference path='fourslash.ts'/>
 
-////interface Iterator<T, U> {
+////interface Iterator_<T, U> {
 ////    (value: T, index: any, list: any): U;
 ////}
 ////
 ////interface WrappedArray<T> {
-////    map<U>(iterator: Iterator<T, U>, context?: any): U[];
+////    map<U>(iterator: Iterator_<T, U>, context?: any): U[];
 ////}
 ////
 ////interface Underscore {
 ////    <T>(list: T[]): WrappedArray<T>;
-////    map<T, U>(list: T[], iterator: Iterator<T, U>, context?: any): U[];
+////    map<T, U>(list: T[], iterator: Iterator_<T, U>, context?: any): U[];
 ////}
 ////
 ////declare var _: Underscore;
@@ -22,8 +22,8 @@
 ////
 ////var aa: any[];
 ////var /*7*/bb = _.map(aa, /*8*/x => x.length);
-////var /*9*/cc = _(aa).map(/*10*/x => x.length); 
-////var /*11*/dd = aa.map(/*12*/x => x.length);     
+////var /*9*/cc = _(aa).map(/*10*/x => x.length);
+////var /*11*/dd = aa.map(/*12*/x => x.length);
 ////
 ////var e = a.map(x => x./*13*/
 
@@ -47,6 +47,4 @@ verify.quickInfos({
     12: "(parameter) x: any"
 });
 
-goTo.marker('13');
-verify.completionListContains('length');
-verify.not.completionListContains('toFixed');
+verify.completions({ marker: "13", includes: "length", excludes: "toFixed" });

@@ -21,36 +21,13 @@
 ////
 ////interface TestInterface implements Module./*TypeReferenceInImplementsList*/ { }
 
-goTo.marker("ValueReference");
-verify.memberListContains("exportedVariable");
-verify.memberListContains("exportedFunction");
-verify.memberListContains("exportedClass");
-verify.memberListContains("exportedModule");
-// No inner declarations
-verify.not.memberListContains("innerVariable");
-verify.not.memberListContains("innerClass");
-// Include type declarations
-verify.memberListContains("exportedInterface");
-
-goTo.marker("TypeReference");
-verify.memberListContains("exportedClass");
-verify.memberListContains("exportedModule");
-verify.memberListContains("exportedInterface");
-// Include value completions
-verify.memberListContains("exportedVariable");
-
-goTo.marker("TypeReferenceInExtendsList");
-verify.memberListContains("exportedClass");
-verify.memberListContains("exportedModule");
-verify.memberListContains("exportedInterface");
-// Include value completions
-verify.memberListContains("exportedVariable");
-
-
-goTo.marker("TypeReferenceInImplementsList");
-verify.memberListContains("exportedClass");
-verify.memberListContains("exportedModule");
-verify.memberListContains("exportedInterface");
-// Include value completions
-verify.memberListContains("exportedVariable");
-
+verify.completions(
+    {
+        marker: ["ValueReference", "TypeReferenceInExtendsList"],
+        exact: ["exportedFunction", "exportedVariable", "exportedClass", "exportedModule"],
+    },
+    {
+        marker: ["TypeReference", "TypeReferenceInImplementsList"],
+        exact: ["exportedClass", "exportedInterface"],
+    },
+);

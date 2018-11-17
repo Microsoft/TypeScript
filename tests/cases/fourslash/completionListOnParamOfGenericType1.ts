@@ -8,15 +8,9 @@
 ////    }
 ////}
 
-goTo.marker('1');
-verify.memberListContains('next');
-verify.memberListContains('prev');
-verify.memberListContains('pushEntry');
+const exact = ["next", "prev", "pushEntry"];
+verify.completions({ marker: "1", exact });
 edit.insert('next.');
-verify.memberListContains('next');
-verify.memberListContains('prev');
-verify.memberListContains('pushEntry');
+verify.completions({ exact });
 edit.insert('prev.');
-verify.memberListContains('next');
-verify.memberListContains('prev');
-verify.memberListContains('pushEntry');
+verify.completions({ exact });

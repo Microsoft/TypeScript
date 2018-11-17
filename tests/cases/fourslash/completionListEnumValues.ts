@@ -13,20 +13,9 @@
 ////function foo(): Colors { return null; }
 ////foo()./*callOfEnumReturnType*/
 
-goTo.marker("enumVariable");
-// Should only have the enum's own members, and nothing else
-verify.memberListContains("Red");
-verify.memberListContains("Green");
-verify.memberListCount(2);
-
-
-goTo.marker("variableOfEnumType");
-// Should have number members, and not enum members
-verify.memberListContains("toString");
-verify.not.memberListContains("Red");
-
-
-goTo.marker("callOfEnumReturnType");
-// Should have number members, and not enum members
-verify.memberListContains("toString");
-verify.not.memberListContains("Red");
+verify.completions(
+    // Should only have the enum's own members, and nothing else
+    { marker: "enumVariable", exact: ["Red", "Green"] },
+    // Should have number members, and not enum members
+    { marker: ["variableOfEnumType", "callOfEnumReturnType"], exact: ["toString", "toFixed", "toExponential", "toPrecision", "valueOf", "toLocaleString"] },
+);

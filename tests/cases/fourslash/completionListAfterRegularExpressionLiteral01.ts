@@ -3,6 +3,4 @@
 ////let v = 100;
 /////a/./**/
 
-goTo.marker();
-verify.not.memberListContains('v');
-verify.memberListContains('compile');
+verify.completions({ marker: "", exact: ["exec", "test", "source", "global", "ignoreCase", "multiline", "lastIndex", "compile"] });

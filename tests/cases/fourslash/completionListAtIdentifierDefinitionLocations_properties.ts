@@ -30,8 +30,4 @@
 ////    private a/*property7*/
 ////}
 
-test.markers().forEach((m) => {
-    goTo.position(m.position, m.fileName);
-    verify.not.completionListIsEmpty();
-    verify.completionListAllowsNewIdentifier();
-});
+verify.completions({ marker: test.markers(), exact: completion.classElementKeywords, isNewIdentifierLocation: true });

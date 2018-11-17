@@ -2,7 +2,7 @@
 
 ////module TestModule {
 ////    var localVariable = "";
-////    export var exportedVaribale = 0;
+////    export var exportedVariable = 0;
 ////
 ////    function localFunction() { }
 ////    export function exportedFunction() { }
@@ -13,7 +13,7 @@
 ////    interface localInterface {}
 ////    export interface exportedInterface {}
 ////
-////    module localModule { 
+////    module localModule {
 ////        export var x = 0;
 ////    }
 ////    export module exportedModule {
@@ -27,7 +27,7 @@
 ////// Add some new items to the module
 ////module TestModule {
 ////    var localVariable2 = "";
-////    export var exportedVaribale2 = 0;
+////    export var exportedVariable2 = 0;
 ////
 ////    function localFunction2() { }
 ////    export function exportedFunction2() { }
@@ -38,7 +38,7 @@
 ////    interface localInterface2 {}
 ////    export interface exportedInterface2 {}
 ////
-////    module localModule2 { 
+////    module localModule2 {
 ////        export var x = 0;
 ////    }
 ////    export module exportedModule2 {
@@ -59,46 +59,53 @@
 ////    }
 ////}
 
-
-goTo.marker("valueReference");
-verify.memberListContains("localVariable");
-verify.memberListContains("exportedVaribale");
-
-verify.memberListContains("localFunction");
-verify.memberListContains("exportedFunction");
-
-verify.memberListContains("localClass");
-verify.memberListContains("exportedClass");
-
-verify.memberListContains("localModule");
-verify.memberListContains("exportedModule");
-
-verify.memberListContains("exportedVaribale2");
-verify.memberListContains("exportedFunction2");
-verify.memberListContains("exportedClass2");
-verify.memberListContains("exportedModule2");
-
-goTo.marker("typeReference");
-verify.memberListContains("localInterface");
-verify.memberListContains("exportedInterface");
-
-verify.memberListContains("localClass");
-verify.memberListContains("exportedClass");
-
-verify.memberListContains("localModule");
-verify.memberListContains("exportedModule");
-
-verify.memberListContains("exportedClass2");
-verify.memberListContains("exportedModule2");
-
-goTo.marker("insideMethod");
-verify.not.memberListContains("property");
-verify.not.memberListContains("testMethod");
-verify.not.memberListContains("staticMethod");
-
-verify.memberListContains("globalVar");
-verify.memberListContains("globalFunction");
-
-verify.memberListContains("param");
-verify.memberListContains("localVar");
-verify.memberListContains("localFunction");
+verify.completions(
+    {
+        marker: "valueReference",
+        includes: [
+            "localVariable",
+            "exportedVariable",
+            "localFunction",
+            "exportedFunction",
+            "localClass",
+            "exportedClass",
+            "localModule",
+            "exportedModule",
+            "exportedVariable2",
+            "exportedFunction2",
+            "exportedClass2",
+            "exportedModule2",
+        ],
+        isNewIdentifierLocation: true, // TODO: Should not be a new identifier location
+    },
+    {
+        marker: "typeReference",
+        includes: [
+            "localInterface",
+            "exportedInterface",
+            "localClass",
+            "exportedClass",
+            "exportedClass2",
+        ],
+        excludes: [
+            "localModule",
+            "exportedModule",
+            "exportedModule2",
+        ],
+    },
+    {
+        marker: "insideMethod",
+        includes: [
+            "globalVar",
+            "globalFunction",
+            "param",
+            "localVar",
+            "localFunction",
+        ],
+        excludes: [
+            "property",
+            "testMethod",
+            "staticMethod",
+        ],
+    },
+);

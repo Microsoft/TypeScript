@@ -9,8 +9,4 @@
 ////    /*15*/
 ////};
 
-goTo.marker("15");
-verify.not.memberListContains("x1");
-verify.memberListContains("y1");
-verify.memberListCount(1);
-
+verify.completions({ marker: "15", exact: "y1" });

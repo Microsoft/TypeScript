@@ -20,16 +20,8 @@
 ////typeof C.k./*6*/caller === 'function';
 ////l./*7*/prototype = Object.prototype;
 
-verify.numberOfErrorsInCurrentFile(0);
-for (var i = 1; i <= 7; i++) {
-    goTo.marker('' + i);
-    verify.memberListCount(8);
-    verify.completionListContains('apply');
-    verify.completionListContains('arguments');
-    verify.completionListContains('bind');
-    verify.completionListContains('call');
-    verify.completionListContains('length');
-    verify.completionListContains('caller');
-    verify.completionListContains('prototype');
-    verify.completionListContains('toString');
-}
+verify.noErrors();
+verify.completions(
+    { marker: ["1", "2", "3", "4", "5", "6"], exact: completion.functionMembersWithPrototype },
+    { marker: "7", exact: ["prototype", ...completion.functionMembers] },
+);

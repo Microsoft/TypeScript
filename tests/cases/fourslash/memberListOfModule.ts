@@ -13,7 +13,4 @@
 ////
 ////var x: Foo./**/
 
-goTo.marker();
-verify.memberListCount(2);
-verify.memberListContains('Bar');
-verify.memberListContains('Blah');
+verify.completions({ marker: "", exact: "Bar" });

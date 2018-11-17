@@ -16,5 +16,4 @@
 
 goTo.marker('1');
 edit.insert("file1.");
-verify.memberListContains("bar");
-verify.not.memberListContains("foo");
+verify.completions({ includes: "bar", excludes: "foo" });

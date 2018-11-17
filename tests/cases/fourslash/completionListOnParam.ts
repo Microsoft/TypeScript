@@ -8,5 +8,4 @@
 ////    public Foo(x: Bar./**/Blah, y: Bar.Blah) { }
 ////}
 
-goTo.marker();
-verify.memberListContains('Blah');
+verify.completions({ marker: "", exact: "Blah" });

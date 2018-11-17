@@ -2,6 +2,4 @@
 
 ////var v = { x: 4, y: 3 }./**/
 
-goTo.marker();
-verify.not.memberListContains('a');
-verify.memberListContains('x');
+verify.completions({ marker: "", exact: ["x", "y"] });

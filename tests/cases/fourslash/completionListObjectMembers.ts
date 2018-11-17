@@ -9,6 +9,7 @@
 //// };
 ////object./**/
 
-goTo.marker();
-verify.memberListContains("bar", '(property) bar: any');
-verify.memberListContains("foo", '(method) foo(bar: any): any');
+verify.completions({
+    marker: "",
+    includes: [{ name: "bar", text: "(property) bar: any" }, { name: "foo", text: "(method) foo(bar: any): any" }],
+});

@@ -14,7 +14,9 @@
 ////    [x/*5*/yz: number]: boolean;
 ////    [/*6*/
 
-for (let marker of test.markers()) {
-    goTo.position(marker.position);
-    verify.completionListAllowsNewIdentifier();
-}
+const exact = completion.globalsPlus(["C"]);
+verify.completions(
+    { marker: ["1", "2", "3", "6"], exact, isNewIdentifierLocation: true },
+    { marker: "4", exact: ["str", ...exact], isNewIdentifierLocation: true },
+    { marker: "5", exact: ["xyz", ...exact], isNewIdentifierLocation: true },
+);

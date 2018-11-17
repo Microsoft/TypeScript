@@ -6,16 +6,9 @@
 ////    }
 ////}
 
-goTo.marker("1");
-
-verify.memberListContains("foo");
-verify.memberListContains("x");
-verify.memberListContains("y");
-verify.memberListContains("z");
-
-verify.memberListContains("bar");
-verify.memberListContains("a");
-verify.memberListContains("b");
-verify.memberListContains("c");
-
-verify.memberListContains("v"); // questionable
+verify.completions({
+    marker: "1",
+    // Note: `v = v` would be a compile error
+    includes: ["foo", "x", "y", "z", "bar", "a", "b", "c", "v"],
+    isNewIdentifierLocation: true,
+});

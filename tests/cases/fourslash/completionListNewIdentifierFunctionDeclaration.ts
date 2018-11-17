@@ -1,9 +1,11 @@
 /// <reference path='fourslash.ts' />
 
+// @noLib: true
+
 ////function F(pref: (a/*1*/
 
-test.markers().forEach((m) => {
-    goTo.position(m.position, m.fileName);
-    verify.not.completionListIsEmpty();
-    verify.completionListAllowsNewIdentifier();
+verify.completions({
+    marker: "1",
+    exact: completion.typeKeywords,
+    isNewIdentifierLocation: true,
 });

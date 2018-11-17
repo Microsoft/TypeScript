@@ -16,7 +16,4 @@
 ////    }
 ////}
 
-goTo.marker();
-verify.memberListContains('foo');
-verify.memberListContains('bar');
-verify.memberListCount(2);
+verify.completions({ marker: "", exact: ["foo", "bar"] });

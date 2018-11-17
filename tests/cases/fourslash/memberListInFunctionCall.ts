@@ -10,6 +10,5 @@
 
 goTo.marker();
 edit.insert('.');
-
-verify.memberListContains('charAt');
+verify.completions({ includes: "charAt" });
 

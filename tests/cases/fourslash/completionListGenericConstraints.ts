@@ -32,7 +32,7 @@
 ////
 ////class CallableWrapper<T extends ICallable> {
 ////    public call(value: T) {
-////        value./*callableMembers*/        
+////        value./*callableMembers*/
 ////    }
 ////}
 ////// Only public members of a constraint should be shown
@@ -47,31 +47,13 @@
 ////
 ////class BaseWrapper<T extends Base> {
 ////    public test(value: T) {
-////        value./*publicOnlyMemebers*/
+////        value./*publicOnlyMembers*/
 ////    }
 ////}
 
-goTo.marker("objectMembers");
-verify.memberListContains("hasOwnProperty");
-verify.memberListContains("isPrototypeOf");
-verify.memberListContains("toString");
-
-goTo.marker("interfaceMembers");
-verify.memberListContains("bar11");
-verify.memberListContains("bar12");
-verify.memberListContains("bar21");
-verify.memberListContains("bar22");
-
-goTo.marker("callableMembers");
-verify.memberListContains("name");
-verify.memberListContains("apply");
-verify.memberListContains("call");
-verify.memberListContains("bind");
-
-goTo.marker("publicOnlyMemebers");
-verify.memberListContains("publicProperty");
-verify.memberListContains("publicMethod");
-verify.not.memberListContains("privateProperty");
-verify.not.memberListContains("privateMethod");
-verify.not.memberListContains("publicStaticMethod");
-verify.not.memberListContains("privateStaticMethod");
+verify.completions(
+    { marker: "objectMembers", exact: ["constructor", "toString", "toLocaleString", "valueOf", "hasOwnProperty", "isPrototypeOf", "propertyIsEnumerable"] },
+    { marker: "interfaceMembers", exact: ["bar21", "bar22", "bar11", "bar12"] },
+    { marker: "callableMembers", exact: ["name", ...completion.functionMembersWithPrototype] },
+    { marker: "publicOnlyMembers", exact: ["publicProperty", "publicMethod"] },
+);

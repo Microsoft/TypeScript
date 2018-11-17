@@ -14,7 +14,10 @@
 ////
 ////x.commonProperty./**/
 
-goTo.marker();
-verify.memberListContains("toString", "(method) toString(): string");
-verify.memberListContains("valueOf", "(method) valueOf(): string | number");
-verify.memberListCount(2);
+verify.completions({
+    marker: "",
+    exact: [
+        { name: "toString", text: "(method) toString(): string", documentation: "Returns a string representation of a string.", },
+        { name: "valueOf", text: "(method) valueOf(): string | number", documentation: "Returns the primitive value of the specified object." },
+    ],
+});

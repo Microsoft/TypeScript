@@ -4,6 +4,4 @@
 ////    static getEncoding(buffer: buffer/**/Pointer
 ////}
 
-goTo.marker();
-verify.completionListContains('parseInt');
-
+verify.completions({ marker: "", includes: "encoder", excludes: "parseInt" });

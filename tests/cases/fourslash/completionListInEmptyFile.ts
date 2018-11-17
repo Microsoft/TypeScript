@@ -3,5 +3,4 @@
 ////var a = 0;
 /////**/
 
-goTo.marker();
-verify.memberListContains("a");
+verify.completions({ marker: "", includes: "a" });

@@ -1,4 +1,4 @@
-﻿///<reference path="fourslash.ts" />
+///<reference path="fourslash.ts" />
 
 //// var x = class myClass {
 ////    getClassName (){
@@ -7,8 +7,11 @@
 ////    /*1*/
 //// }
 
-goTo.marker("0");
-verify.completionListContains("myClass", "(local class) myClass", /*documentation*/ undefined, "local class");
-
-goTo.marker("1");
-verify.completionListContains("myClass", "(local class) myClass", /*documentation*/ undefined, "local class");
+verify.completions(
+    { marker: "0", includes: { name: "myClass", text: "(local class) myClass", kind: "local class" } },
+    {
+        marker: "1",
+        exact: ["private", "protected", "public", "static", "abstract", "async", "constructor", "get", "readonly", "set"],
+        isNewIdentifierLocation: true,
+    },
+);

@@ -8,25 +8,16 @@
 ////    /**/
 ////};
 
-goTo.marker();
-verify.memberListContains("x1");
-verify.memberListContains("y1");
-verify.memberListCount(2);
+verify.completions({ marker: "", exact: ["x1", "y1"] });
 
 //      x|
 edit.insert("x");
-verify.memberListContains("x1");
-verify.memberListContains("y1");
-verify.memberListCount(2);
+verify.completions({ exact: ["x1", "y1"] });
 
 //      x1|
 edit.insert("1");
-verify.memberListContains("x1");
-verify.memberListContains("y1");
-verify.memberListCount(2);
+verify.completions({ exact: ["x1", "y1"] })
 
 //      x1: null,|
 edit.insert(": null,");
-verify.not.memberListContains("x1");
-verify.memberListContains("y1");
-verify.memberListCount(1);
+verify.completions({ exact: ["y1"] });

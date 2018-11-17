@@ -26,24 +26,29 @@
 ////}
 //// Derived./*2*/
 
-// Sub class, everything but private is visible
-goTo.marker("1");
-verify.not.memberListContains('privateMethod');
-verify.not.memberListContains('privateProperty');
-verify.memberListContains('protectedMethod');
-verify.memberListContains('protectedProperty');
-verify.memberListContains('publicMethod');
-verify.memberListContains('publicProperty');
-verify.memberListContains('protectedOverriddenMethod');
-verify.memberListContains('protectedOverriddenProperty');
+const publicCompletions: ReadonlyArray<FourSlashInterface.ExpectedCompletionEntry> = ["publicMethod", "publicProperty", ...completion.functionMembers];
 
-// Can see protected methods elevated to public
-goTo.marker("2");
-verify.not.memberListContains('privateMethod');
-verify.not.memberListContains('privateProperty');
-verify.not.memberListContains('protectedMethod');
-verify.not.memberListContains('protectedProperty');
-verify.memberListContains('publicMethod');
-verify.memberListContains('publicProperty');
-verify.memberListContains('protectedOverriddenMethod');
-verify.memberListContains('protectedOverriddenProperty');
+verify.completions(
+    {
+        // Sub class, everything but private is visible
+        marker: "1",
+        exact: [
+            "prototype",
+            "protectedOverriddenMethod",
+            "protectedOverriddenProperty",
+            "protectedMethod",
+            "protectedProperty",
+            ...publicCompletions
+        ],
+    },
+    {
+        // Can see protected methods elevated to public
+        marker: "2",
+        exact: [
+            "prototype",
+            "protectedOverriddenMethod",
+            "protectedOverriddenProperty",
+            ...publicCompletions,
+        ],
+    },
+);

@@ -14,14 +14,7 @@
 /////*globalScope*/
 ////fo/*referenceInGlobalScope*/o;
 
-goTo.marker("globalScope");
-verify.memberListContains("foo");
-
-goTo.marker("insideFunctionDeclaration");
-verify.memberListContains("foo");
-
-goTo.marker("insideFunctionExpression");
-verify.memberListContains("foo");
+verify.completions({ marker: ["globalScope", "insideFunctionDeclaration", "insideFunctionExpression"], includes: "foo" });
 
 verify.quickInfos({
     referenceInsideFunctionExpression: "(local function) foo(): number",

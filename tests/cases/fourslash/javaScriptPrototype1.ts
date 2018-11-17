@@ -8,7 +8,7 @@
 //// }
 //// myCtor.prototype.foo = function() { return 32 };
 //// myCtor.prototype.bar = function() { return '' };
-//// 
+////
 //// var m = new myCtor(10);
 //// m/*1*/
 //// var a = m.foo;
@@ -22,25 +22,22 @@
 // Members of the class instance
 goTo.marker('1');
 edit.insert('.');
-verify.memberListContains('foo', undefined, undefined, 'property');
-verify.memberListContains('bar', undefined, undefined, 'property');
+verify.completions({ includes: ["foo", "bar"].map(name => ({ name, kind: "method" })) });
 edit.backspace();
 
 // Members of a class method (1)
 goTo.marker('2');
 edit.insert('.');
-verify.memberListContains('length', undefined, undefined, 'property');
+verify.completions({ includes: { name: "length", kind: "property", kindModifiers: "declare" } });
 edit.backspace();
 
 // Members of the invocation of a class method (1)
 goTo.marker('3');
 edit.insert('.');
-verify.memberListContains('toFixed', undefined, undefined, 'method');
-verify.not.memberListContains('substr', undefined, undefined, 'method');
+verify.completions({ includes: "toFixed", excludes: "substr" });
 edit.backspace();
 
 // Members of the invocation of a class method (2)
 goTo.marker('4');
 edit.insert('.');
-verify.memberListContains('substr', undefined, undefined, 'method');
-verify.not.memberListContains('toFixed', undefined, undefined, 'method');
+verify.completions({ includes: "substr", excludes: "toFixed" });

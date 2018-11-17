@@ -2,6 +2,4 @@
 
 /////a/./**/
 
-goTo.marker();
-verify.not.memberListContains('alert');
-verify.memberListContains('compile');
+verify.completions({ marker: "", exact: ["exec", "test", "source", "global", "ignoreCase", "multiline", "lastIndex", "compile"] });

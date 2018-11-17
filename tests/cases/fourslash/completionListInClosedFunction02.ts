@@ -5,14 +5,8 @@
 ////    }
 ////}
 
-goTo.marker("1");
-
-verify.memberListContains("foo");
-verify.memberListContains("x");
-verify.memberListContains("y");
-verify.memberListContains("z");
-
-verify.memberListContains("bar");
-verify.memberListContains("a");
-verify.memberListContains("b");
-verify.memberListContains("c"); // questionable
+verify.completions({
+    marker: "1",
+    // Note: `c: typeof c` would be a compile error
+    includes: ["foo", "x", "y", "z", "bar", "a", "b", "c"],
+});

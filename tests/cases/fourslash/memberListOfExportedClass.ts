@@ -10,6 +10,4 @@
 ////
 ////c./**/ // test on c.
 
-goTo.marker();
-verify.memberListCount(1);
-verify.memberListContains('pub', '(property) M.C.pub: number');
+verify.completions({ marker: "", exact: { name: "pub", text: "(property) M.C.pub: number" } });

@@ -8,5 +8,4 @@
 
 goTo.marker();
 edit.insert(".");
-verify.not.memberListIsEmpty();
-verify.memberListContains("text");
+verify.completions({ exact: "text" });

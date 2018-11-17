@@ -13,6 +13,5 @@
 ////});
 ////function each<T>(items: T[], handler: (item: T) => void) { }
 
-goTo.marker('1');
-verify.quickInfoIs("(property) a1: string");
-verify.memberListContains("a1", "(property) a1: string");
+verify.quickInfoAt("1", "(property) a1: string");
+verify.completions({ marker: "1", exact: { name: "a1", text: "(property) a1: string" } });
