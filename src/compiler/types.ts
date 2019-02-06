@@ -1178,6 +1178,7 @@ namespace ts {
     // A TypeLiteral is the declaration node for an anonymous symbol.
     export interface TypeLiteralNode extends TypeNode, Declaration {
         kind: SyntaxKind.TypeLiteral;
+        isExact: boolean;
         members: NodeArray<TypeElement>;
     }
 
@@ -1253,6 +1254,7 @@ namespace ts {
         readonlyToken?: ReadonlyToken | PlusToken | MinusToken;
         typeParameter: TypeParameterDeclaration;
         questionToken?: QuestionToken | PlusToken | MinusToken;
+        isExact: boolean;
         type?: TypeNode;
     }
 
@@ -3991,6 +3993,7 @@ namespace ts {
         MarkerType       = 1 << 13, // Marker type used for variance probing
         JSLiteral        = 1 << 14, // Object type declared in JS - disables errors on read/write of nonexisting members
         FreshLiteral     = 1 << 15, // Fresh object literal
+        Exact            = 1 << 16, // Exact object type - disables width subtyping
         ClassOrInterface = Class | Interface
     }
 

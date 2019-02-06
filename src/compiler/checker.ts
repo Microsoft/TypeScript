@@ -3494,7 +3494,7 @@ namespace ts {
                     }
                     const typeParameterNode = typeParameterToDeclarationWithConstraint(getTypeParameterFromMappedType(type), context, appropriateConstraintTypeNode);
                     const templateTypeNode = typeToTypeNodeHelper(getTemplateTypeFromMappedType(type), context);
-                    const mappedTypeNode = createMappedTypeNode(readonlyToken, typeParameterNode, questionToken, templateTypeNode);
+                    const mappedTypeNode = createMappedTypeNode(readonlyToken, typeParameterNode, questionToken, templateTypeNode, type.declaration.isExact);
                     context.approximateLength += 10;
                     return setEmitFlags(mappedTypeNode, EmitFlags.SingleLine);
                 }
@@ -3578,7 +3578,7 @@ namespace ts {
                     if (!resolved.properties.length && !resolved.stringIndexInfo && !resolved.numberIndexInfo) {
                         if (!resolved.callSignatures.length && !resolved.constructSignatures.length) {
                             context.approximateLength += 2;
-                            return setEmitFlags(createTypeLiteralNode(/*members*/ undefined), EmitFlags.SingleLine);
+                            return setEmitFlags(createTypeLiteralNode(/*members*/ undefined, !!(type.objectFlags & ObjectFlags.Exact)), EmitFlags.SingleLine);
                         }
 
                         if (resolved.callSignatures.length === 1 && !resolved.constructSignatures.length) {
@@ -3599,7 +3599,7 @@ namespace ts {
                     context.flags |= NodeBuilderFlags.InObjectTypeLiteral;
                     const members = createTypeNodesFromResolvedType(resolved);
                     context.flags = savedFlags;
-                    const typeLiteralNode = createTypeLiteralNode(members);
+                    const typeLiteralNode = createTypeLiteralNode(members, !!(type.objectFlags & ObjectFlags.Exact));
                     context.approximateLength += 2;
                     return setEmitFlags(typeLiteralNode, (context.flags & NodeBuilderFlags.MultilineObjectLiterals) ? 0 : EmitFlags.SingleLine);
                 }
@@ -10011,7 +10011,11 @@ namespace ts {
         function getTypeFromMappedTypeNode(node: MappedTypeNode): Type {
             const links = getNodeLinks(node);
             if (!links.resolvedType) {
-                const type = <MappedType>createObjectType(ObjectFlags.Mapped, node.symbol);
+                let flags = ObjectFlags.Mapped;
+                if (node.isExact) {
+                    flags |= ObjectFlags.Exact;
+                }
+                const type = <MappedType>createObjectType(flags, node.symbol);
                 type.declaration = node;
                 type.aliasSymbol = getAliasSymbolForTypeNode(node);
                 type.aliasTypeArguments = getTypeArgumentsForAliasSymbol(type.aliasSymbol);
@@ -10244,7 +10248,11 @@ namespace ts {
                     links.resolvedType = emptyTypeLiteralType;
                 }
                 else {
-                    let type = createObjectType(ObjectFlags.Anonymous, node.symbol);
+                    let flags = ObjectFlags.Anonymous;
+                    if (isTypeLiteralNode(node) && node.isExact) {
+                        flags |= ObjectFlags.Exact;
+                    }
+                    let type = createObjectType(flags, node.symbol);
                     type.aliasSymbol = aliasSymbol;
                     type.aliasTypeArguments = getTypeArgumentsForAliasSymbol(aliasSymbol);
                     if (isJSDocTypeLiteral(node) && node.isArrayType) {
@@ -11899,6 +11907,7 @@ namespace ts {
             let expandingFlags = ExpandingFlags.None;
             let overflow = false;
             let suppressNextError = false;
+            let inExactContext = false;
 
             Debug.assert(relation !== identityRelation || !errorNode, "no error reporting in identity checking");
 
@@ -12034,6 +12043,11 @@ namespace ts {
                     target = getSimplifiedType(target);
                 }
 
+                // Are we in a context that uses exact types? If so we
+                // disable excess property checking and just use exact
+                // type rules.
+                inExactContext = inExactContext || someType(target, t => (getObjectFlags(t) & ObjectFlags.Exact) !== 0);
+
                 // Try to see if we're relating something like `Foo` -> `Bar | null | undefined`.
                 // If so, reporting the `null` and `undefined` in the type is hardly useful.
                 // First, see if we're even relating an object type to a union.
@@ -12061,8 +12075,19 @@ namespace ts {
                 if (relation === comparableRelation && !(target.flags & TypeFlags.Never) && isSimpleTypeRelatedTo(target, source, relation) ||
                     isSimpleTypeRelatedTo(source, target, relation, reportErrors ? reportError : undefined)) return Ternary.True;
 
+                if ((getObjectFlags(target) & ObjectFlags.Exact) && !(getObjectFlags(source) & (ObjectFlags.Exact | ObjectFlags.FreshLiteral))) {
+                    if (reportErrors) {
+                        reportRelationError(Diagnostics.Non_exact_types_are_not_assignable_to_exact_types, source, target);
+                    }
+                    return Ternary.False;
+                }
+
                 const isComparingJsxAttributes = !!(getObjectFlags(source) & ObjectFlags.JsxAttributes);
-                if (isObjectLiteralType(source) && getObjectFlags(source) & ObjectFlags.FreshLiteral) {
+
+                // if we are in an exact context, we should not drop freshness.
+                // we should only check excess if this is a literal
+                const shouldCheckExcess = !inExactContext || (getObjectFlags(target) & ObjectFlags.Exact);
+                if (shouldCheckExcess && isObjectLiteralType(source) && getObjectFlags(source) & ObjectFlags.FreshLiteral) {
                     const discriminantType = target.flags & TypeFlags.Union ? findMatchingDiscriminantType(source, target as UnionType) : undefined;
                     if (hasExcessProperties(<FreshObjectLiteralType>source, target, discriminantType, reportErrors)) {
                         if (reportErrors) {
@@ -12074,7 +12099,10 @@ namespace ts {
                     // and intersection types are further deconstructed on the target side, we don't want to
                     // make the check again (as it might fail for a partial target type). Therefore we obtain
                     // the regular source type and proceed with that.
-                    if (isUnionOrIntersectionTypeWithoutNullableConstituents(target) && !discriminantType) {
+                    //
+                    // Note that if we are in an exact context we do not drop freshness incase we encounter a nested
+                    // exact type and we need to know the source is a literal.
+                    if (!inExactContext && isUnionOrIntersectionTypeWithoutNullableConstituents(target) && !discriminantType) {
                         source = getRegularTypeOfObjectLiteral(source);
                     }
                 }
@@ -12253,7 +12281,9 @@ namespace ts {
                                             symbolToString(prop), typeToString(errorTarget), suggestion);
                                     }
                                     else {
-                                        reportError(Diagnostics.Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1,
+                                        reportError(getObjectFlags(target) & ObjectFlags.Exact ?
+                                            Diagnostics.Object_literal_may_only_specify_known_properties_when_assigned_to_exact_type_and_0_does_not_exist_in_type_1 :
+                                            Diagnostics.Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1,
                                             symbolToString(prop), typeToString(errorTarget));
                                     }
                                 }
@@ -12822,6 +12852,18 @@ namespace ts {
                         getCombinedMappedTypeOptionality(source) <= getCombinedMappedTypeOptionality(target));
                 if (modifiersRelated) {
                     let result: Ternary;
+                    if (getObjectFlags(target) & ObjectFlags.Exact) {
+                        // TODO: Not sure if identical is right here and need Better errors here.
+                        if (isTypeIdenticalTo(getConstraintTypeFromMappedType(target), getConstraintTypeFromMappedType(source))) {
+                            const mapper = createTypeMapper([getTypeParameterFromMappedType(source)], [getTypeParameterFromMappedType(target)]);
+                            return isRelatedTo(instantiateType(getTemplateTypeFromMappedType(source), mapper), getTemplateTypeFromMappedType(target), reportErrors);
+                        }
+                        if (reportErrors) {
+                            // Invariant. source must be exact.
+                            reportError(Diagnostics.Exact_mapped_types_0_and_1_do_not_have_identical_key_constraints, typeToString(source), typeToString(target));
+                        }
+                        return Ternary.False;
+                    }
                     if (result = isRelatedTo(getConstraintTypeFromMappedType(target), getConstraintTypeFromMappedType(source), reportErrors)) {
                         const mapper = createTypeMapper([getTypeParameterFromMappedType(source)], [getTypeParameterFromMappedType(target)]);
                         return result & isRelatedTo(instantiateType(getTemplateTypeFromMappedType(source), mapper), getTemplateTypeFromMappedType(target), reportErrors);
@@ -12859,13 +12901,15 @@ namespace ts {
                     }
                     return Ternary.False;
                 }
-                if (isObjectLiteralType(target)) {
+                if (isObjectLiteralType(target) || (getObjectFlags(target) & ObjectFlags.Exact)) {
                     for (const sourceProp of getPropertiesOfType(source)) {
                         if (!getPropertyOfObjectType(target, sourceProp.escapedName)) {
                             const sourceType = getTypeOfSymbol(sourceProp);
                             if (!(sourceType === undefinedType || sourceType === undefinedWideningType)) {
                                 if (reportErrors) {
-                                    reportError(Diagnostics.Property_0_does_not_exist_on_type_1, symbolToString(sourceProp), typeToString(target));
+                                    reportError(getObjectFlags(target) & ObjectFlags.Exact ?
+                                        Diagnostics.Exact_types_may_only_include_specified_properties_and_0_does_not_exist_on_type_1 :
+                                        Diagnostics.Property_0_does_not_exist_on_type_1, symbolToString(sourceProp), typeToString(target));
                                 }
                                 return Ternary.False;
                             }
@@ -15442,6 +15486,10 @@ namespace ts {
 
         function everyType(type: Type, f: (t: Type) => boolean): boolean {
             return type.flags & TypeFlags.Union ? every((<UnionType>type).types, f) : f(type);
+        }
+
+        function someType(type: Type, f: (t: Type) => boolean): boolean {
+            return type.flags & TypeFlags.UnionOrIntersection ? some((<UnionOrIntersectionType>type).types, f) : f(type);
         }
 
         function filterType(type: Type, f: (t: Type) => boolean): Type {
@@ -22265,6 +22313,11 @@ namespace ts {
             if (expr.kind !== SyntaxKind.PropertyAccessExpression && expr.kind !== SyntaxKind.ElementAccessExpression) {
                 error(expr, Diagnostics.The_operand_of_a_delete_operator_must_be_a_property_reference);
                 return booleanType;
+            }
+            const expression = (<PropertyAccessExpression>expr).expression;
+            const type = getTypeOfExpression(expression);
+            if (someType(type, t => (getObjectFlags(t) & ObjectFlags.Exact) !== 0)) {
+                error(expression, Diagnostics.Properties_on_exact_types_cannot_be_deleted);
             }
             const links = getNodeLinks(expr);
             const symbol = getExportSymbolOfValueSymbolIfExported(links.resolvedSymbol);

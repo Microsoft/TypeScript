@@ -45,7 +45,8 @@ namespace ts.codefix {
             hasReadonlyModifier(indexSignature) ? createModifier(SyntaxKind.ReadonlyKeyword) : undefined,
             mappedTypeParameter,
             indexSignature.questionToken,
-            indexSignature.type);
+            indexSignature.type,
+            /*isExact*/ false);
         const intersectionType = createIntersectionTypeNode([
             ...getAllSuperTypeNodes(container),
             mappedIntersectionType,

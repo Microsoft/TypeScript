@@ -1605,9 +1605,10 @@ namespace ts {
             }
 
             switch (kind) {
+                case ParsingContext.TypeMembers:
+                    return token() === SyntaxKind.BarToken || token() === SyntaxKind.CloseBraceToken;
                 case ParsingContext.BlockStatements:
                 case ParsingContext.SwitchClauses:
-                case ParsingContext.TypeMembers:
                 case ParsingContext.ClassMembers:
                 case ParsingContext.EnumMembers:
                 case ParsingContext.ObjectLiteralMembers:
@@ -2750,14 +2751,31 @@ namespace ts {
 
         function parseTypeLiteral(): TypeLiteralNode {
             const node = <TypeLiteralNode>createNode(SyntaxKind.TypeLiteral);
-            node.members = parseObjectTypeMembers();
-            return finishNode(node);
+            if (parseExpected(SyntaxKind.OpenBraceToken)) {
+                const isExact = parseOptional(SyntaxKind.BarToken);
+                node.isExact = isExact;
+                node.members = parseList(ParsingContext.TypeMembers, parseTypeMember);
+                if (isExact) {
+                    parseExpected(SyntaxKind.BarToken);
+                }
+                parseExpected(SyntaxKind.CloseBraceToken);
+                return finishNode(node);
+            }
+            else {
+                const node = <TypeLiteralNode>createNode(SyntaxKind.TypeLiteral);
+                node.members = createMissingList<TypeElement>();
+                return finishNode(node);
+            }
         }
 
         function parseObjectTypeMembers(): NodeArray<TypeElement> {
             let members: NodeArray<TypeElement>;
             if (parseExpected(SyntaxKind.OpenBraceToken)) {
+                const isExact = parseOptional(SyntaxKind.BarToken);
                 members = parseList(ParsingContext.TypeMembers, parseTypeMember);
+                if (isExact) {
+                    parseExpected(SyntaxKind.BarToken);
+                }
                 parseExpected(SyntaxKind.CloseBraceToken);
             }
             else {
@@ -2769,6 +2787,7 @@ namespace ts {
 
         function isStartOfMappedType() {
             nextToken();
+            parseOptional(SyntaxKind.BarToken);
             if (token() === SyntaxKind.PlusToken || token() === SyntaxKind.MinusToken) {
                 return nextToken() === SyntaxKind.ReadonlyKeyword;
             }
@@ -2789,6 +2808,8 @@ namespace ts {
         function parseMappedType() {
             const node = <MappedTypeNode>createNode(SyntaxKind.MappedType);
             parseExpected(SyntaxKind.OpenBraceToken);
+            const isExact = parseOptional(SyntaxKind.BarToken);
+            node.isExact = isExact;
             if (token() === SyntaxKind.ReadonlyKeyword || token() === SyntaxKind.PlusToken || token() === SyntaxKind.MinusToken) {
                 node.readonlyToken = parseTokenNode<ReadonlyToken | PlusToken | MinusToken>();
                 if (node.readonlyToken.kind !== SyntaxKind.ReadonlyKeyword) {
@@ -2806,6 +2827,9 @@ namespace ts {
             }
             node.type = parseTypeAnnotation();
             parseSemicolon();
+            if (isExact) {
+                parseExpected(SyntaxKind.BarToken);
+            }
             parseExpected(SyntaxKind.CloseBraceToken);
             return finishNode(node);
         }

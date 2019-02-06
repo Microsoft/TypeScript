@@ -723,15 +723,16 @@ namespace ts {
             : node;
     }
 
-    export function createTypeLiteralNode(members: ReadonlyArray<TypeElement> | undefined) {
+    export function createTypeLiteralNode(members: ReadonlyArray<TypeElement> | undefined, isExact = false) {
         const node = createSynthesizedNode(SyntaxKind.TypeLiteral) as TypeLiteralNode;
+        node.isExact = isExact;
         node.members = createNodeArray(members);
         return node;
     }
 
     export function updateTypeLiteralNode(node: TypeLiteralNode, members: NodeArray<TypeElement>) {
         return node.members !== members
-            ? updateNode(createTypeLiteralNode(members), node)
+            ? updateNode(createTypeLiteralNode(members, node.isExact), node)
             : node;
     }
 
@@ -902,8 +903,9 @@ namespace ts {
             : node;
     }
 
-    export function createMappedTypeNode(readonlyToken: ReadonlyToken | PlusToken | MinusToken | undefined, typeParameter: TypeParameterDeclaration, questionToken: QuestionToken | PlusToken | MinusToken | undefined, type: TypeNode | undefined): MappedTypeNode {
+    export function createMappedTypeNode(readonlyToken: ReadonlyToken | PlusToken | MinusToken | undefined, typeParameter: TypeParameterDeclaration, questionToken: QuestionToken | PlusToken | MinusToken | undefined, type: TypeNode | undefined, isExact: boolean): MappedTypeNode {
         const node = createSynthesizedNode(SyntaxKind.MappedType) as MappedTypeNode;
+        node.isExact = isExact;
         node.readonlyToken = readonlyToken;
         node.typeParameter = typeParameter;
         node.questionToken = questionToken;
@@ -911,12 +913,12 @@ namespace ts {
         return node;
     }
 
-    export function updateMappedTypeNode(node: MappedTypeNode, readonlyToken: ReadonlyToken | PlusToken | MinusToken | undefined, typeParameter: TypeParameterDeclaration, questionToken: QuestionToken | PlusToken | MinusToken | undefined, type: TypeNode | undefined): MappedTypeNode {
+    export function updateMappedTypeNode(node: MappedTypeNode, readonlyToken: ReadonlyToken | PlusToken | MinusToken | undefined, typeParameter: TypeParameterDeclaration, questionToken: QuestionToken | PlusToken | MinusToken | undefined, type: TypeNode | undefined, isExact: boolean): MappedTypeNode {
         return node.readonlyToken !== readonlyToken
             || node.typeParameter !== typeParameter
             || node.questionToken !== questionToken
             || node.type !== type
-            ? updateNode(createMappedTypeNode(readonlyToken, typeParameter, questionToken, type), node)
+            ? updateNode(createMappedTypeNode(readonlyToken, typeParameter, questionToken, type, isExact), node)
             : node;
     }
 
