@@ -3,7 +3,7 @@ namespace ts {
         None = 0,
         Yield = 1 << 0,
         Await = 1 << 1,
-        Type  = 1 << 2,
+        Type = 1 << 2,
         IgnoreMissingOpenBrace = 1 << 4,
         JSDoc = 1 << 5,
     }
@@ -2415,6 +2415,9 @@ namespace ts {
         function parseTypeParameter(): TypeParameterDeclaration {
             const node = <TypeParameterDeclaration>createNode(SyntaxKind.TypeParameter);
             node.name = parseIdentifier();
+            node.uniformityConstraint = 0;
+            node.uniformityConstraint |= parseOptional(SyntaxKind.ExclamationToken) ? UniformityFlags.TypeOf : 0;
+            node.uniformityConstraint |= parseOptional(SyntaxKind.TildeToken) ? UniformityFlags.Equality : 0;
             if (parseOptional(SyntaxKind.ExtendsKeyword)) {
                 // It's not uncommon for people to write improper constraints to a generic.  If the
                 // user writes a constraint that is an expression and not an actual type, then parse

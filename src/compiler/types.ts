@@ -852,6 +852,8 @@ namespace ts {
 
         // For error recovery purposes.
         expression?: Expression;
+
+        uniformityConstraint?: UniformityFlags;
     }
 
     export interface SignatureDeclarationBase extends NamedDeclaration, JSDocContainer {
@@ -4042,6 +4044,11 @@ namespace ts {
     export interface EnumType extends Type {
     }
 
+    export const enum UniformityFlags {
+        TypeOf = 1 << 0,
+        Equality = 1 << 1,
+    }
+
     export const enum ObjectFlags {
         Class            = 1 << 0,  // Class
         Interface        = 1 << 1,  // Interface
@@ -4273,6 +4280,8 @@ namespace ts {
         isThisType?: boolean;
         /* @internal */
         resolvedDefaultType?: Type;
+        /* @internal */
+        uniformityConstraint?: UniformityFlags;
     }
 
     // Indexed access types (TypeFlags.IndexedAccess)

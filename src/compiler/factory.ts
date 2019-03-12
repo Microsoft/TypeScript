@@ -300,19 +300,21 @@ namespace ts {
 
     // Signature elements
 
-    export function createTypeParameterDeclaration(name: string | Identifier, constraint?: TypeNode, defaultType?: TypeNode) {
+    export function createTypeParameterDeclaration(name: string | Identifier, constraint?: TypeNode, defaultType?: TypeNode, uniformityConstraint?: UniformityFlags) {
         const node = createSynthesizedNode(SyntaxKind.TypeParameter) as TypeParameterDeclaration;
         node.name = asName(name);
         node.constraint = constraint;
         node.default = defaultType;
+        node.uniformityConstraint = uniformityConstraint;
         return node;
     }
 
-    export function updateTypeParameterDeclaration(node: TypeParameterDeclaration, name: Identifier, constraint: TypeNode | undefined, defaultType: TypeNode | undefined) {
+    export function updateTypeParameterDeclaration(node: TypeParameterDeclaration, name: Identifier, constraint: TypeNode | undefined, defaultType: TypeNode | undefined, uniformityConstraint?: UniformityFlags) {
         return node.name !== name
             || node.constraint !== constraint
             || node.default !== defaultType
-            ? updateNode(createTypeParameterDeclaration(name, constraint, defaultType), node)
+            || node.uniformityConstraint !== uniformityConstraint
+            ? updateNode(createTypeParameterDeclaration(name, constraint, defaultType, uniformityConstraint), node)
             : node;
     }
 

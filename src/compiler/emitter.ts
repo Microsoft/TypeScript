@@ -1637,6 +1637,12 @@ namespace ts {
 
         function emitTypeParameter(node: TypeParameterDeclaration) {
             emit(node.name);
+            if (node.uniformityConstraint && node.uniformityConstraint & UniformityFlags.TypeOf) {
+                writePunctuation("!");
+            }
+            else if (node.uniformityConstraint && node.uniformityConstraint & UniformityFlags.Equality) {
+                writePunctuation("~");
+            }
             if (node.constraint) {
                 writeSpace();
                 writeKeyword("extends");
