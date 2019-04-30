@@ -1476,6 +1476,11 @@ type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => i
 type InstanceType<T extends new (...args: any) => any> = T extends new (...args: any) => infer R ? R : any;
 
 /**
+ * Obtain the resolved type of a PromiseLike type
+ */
+type ResolveType<T> = T extends PromiseLike<infer R> ? R : T
+
+/**
  * Marker for contextual 'this' type
  */
 interface ThisType<T> { }
