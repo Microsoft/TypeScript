@@ -865,7 +865,8 @@ namespace ts {
             code: messageChain.code,
             category: messageChain.category,
             messageText: messageChain.next ? messageChain : messageChain.messageText,
-            relatedInformation
+            relatedInformation,
+            ...(!messageChain.next && messageChain.annotations ? { annotations: messageChain.annotations } : {})
         };
     }
 
@@ -3194,7 +3195,7 @@ namespace ts {
         return indentStrings[1].length;
     }
 
-    export function createTextWriter(newLine: string): EmitTextWriter {
+    export function createTextWriter(newLine: string, writeSymbol?: ((t: string, s: Symbol) => string)): EmitTextWriter {
         let output: string;
         let indent: number;
         let lineStart: boolean;
@@ -3285,7 +3286,7 @@ namespace ts {
             writePunctuation: write,
             writeSpace: write,
             writeStringLiteral: write,
-            writeSymbol: (s, _) => write(s),
+            writeSymbol: (s, _) => write(writeSymbol ? writeSymbol(s, _) : s),
             writeTrailingSemicolon: write,
             writeComment: write,
             getTextPosWithWriteLine
@@ -7107,8 +7108,27 @@ namespace ts {
         getSourceMapSourceConstructor: () => <any>SourceMapSource,
     };
 
-    export function formatStringFromArgs(text: string, args: ArrayLike<string | number>, baseIndex = 0): string {
-        return text.replace(/{(\d+)}/g, (_match, index: string) => "" + Debug.assertDefined(args[+index + baseIndex]));
+    function renderForOutput(arg: string | number | Type | Symbol, renderContext: DiagnosticRenderContext | undefined, offset: number) {
+        Debug.assertDefined(arg);
+        if (typeof arg === "string" || typeof arg === "number") {
+            return arg;
+        }
+        if (!renderContext) {
+            return Debug.fail("Type or symbol passed into diagnostic rendering pipeline with no renderer provided.");
+        }
+        if (arg.escapedName) {
+            return renderContext.symbolToString(arg, offset);
+        }
+        return renderContext.typeToString(arg as Type, offset);
+    }
+
+    export function formatStringFromArgs(text: string, args: ArrayLike<string | number | Type | Symbol>, baseIndex = 0, renderContext?: DiagnosticRenderContext): string {
+        let offsetAdjustmentFromReplacement = 0;
+        return text.replace(/{(\d+)}/g, (match: string, index: string, offset: number) => {
+            const text = "" + renderForOutput(args[+index + baseIndex], renderContext, offset + offsetAdjustmentFromReplacement);
+            offsetAdjustmentFromReplacement += text.length - match.length;
+            return text;
+        });
     }
 
     export let localizedDiagnosticMessages: MapLike<string> | undefined;
@@ -7176,6 +7196,30 @@ namespace ts {
         };
     }
 
+    export function createRenderedCompilerDiagnostic(checker: TypeChecker, flags: DiagnosticRendererFlags, message: DiagnosticMessage, ...args: (string | number | Type | Symbol | undefined)[]): Diagnostic;
+    export function createRenderedCompilerDiagnostic(checker: TypeChecker, flags: DiagnosticRendererFlags, message: DiagnosticMessage): Diagnostic {
+        let text = getLocaleSpecificMessage(message);
+        let spans: SymbolSpan[] | undefined;
+
+        if (arguments.length > 3) {
+            const ctx = checker.getDiagnosticRenderingContext(flags);
+            text = formatStringFromArgs(text, arguments, 3, ctx);
+            spans = ctx.getPendingAnnotationSpans();
+        }
+
+        return {
+            file: undefined,
+            start: undefined,
+            length: undefined,
+
+            messageText: text,
+            category: message.category,
+            code: message.code,
+            reportsUnnecessary: message.reportsUnnecessary,
+            ...(typeof spans === "undefined" ? {} : { annotations: spans })
+        };
+    }
+
     export function createCompilerDiagnosticFromMessageChain(chain: DiagnosticMessageChain): Diagnostic {
         return {
             file: undefined,
@@ -7202,6 +7246,27 @@ namespace ts {
             code: message.code,
 
             next: details
+        };
+    }
+
+    export function chainRenderedDiagnosticMessages(checker: TypeChecker, flags: DiagnosticRendererFlags, details: DiagnosticMessageChain | undefined, message: DiagnosticMessage, ...args: (string | number | Type | Symbol | undefined)[]): DiagnosticMessageChain;
+    export function chainRenderedDiagnosticMessages(checker: TypeChecker, flags: DiagnosticRendererFlags, details: DiagnosticMessageChain | undefined, message: DiagnosticMessage): DiagnosticMessageChain {
+        let text = getLocaleSpecificMessage(message);
+        let spans: SymbolSpan[] | undefined;
+
+        if (arguments.length > 4) {
+            const ctx = checker.getDiagnosticRenderingContext(flags);
+            text = formatStringFromArgs(text, arguments, 4, ctx);
+            spans = ctx.getPendingAnnotationSpans();
+        }
+
+        return {
+            messageText: text,
+            category: message.category,
+            code: message.code,
+
+            next: details,
+            ...(typeof spans === "undefined" ? {} : { annotations: spans })
         };
     }
 

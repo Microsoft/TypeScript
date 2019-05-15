@@ -478,6 +478,20 @@ namespace ts.server.protocol {
         /** May store more in future. For now, this will simply be `true` to indicate when a diagnostic is an unused-identifier diagnostic. */
         reportsUnnecessary?: {};
         relatedInformation?: DiagnosticRelatedInformation[];
+        /**
+         * List of spans of the message that have associated information
+         */
+        annotations?: DiagnosticAnnotationSpan[];
+    }
+
+    export type DiagnosticAnnotationSpan = DiagnosticSymbolSpan;
+
+    export interface DiagnosticSymbolSpan {
+        kind: "symbol";
+        start: number;
+        length: number;
+        file: string;
+        location: Location;
     }
 
     /**
@@ -2385,6 +2399,10 @@ namespace ts.server.protocol {
          * The name of the plugin reporting the message.
          */
         source?: string;
+        /**
+         * List of spans of the message that have associated information
+         */
+        annotations?: DiagnosticAnnotationSpan[];
     }
 
     export interface DiagnosticWithFileName extends Diagnostic {

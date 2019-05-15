@@ -2009,6 +2009,13 @@ declare namespace ts {
          */
         runWithCancellationToken<T>(token: CancellationToken, cb: (checker: TypeChecker) => T): T;
     }
+    type AnnotationSpan = SymbolSpan;
+    interface SymbolSpan {
+        kind: "symbol";
+        symbol: Symbol;
+        start: number;
+        length: number;
+    }
     enum NodeBuilderFlags {
         None = 0,
         NoTruncation = 1,
@@ -2270,8 +2277,8 @@ declare namespace ts {
         regularType: LiteralType;
     }
     interface UniqueESSymbolType extends Type {
+        __uniqueESSymbolBrand: any;
         symbol: Symbol;
-        escapedName: __String;
     }
     interface StringLiteralType extends LiteralType {
         value: string;
@@ -2448,6 +2455,7 @@ declare namespace ts {
      */
     interface DiagnosticMessageChain {
         messageText: string;
+        annotations?: AnnotationSpan[];
         category: DiagnosticCategory;
         code: number;
         next?: DiagnosticMessageChain;
@@ -2465,6 +2473,7 @@ declare namespace ts {
         start: number | undefined;
         length: number | undefined;
         messageText: string | DiagnosticMessageChain;
+        annotations?: AnnotationSpan[];
     }
     interface DiagnosticWithLocation extends Diagnostic {
         file: SourceFile;

@@ -3319,6 +3319,31 @@ namespace ts {
         runWithCancellationToken<T>(token: CancellationToken, cb: (checker: TypeChecker) => T): T;
 
         /* @internal */ getLocalTypeParametersOfClassOrInterfaceOrTypeAlias(symbol: Symbol): ReadonlyArray<TypeParameter> | undefined;
+
+        /* @internal */ getDiagnosticRenderingContext(flags: DiagnosticRendererFlags): DiagnosticRenderContext;
+    }
+
+
+    /** @internal */
+    export enum DiagnosticRendererFlags {
+        None                    =      0,
+        UseFullyQualifiedTypes  = 1 << 0,
+    }
+
+    export type AnnotationSpan = SymbolSpan;
+
+    export interface SymbolSpan {
+        kind: "symbol";
+        symbol: Symbol;
+        start: number;
+        length: number;
+    }
+
+    /** @internal */
+    export interface DiagnosticRenderContext {
+        typeToString(type: Type, symbolOffset: number): string;
+        symbolToString(symbol: Symbol, symbolOffset: number): string;
+        getPendingAnnotationSpans(): AnnotationSpan[] | undefined;
     }
 
     /* @internal */
@@ -4009,6 +4034,8 @@ namespace ts {
         restrictiveInstantiation?: Type; // Instantiation with type parameters mapped to unconstrained form
         /* @internal */
         immediateBaseConstraint?: Type;  // Immediate base constraint cache
+        /* @internal */
+        escapedName?: undefined; // Never set
     }
 
     /* @internal */
@@ -4043,8 +4070,8 @@ namespace ts {
 
     // Unique symbol types (TypeFlags.UniqueESSymbol)
     export interface UniqueESSymbolType extends Type {
+        __uniqueESSymbolBrand: any;
         symbol: Symbol;
-        escapedName: __String;
     }
 
     export interface StringLiteralType extends LiteralType {
@@ -4547,6 +4574,7 @@ namespace ts {
      */
     export interface DiagnosticMessageChain {
         messageText: string;
+        annotations?: AnnotationSpan[];
         category: DiagnosticCategory;
         code: number;
         next?: DiagnosticMessageChain;
@@ -4565,6 +4593,7 @@ namespace ts {
         start: number | undefined;
         length: number | undefined;
         messageText: string | DiagnosticMessageChain;
+        annotations?: AnnotationSpan[];
     }
     export interface DiagnosticWithLocation extends Diagnostic {
         file: SourceFile;
