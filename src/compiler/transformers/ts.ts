@@ -546,7 +546,7 @@ namespace ts {
 
         function visitSourceFile(node: SourceFile) {
             const alwaysStrict = getStrictOptionValue(compilerOptions, "alwaysStrict") &&
-                !(isExternalModule(node) && moduleKind >= ModuleKind.ES2015) &&
+                !(isExternalModule(node) && (moduleKind >= ModuleKind.ES2015 || moduleKind === ModuleKind.Hybrid)) &&
                 !isJsonSourceFile(node);
 
             return updateSourceFileNode(
@@ -2462,6 +2462,7 @@ namespace ts {
                 || (isExternalModuleExport(node)
                     && moduleKind !== ModuleKind.ES2015
                     && moduleKind !== ModuleKind.ESNext
+                    && moduleKind !== ModuleKind.Hybrid
                     && moduleKind !== ModuleKind.System);
         }
 

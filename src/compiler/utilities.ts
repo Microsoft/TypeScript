@@ -7252,7 +7252,8 @@ namespace ts {
     export function getEmitModuleResolutionKind(compilerOptions: CompilerOptions) {
         let moduleResolution = compilerOptions.moduleResolution;
         if (moduleResolution === undefined) {
-            moduleResolution = getEmitModuleKind(compilerOptions) === ModuleKind.CommonJS ? ModuleResolutionKind.NodeJs : ModuleResolutionKind.Classic;
+            const emitModuleKind = getEmitModuleKind(compilerOptions);
+            moduleResolution = emitModuleKind === ModuleKind.CommonJS || emitModuleKind === ModuleKind.Hybrid ? ModuleResolutionKind.NodeJs : ModuleResolutionKind.Classic;
         }
         return moduleResolution;
     }
@@ -7263,6 +7264,7 @@ namespace ts {
             case ModuleKind.AMD:
             case ModuleKind.ES2015:
             case ModuleKind.ESNext:
+            case ModuleKind.Hybrid:
                 return true;
             default:
                 return false;
