@@ -103,6 +103,7 @@ namespace ts {
         | SyntaxKind.YieldKeyword
         | SyntaxKind.AsyncKeyword
         | SyntaxKind.AwaitKeyword
+        | SyntaxKind.TagKeyword
         | SyntaxKind.OfKeyword;
 
     export type JsxTokenSyntaxKind =
@@ -277,6 +278,7 @@ namespace ts {
         FromKeyword,
         GlobalKeyword,
         BigIntKeyword,
+        TagKeyword,
         OfKeyword, // LastKeyword and LastToken and LastContextualKeyword
 
         // Parse tree nodes
@@ -1247,7 +1249,7 @@ namespace ts {
 
     export interface TypeOperatorNode extends TypeNode {
         kind: SyntaxKind.TypeOperator;
-        operator: SyntaxKind.KeyOfKeyword | SyntaxKind.UniqueKeyword | SyntaxKind.ReadonlyKeyword;
+        operator: SyntaxKind.KeyOfKeyword | SyntaxKind.UniqueKeyword | SyntaxKind.ReadonlyKeyword | SyntaxKind.TagKeyword;
         type: TypeNode;
     }
 
@@ -4008,6 +4010,7 @@ namespace ts {
         Conditional     = 1 << 24,  // T extends U ? X : Y
         Substitution    = 1 << 25,  // Type parameter substitution
         NonPrimitive    = 1 << 26,  // intrinsic object type
+        StructuralTag   = 1 << 27,  // tag T
 
         /* @internal */
         AnyOrUnknown = Any | Unknown,
@@ -4035,7 +4038,7 @@ namespace ts {
         /* @internal */
         DisjointDomains = NonPrimitive | StringLike | NumberLike | BigIntLike | BooleanLike | ESSymbolLike | VoidLike | Null,
         UnionOrIntersection = Union | Intersection,
-        StructuredType = Object | Union | Intersection,
+        StructuredType = Object | Union | Intersection | StructuralTag,
         TypeVariable = TypeParameter | IndexedAccess,
         InstantiableNonPrimitive = TypeVariable | Conditional | Substitution,
         InstantiablePrimitive = Index,
@@ -4289,7 +4292,7 @@ namespace ts {
         resolvedApparentType: Type;
     }
 
-    export type StructuredType = ObjectType | UnionType | IntersectionType;
+    export type StructuredType = ObjectType | UnionType | IntersectionType | StructuralTagType;
 
     /* @internal */
     // An instantiated anonymous type has a target and a mapper
@@ -4453,6 +4456,17 @@ namespace ts {
     export interface SubstitutionType extends InstantiableType {
         typeVariable: TypeVariable;  // Target type variable
         substitute: Type;            // Type to substitute for type parameter
+    }
+
+    // Structual tag type, or a `tag T` (TypeFlags.StructuralTag)
+    export interface StructuralTagType extends Type {
+        type: Type;
+        /* @internal */ members?: SymbolTable;                          // Always emptySymbols
+        /* @internal */ properties?: Symbol[];                          // Always emptyArray
+        /* @internal */ callSignatures?: readonly Signature[];      // Always emptyArray
+        /* @internal */ constructSignatures?: readonly Signature[]; // Always emptyArray
+        /* @internal */ stringIndexInfo?: undefined;
+        /* @internal */ numberIndexInfo?: undefined;
     }
 
     /* @internal */
