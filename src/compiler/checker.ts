@@ -9384,7 +9384,7 @@ namespace ts {
         }
 
         function getSimplifiedTypeOrConstraint(type: Type) {
-            const simplified = getSimplifiedType(type, /*writing*/ false);
+            const simplified = getSimplifiedType(type);
             return simplified !== type ? simplified : getConstraintOfType(type);
         }
 
@@ -9429,7 +9429,7 @@ namespace ts {
             // a union - once negated types exist and are applied to the conditional false branch, this "constraint"
             // likely doesn't need to exist.
             if (type.root.isDistributive && type.restrictiveInstantiation !== type) {
-                const simplified = getSimplifiedType(type.checkType, /*writing*/ false);
+                const simplified = getSimplifiedType(type.checkType);
                 const constraint = simplified === type.checkType ? getConstraintOfType(simplified) : simplified;
                 if (constraint && constraint !== type.checkType) {
                     const mapper = makeUnaryTypeMapper(type.root.checkType, constraint);
@@ -9534,7 +9534,7 @@ namespace ts {
                         return t.immediateBaseConstraint = noConstraintType;
                     }
                     constraintDepth++;
-                    let result = computeBaseConstraint(getSimplifiedType(t, /*writing*/ false));
+                    let result = computeBaseConstraint(getSimplifiedType(t));
                     constraintDepth--;
                     if (!popTypeResolution()) {
                         if (t.flags & TypeFlags.TypeParameter) {
@@ -11810,7 +11810,21 @@ namespace ts {
             const type = <IndexedAccessType>createType(TypeFlags.IndexedAccess);
             type.objectType = objectType;
             type.indexType = indexType;
+            type.writing = false;
             return type;
+        }
+
+        function getWritingIndexedAccessType(type: IndexedAccessType) {
+            const id = "w," + type.objectType.id + "," + type.indexType.id;
+            let writeType = indexedAccessTypes.get(id);
+            if (!writeType) {
+                writeType = <IndexedAccessType>createType(TypeFlags.IndexedAccess);
+                writeType.objectType = type.objectType;
+                writeType.indexType = type.indexType;
+                writeType.writing = true;
+                indexedAccessTypes.set(id, writeType);
+            }
+            return writeType;
         }
 
         /**
@@ -12016,9 +12030,9 @@ namespace ts {
             return !!(type.flags & TypeFlags.TypeParameter && (<TypeParameter>type).isThisType);
         }
 
-        function getSimplifiedType(type: Type, writing: boolean): Type {
-            return type.flags & TypeFlags.IndexedAccess ? getSimplifiedIndexedAccessType(<IndexedAccessType>type, writing) :
-                type.flags & TypeFlags.Conditional ? getSimplifiedConditionalType(<ConditionalType>type, writing) :
+        function getSimplifiedType(type: Type): Type {
+            return type.flags & TypeFlags.IndexedAccess ? getSimplifiedIndexedAccessType(<IndexedAccessType>type) :
+                type.flags & TypeFlags.Conditional ? getSimplifiedConditionalType(<ConditionalType>type) :
                 type;
         }
 
@@ -12027,7 +12041,7 @@ namespace ts {
             // (T | U)[K] -> T[K] & U[K] (writing)
             // (T & U)[K] -> T[K] & U[K]
             if (objectType.flags & TypeFlags.UnionOrIntersection) {
-                const types = map((objectType as UnionOrIntersectionType).types, t => getSimplifiedType(getIndexedAccessType(t, indexType), writing));
+                const types = map((objectType as UnionOrIntersectionType).types, t => getSimplifiedType(getIndexedAccessType(t, indexType)));
                 return objectType.flags & TypeFlags.Intersection || writing ? getIntersectionType(types) : getUnionType(types);
             }
         }
@@ -12036,7 +12050,7 @@ namespace ts {
             // T[A | B] -> T[A] | T[B] (reading)
             // T[A | B] -> T[A] & T[B] (writing)
             if (indexType.flags & TypeFlags.Union) {
-                const types = map((indexType as UnionType).types, t => getSimplifiedType(getIndexedAccessType(objectType, t), writing));
+                const types = map((indexType as UnionType).types, t => getSimplifiedType(getIndexedAccessType(objectType, t)));
                 return writing ? getIntersectionType(types) : getUnionType(types);
             }
         }
@@ -12044,7 +12058,8 @@ namespace ts {
         // Transform an indexed access to a simpler form, if possible. Return the simpler form, or return
         // the type itself if no transformation is possible. The writing flag indicates that the type is
         // the target of an assignment.
-        function getSimplifiedIndexedAccessType(type: IndexedAccessType, writing: boolean): Type {
+        function getSimplifiedIndexedAccessType(type: IndexedAccessType): Type {
+            const writing = type.writing;
             const cache = writing ? "simplifiedForWriting" : "simplifiedForReading";
             if (type[cache]) {
                 return type[cache] === circularConstraintType ? type : type[cache]!;
@@ -12052,8 +12067,8 @@ namespace ts {
             type[cache] = circularConstraintType;
             // We recursively simplify the object type as it may in turn be an indexed access type. For example, with
             // '{ [P in T]: { [Q in U]: number } }[T][U]' we want to first simplify the inner indexed access type.
-            const objectType = getSimplifiedType(type.objectType, writing);
-            const indexType = getSimplifiedType(type.indexType, writing);
+            const objectType = getSimplifiedType(type.objectType);
+            const indexType = getSimplifiedType(type.indexType);
             // T[A | B] -> T[A] | T[B] (reading)
             // T[A | B] -> T[A] & T[B] (writing)
             const distributedOverIndex = distributeObjectOverIndexType(objectType, indexType, writing);
@@ -12077,12 +12092,12 @@ namespace ts {
             // that substitutes the index type for P. For example, for an index access { [P in K]: Box<T[P]> }[X], we
             // construct the type Box<T[X]>.
             if (isGenericMappedType(objectType)) {
-                return type[cache] = mapType(substituteIndexedMappedType(objectType, type.indexType), t => getSimplifiedType(t, writing));
+                return type[cache] = mapType(substituteIndexedMappedType(objectType, type.indexType), t => getSimplifiedType(t));
             }
             return type[cache] = type;
         }
 
-        function getSimplifiedConditionalType(type: ConditionalType, writing: boolean) {
+        function getSimplifiedConditionalType(type: ConditionalType) {
             const checkType = type.checkType;
             const extendsType = type.extendsType;
             const trueType = getTrueTypeFromConditionalType(type);
@@ -12090,7 +12105,7 @@ namespace ts {
             // Simplifications for types of the form `T extends U ? T : never` and `T extends U ? never : T`.
             if (falseType.flags & TypeFlags.Never && getActualTypeVariable(trueType) === getActualTypeVariable(checkType)) {
                 if (checkType.flags & TypeFlags.Any || isTypeAssignableTo(getRestrictiveInstantiation(checkType), getRestrictiveInstantiation(extendsType))) { // Always true
-                    return getSimplifiedType(trueType, writing);
+                    return getSimplifiedType(trueType);
                 }
                 else if (isIntersectionEmpty(checkType, extendsType)) { // Always false
                     return neverType;
@@ -12101,7 +12116,7 @@ namespace ts {
                     return neverType;
                 }
                 else if (checkType.flags & TypeFlags.Any || isIntersectionEmpty(checkType, extendsType)) { // Always false
-                    return getSimplifiedType(falseType, writing);
+                    return getSimplifiedType(falseType);
                 }
             }
             return type;
@@ -12143,7 +12158,7 @@ namespace ts {
                     return objectType;
                 }
                 // Defer the operation by creating an indexed access type.
-                const id = objectType.id + "," + indexType.id;
+                const id = "r," + objectType.id + "," + indexType.id;
                 let type = indexedAccessTypes.get(id);
                 if (!type) {
                     indexedAccessTypes.set(id, type = createIndexedAccessType(objectType, indexType));
@@ -14494,10 +14509,10 @@ namespace ts {
                     target = (<SubstitutionType>target).typeVariable;
                 }
                 if (source.flags & TypeFlags.Simplifiable) {
-                    source = getSimplifiedType(source, /*writing*/ false);
+                    source = getSimplifiedType(source);
                 }
                 if (target.flags & TypeFlags.Simplifiable) {
-                    target = getSimplifiedType(target, /*writing*/ true);
+                    target = getSimplifiedType(target);
                 }
 
                 // Try to see if we're relating something like `Foo` -> `Bar | null | undefined`.
@@ -17429,16 +17444,16 @@ namespace ts {
                     }
                     else {
                         // Infer to the simplified version of an indexed access, if possible, to (hopefully) expose more bare type parameters to the inference engine
-                        const simplified = getSimplifiedType(target, /*writing*/ false);
+                        const simplified = getSimplifiedType(target);
                         if (simplified !== target) {
                             invokeOnce(source, simplified, inferFromTypes);
                         }
                         else if (target.flags & TypeFlags.IndexedAccess) {
-                            const indexType = getSimplifiedType((target as IndexedAccessType).indexType, /*writing*/ false);
+                            const indexType = getSimplifiedType((target as IndexedAccessType).indexType);
                             // Generally simplifications of instantiable indexes are avoided to keep relationship checking correct, however if our target is an access, we can consider
                             // that key of that access to be "instantiated", since we're looking to find the infernce goal in any way we can.
                             if (indexType.flags & TypeFlags.Instantiable) {
-                                const simplified = distributeIndexOverObjectType(getSimplifiedType((target as IndexedAccessType).objectType, /*writing*/ false), indexType, /*writing*/ false);
+                                const simplified = distributeIndexOverObjectType(getSimplifiedType((target as IndexedAccessType).objectType), indexType, (target as IndexedAccessType).writing);
                                 if (simplified && simplified !== target) {
                                     invokeOnce(source, simplified, inferFromTypes);
                                 }
@@ -26901,6 +26916,7 @@ namespace ts {
                         Diagnostics.The_left_hand_side_of_an_assignment_expression_may_not_be_an_optional_property_access)
                         && (!isIdentifier(left) || unescapeLeadingUnderscores(left.escapedText) !== "exports")) {
                         // to avoid cascading errors check assignability only if 'isReference' check succeeded and no errors were reported
+                        leftType = leftType.flags & TypeFlags.IndexedAccess ? getWritingIndexedAccessType(<IndexedAccessType>leftType) : leftType;
                         checkTypeAssignableToAndOptionallyElaborate(valueType, leftType, left, right);
                     }
                 }

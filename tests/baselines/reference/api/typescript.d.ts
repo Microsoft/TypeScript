@@ -2444,6 +2444,7 @@ declare namespace ts {
     export interface IndexedAccessType extends InstantiableType {
         objectType: Type;
         indexType: Type;
+        writing: boolean;
         constraint?: Type;
         simplifiedForReading?: Type;
         simplifiedForWriting?: Type;
