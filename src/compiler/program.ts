@@ -706,8 +706,7 @@ namespace ts {
         let files: SourceFile[];
         let symlinks: ReadonlyMap<string> | undefined;
         let commonSourceDirectory: string;
-        let diagnosticsProducingTypeChecker: TypeChecker;
-        let noDiagnosticsTypeChecker: TypeChecker;
+        let typeChecker: TypeChecker;
         let classifiableNames: UnderscoreEscapedMap<true>;
         const ambientModuleNameToUnmodifiedFileName = createMap<string>();
         // Todo:: Use this to report why file was included in --extendedDiagnostics
@@ -938,20 +937,18 @@ namespace ts {
             getProgramDiagnostics,
             getTypeChecker,
             getClassifiableNames,
-            getDiagnosticsProducingTypeChecker,
             getCommonSourceDirectory,
             emit,
             getCurrentDirectory: () => currentDirectory,
-            getNodeCount: () => getDiagnosticsProducingTypeChecker().getNodeCount(),
-            getIdentifierCount: () => getDiagnosticsProducingTypeChecker().getIdentifierCount(),
-            getSymbolCount: () => getDiagnosticsProducingTypeChecker().getSymbolCount(),
-            getTypeCount: () => getDiagnosticsProducingTypeChecker().getTypeCount(),
-            getRelationCacheSizes: () => getDiagnosticsProducingTypeChecker().getRelationCacheSizes(),
+            getNodeCount: () => getTypeChecker().getNodeCount(),
+            getIdentifierCount: () => getTypeChecker().getIdentifierCount(),
+            getSymbolCount: () => getTypeChecker().getSymbolCount(),
+            getTypeCount: () => getTypeChecker().getTypeCount(),
+            getRelationCacheSizes: () => getTypeChecker().getRelationCacheSizes(),
             getFileProcessingDiagnostics: () => fileProcessingDiagnostics,
             getResolvedTypeReferenceDirectives: () => resolvedTypeReferenceDirectives,
             isSourceFileFromExternalLibrary,
             isSourceFileDefaultLibrary,
-            dropDiagnosticsProducingTypeChecker,
             getSourceFileFromReference,
             getLibFileFromReference,
             sourceFileToPackageName,
@@ -1547,16 +1544,8 @@ namespace ts {
             }
         }
 
-        function getDiagnosticsProducingTypeChecker() {
-            return diagnosticsProducingTypeChecker || (diagnosticsProducingTypeChecker = createTypeChecker(program, /*produceDiagnostics:*/ true));
-        }
-
-        function dropDiagnosticsProducingTypeChecker() {
-            diagnosticsProducingTypeChecker = undefined!;
-        }
-
         function getTypeChecker() {
-            return noDiagnosticsTypeChecker || (noDiagnosticsTypeChecker = createTypeChecker(program, /*produceDiagnostics:*/ false));
+            return typeChecker || (typeChecker = createTypeChecker(program));
         }
 
         function emit(sourceFile?: SourceFile, writeFileCallback?: WriteFileCallback, cancellationToken?: CancellationToken, emitOnlyDtsFiles?: boolean, transformers?: CustomTransformers, forceDtsEmit?: boolean): EmitResult {
@@ -1581,7 +1570,7 @@ namespace ts {
             // This is because in the -out scenario all files need to be emitted, and therefore all
             // files need to be type checked. And the way to specify that all files need to be type
             // checked is to not pass the file to getEmitResolver.
-            const emitResolver = getDiagnosticsProducingTypeChecker().getEmitResolver((options.outFile || options.out) ? undefined : sourceFile, cancellationToken);
+            const emitResolver = getTypeChecker().getEmitResolver((options.outFile || options.out) ? undefined : sourceFile, cancellationToken);
 
             performance.mark("beforeEmit");
 
@@ -1687,15 +1676,7 @@ namespace ts {
                 if (e instanceof OperationCanceledException) {
                     // We were canceled while performing the operation.  Because our type checker
                     // might be a bad state, we need to throw it away.
-                    //
-                    // Note: we are overly aggressive here.  We do not actually *have* to throw away
-                    // the "noDiagnosticsTypeChecker".  However, for simplicity, i'd like to keep
-                    // the lifetimes of these two TypeCheckers the same.  Also, we generally only
-                    // cancel when the user has made a change anyways.  And, in that case, we (the
-                    // program instance) will get thrown away anyways.  So trying to keep one of
-                    // these type checkers alive doesn't serve much purpose.
-                    noDiagnosticsTypeChecker = undefined!;
-                    diagnosticsProducingTypeChecker = undefined!;
+                    typeChecker = undefined!;
                 }
 
                 throw e;
@@ -1719,7 +1700,7 @@ namespace ts {
                     return emptyArray;
                 }
 
-                const typeChecker = getDiagnosticsProducingTypeChecker();
+                const typeChecker = getTypeChecker();
 
                 Debug.assert(!!sourceFile.bindDiagnostics);
 
@@ -1747,7 +1728,7 @@ namespace ts {
 
         function getSuggestionDiagnostics(sourceFile: SourceFile, cancellationToken: CancellationToken): readonly DiagnosticWithLocation[] {
             return runWithCancellationToken(() => {
-                return getDiagnosticsProducingTypeChecker().getSuggestionDiagnostics(sourceFile, cancellationToken);
+                return getTypeChecker().getSuggestionDiagnostics(sourceFile, cancellationToken);
             });
         }
 
@@ -1984,7 +1965,7 @@ namespace ts {
 
         function getDeclarationDiagnosticsForFileNoCache(sourceFile: SourceFile | undefined, cancellationToken: CancellationToken | undefined): readonly DiagnosticWithLocation[] {
             return runWithCancellationToken(() => {
-                const resolver = getDiagnosticsProducingTypeChecker().getEmitResolver(sourceFile, cancellationToken);
+                const resolver = getTypeChecker().getEmitResolver(sourceFile, cancellationToken);
                 // Don't actually write any files since we're just getting diagnostics.
                 return ts.getDeclarationDiagnostics(getEmitHost(noop), resolver, sourceFile) || emptyArray;
             });
@@ -2043,7 +2024,7 @@ namespace ts {
         }
 
         function getGlobalDiagnostics(): SortedReadonlyArray<Diagnostic> {
-            return rootNames.length ? sortAndDeduplicateDiagnostics(getDiagnosticsProducingTypeChecker().getGlobalDiagnostics().slice()) : emptyArray as any as SortedReadonlyArray<Diagnostic>;
+            return rootNames.length ? sortAndDeduplicateDiagnostics(getTypeChecker().getGlobalDiagnostics().slice()) : emptyArray as any as SortedReadonlyArray<Diagnostic>;
         }
 
         function getConfigFileParsingDiagnostics(): readonly Diagnostic[] {
