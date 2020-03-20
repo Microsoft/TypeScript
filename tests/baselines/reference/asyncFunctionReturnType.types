@@ -180,8 +180,8 @@ async function fGenericIndexedTypeForExplicitPromiseOfAnyProp<TObj extends Obj>(
 >anyProp : any
 }
 
-async function fGenericIndexedTypeForKProp<TObj extends Obj, K extends keyof TObj>(obj: TObj, key: K): Promise<TObj[K]> {
->fGenericIndexedTypeForKProp : <TObj extends Obj, K extends keyof TObj>(obj: TObj, key: K) => Promise<TObj[K]>
+async function fGenericIndexedTypeForKProp<TObj extends Obj, K extends keyof TObj>(obj: TObj, key: K): Promise<Awaited<TObj[K]>> {
+>fGenericIndexedTypeForKProp : <TObj extends Obj, K extends keyof TObj>(obj: TObj, key: K) => Promise<Awaited<TObj[K]>>
 >obj : TObj
 >key : K
 
@@ -220,3 +220,20 @@ async function fGenericIndexedTypeForExplicitPromiseOfKProp<TObj extends Obj, K 
 >obj : TObj
 >key : K
 }
+
+// #27711
+
+async function fGeneric<T>(x: T) {
+>fGeneric : <T>(x: T) => Promise<Awaited<T>>
+>x : T
+
+    return x;
+>x : T
+}
+const expected: Promise<string> = fGeneric(undefined as Promise<string>);
+>expected : Promise<string>
+>fGeneric(undefined as Promise<string>) : Promise<string>
+>fGeneric : <T>(x: T) => Promise<Awaited<T>>
+>undefined as Promise<string> : Promise<string>
+>undefined : undefined
+
