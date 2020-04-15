@@ -80,7 +80,9 @@ define(["require", "exports"], function (require, exports) {
             });
         }
     }
+
     class D {
+
         constructor() {
             this.myModule = new Promise((resolve_4, reject_4) => { require(["./0"], resolve_4, reject_4); });
         }

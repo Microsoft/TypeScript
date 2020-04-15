@@ -42,8 +42,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var CBaseBase = /** @class */ (function () {
-    function CBaseBase(x) {
-    }
+    function CBaseBase(x) {}
     return CBaseBase;
 }());
 var CBase = /** @class */ (function (_super) {
@@ -75,6 +74,7 @@ var C = /** @class */ (function (_super) {
     C.prototype.alsoWorks = function () {
         new CBase(this); // Should not error, parameter is of type Parameter<Wrapper<T1>>
     };
+
     C.prototype.method = function (t) { };
     return C;
 }(CBase));

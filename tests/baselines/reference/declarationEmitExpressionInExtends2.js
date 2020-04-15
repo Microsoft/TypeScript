@@ -33,6 +33,7 @@ var C = /** @class */ (function () {
 function getClass(c) {
     return C;
 }
+
 var MyClass = /** @class */ (function (_super) {
     __extends(MyClass, _super);
     function MyClass() {

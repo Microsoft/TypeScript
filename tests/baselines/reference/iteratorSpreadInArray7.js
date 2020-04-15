@@ -23,9 +23,11 @@ class SymbolIterator {
             done: false
         };
     }
+
     [Symbol.iterator]() {
         return this;
     }
 }
+
 var array;
 array.concat([...new SymbolIterator]);

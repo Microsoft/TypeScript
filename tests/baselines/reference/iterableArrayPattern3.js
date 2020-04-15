@@ -18,10 +18,8 @@ var a: Bar, b: Bar;
 [a, b] = new FooIterator;
 
 //// [iterableArrayPattern3.js]
-class Bar {
-}
-class Foo extends Bar {
-}
+class Bar {}
+class Foo extends Bar {}
 class FooIterator {
     next() {
         return {
@@ -29,9 +27,11 @@ class FooIterator {
             done: false
         };
     }
+
     [Symbol.iterator]() {
         return this;
     }
 }
+
 var a, b;
 [a, b] = new FooIterator;

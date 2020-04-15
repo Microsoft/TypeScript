@@ -98,6 +98,15 @@ function subarea(s) {
         case "circle": return Math.PI * s[0].sub.under["shape"].radius * s[0]["sub"].under.shape["radius"];
     }
 }
+
+
+
+
+
+
+
+
+
 function check(z, c) {
     z[0]; // fine, typescript sees "xx" | "yy"
     switch (z[0]) {
@@ -118,6 +127,7 @@ function check(z, c) {
             break;
     }
 }
+
 function g(pair) {
     return pair[1] ? pair[1] : 'nope';
 }

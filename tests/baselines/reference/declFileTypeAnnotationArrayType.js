@@ -83,6 +83,7 @@ function foo() {
 function foo2() {
     return [new c()];
 }
+
 // Qualified name
 function foo3() {
     return [new m.c()];
@@ -90,6 +91,7 @@ function foo3() {
 function foo4() {
     return m.c;
 }
+
 // Just the name with type arguments
 function foo5() {
     return [new g()];
@@ -97,6 +99,7 @@ function foo5() {
 function foo6() {
     return [new g()];
 }
+
 // Qualified name with type arguments
 function foo7() {
     return [new m.g()];
@@ -104,6 +107,7 @@ function foo7() {
 function foo8() {
     return [new m.g()];
 }
+
 // Array of function types
 function foo9() {
     return [function () { return new c(); }];

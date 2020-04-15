@@ -108,23 +108,19 @@ function f(i: Indexed) {
 
 //// [typeGuardOfFromPropNameInUnionType.js]
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 var B = /** @class */ (function () {
-    function B() {
-    }
+    function B() {}
     return B;
 }());
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var D = /** @class */ (function () {
-    function D() {
-    }
+    function D() {}
     return D;
 }());
 function namedClasses(x) {
@@ -135,6 +131,7 @@ function namedClasses(x) {
         x.b = 1;
     }
 }
+
 function multipleClasses(x) {
     if ("a" in x) {
         var y = x.a;
@@ -143,6 +140,7 @@ function multipleClasses(x) {
         var z = x.b;
     }
 }
+
 function anonymousClasses(x) {
     if ("a" in x) {
         var y = x.a;
@@ -151,14 +149,13 @@ function anonymousClasses(x) {
         var z = x.b;
     }
 }
+
 var AWithOptionalProp = /** @class */ (function () {
-    function AWithOptionalProp() {
-    }
+    function AWithOptionalProp() {}
     return AWithOptionalProp;
 }());
 var BWithOptionalProp = /** @class */ (function () {
-    function BWithOptionalProp() {
-    }
+    function BWithOptionalProp() {}
     return BWithOptionalProp;
 }());
 function positiveTestClassesWithOptionalProperties(x) {
@@ -171,6 +168,7 @@ function positiveTestClassesWithOptionalProperties(x) {
             : x.b;
     }
 }
+
 function inParenthesizedExpression(x) {
     if ("a" in (x)) {
         var y = x.a;
@@ -179,9 +177,9 @@ function inParenthesizedExpression(x) {
         var z = x.b;
     }
 }
+
 var ClassWithUnionProp = /** @class */ (function () {
-    function ClassWithUnionProp() {
-    }
+    function ClassWithUnionProp() {}
     return ClassWithUnionProp;
 }());
 function inProperty(x) {
@@ -192,9 +190,9 @@ function inProperty(x) {
         var z = x.prop.b;
     }
 }
+
 var NestedClassWithProp = /** @class */ (function () {
-    function NestedClassWithProp() {
-    }
+    function NestedClassWithProp() {}
     return NestedClassWithProp;
 }());
 function innestedProperty(x) {
@@ -205,6 +203,7 @@ function innestedProperty(x) {
         var z = x.outer.prop.b;
     }
 }
+
 var InMemberOfClass = /** @class */ (function () {
     function InMemberOfClass() {
     }
@@ -231,6 +230,7 @@ var SelfAssert = /** @class */ (function () {
     };
     return SelfAssert;
 }());
+
 function f(i) {
     if ("a" in i) {
         return i.a;

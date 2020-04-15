@@ -12,8 +12,7 @@ define(["require", "exports"], function (require, exports) {
     exports.__esModule = true;
     exports.C = void 0;
     var C = /** @class */ (function () {
-        function C() {
-        }
+        function C() {}
         return C;
     }());
     exports.C = C;
@@ -22,6 +21,5 @@ define(["require", "exports"], function (require, exports) {
 define(["require", "exports"], function (require, exports) {
     "use strict";
     exports.__esModule = true;
-    from;
-    "./0";
+    from;"./0";
 });

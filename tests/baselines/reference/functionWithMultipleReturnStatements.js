@@ -74,6 +74,7 @@ function f1() {
         return '';
     }
 }
+
 function f2() {
     if (true) {
         return 1;
@@ -85,6 +86,7 @@ function f2() {
         return '';
     }
 }
+
 function f3() {
     try {
         return 1;
@@ -93,6 +95,7 @@ function f3() {
         return '';
     }
 }
+
 function f4() {
     try {
         return 1;
@@ -103,10 +106,12 @@ function f4() {
         return '';
     }
 }
+
 function f5() {
     return 1;
     return '';
 }
+
 function f6(x, y) {
     if (true) {
         return x;
@@ -115,6 +120,7 @@ function f6(x, y) {
         return y;
     }
 }
+
 function f8(x, y) {
     if (true) {
         return x;

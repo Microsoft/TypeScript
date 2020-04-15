@@ -16,12 +16,14 @@ var SFCComp = SFC1 || SFC2;
 "use strict";
 exports.__esModule = true;
 var React = require("react");
+
 function SFC1(prop) {
     return React.createElement("div", null, "hello");
-}
-;
+};
+
 function SFC2(prop) {
     return React.createElement("h1", null, "World ");
 }
+
 var SFCComp = SFC1 || SFC2;
 React.createElement(SFCComp, { x: "hi" });

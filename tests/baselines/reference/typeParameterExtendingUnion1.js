@@ -27,8 +27,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Animal = /** @class */ (function () {
-    function Animal() {
-    }
+    function Animal() {}
     Animal.prototype.run = function () { };
     return Animal;
 }());
@@ -49,6 +48,7 @@ var Dog = /** @class */ (function (_super) {
 function run(a) {
     a.run();
 }
+
 function f(a) {
     a.run();
     run(a);

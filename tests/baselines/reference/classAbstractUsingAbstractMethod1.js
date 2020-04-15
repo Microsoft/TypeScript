@@ -53,5 +53,6 @@ var C = /** @class */ (function (_super) {
 }(A));
 var a = new B;
 a.foo();
+
 a = new C; // error, cannot instantiate abstract class.
 a.foo();

@@ -277,6 +277,7 @@ module TypeScript {
 ///<reference path='typescript.ts' />
 var TypeScript;
 (function (TypeScript) {
+
     function hasFlag(val, flag) {
         return (val & flag) != 0;
     }
@@ -511,8 +512,11 @@ var TypeScript;
     // Compiler defaults to generating ES5-compliant code for
     //  - getters and setters
     TypeScript.codeGenTarget = CodeGenTarget.ES3;
+
     TypeScript.moduleGenTarget = ModuleGenTarget.Synchronous;
+
     TypeScript.optimizeModuleCodeGen = true;
+
     function flagsToString(e, flags) {
         var builder = "";
         for (var i = 1; i < (1 << 31); i = i << 1) {

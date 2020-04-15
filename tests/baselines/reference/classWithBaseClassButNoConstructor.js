@@ -55,8 +55,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Base = /** @class */ (function () {
-    function Base(x) {
-    }
+    function Base(x) {}
     return Base;
 }());
 var C = /** @class */ (function (_super) {
@@ -69,9 +68,9 @@ var C = /** @class */ (function (_super) {
 var r = C;
 var c = new C(); // error
 var c2 = new C(1); // ok
+
 var Base2 = /** @class */ (function () {
-    function Base2(x) {
-    }
+    function Base2(x) {}
     return Base2;
 }());
 var D = /** @class */ (function (_super) {
@@ -84,6 +83,8 @@ var D = /** @class */ (function (_super) {
 var r2 = D;
 var d = new D(); // error
 var d2 = new D(1); // ok
+
+
 // specialized base class
 var D2 = /** @class */ (function (_super) {
     __extends(D2, _super);
@@ -95,6 +96,7 @@ var D2 = /** @class */ (function (_super) {
 var r3 = D2;
 var d3 = new D(); // error
 var d4 = new D(1); // ok
+
 var D3 = /** @class */ (function (_super) {
     __extends(D3, _super);
     function D3() {

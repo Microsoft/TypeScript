@@ -90,13 +90,16 @@ declare var x;
 //// [commentsemitComments.js]
 /** Variable comments*/
 var myVariable = 10;
+
 /** function comments*/
 function foo(/** parameter comment*/ p) {
 }
+
 /** variable with function type comment*/
 var fooVar;
 foo(50);
 fooVar();
+
 /**class comment*/
 var c = /** @class */ (function () {
     /** constructor comment*/
@@ -104,6 +107,10 @@ var c = /** @class */ (function () {
         /** property comment */
         this.b = 10;
     }
+
+
+
+
     /** function comment */
     c.prototype.myFoo = function () {
         return this.b;
@@ -128,6 +135,8 @@ var c = /** @class */ (function () {
 }());
 /**instance comment*/
 var i = new c();
+
+
 /**interface instance comments*/
 var i1_i;
 /** this is module comment*/

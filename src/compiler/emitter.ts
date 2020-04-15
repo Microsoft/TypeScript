@@ -361,6 +361,7 @@ namespace ts {
             const printerOptions: PrinterOptions = {
                 removeComments: compilerOptions.removeComments,
                 newLine: compilerOptions.newLine,
+                preserveSourceNewlines: true,
                 noEmitHelpers: compilerOptions.noEmitHelpers,
                 module: compilerOptions.module,
                 target: compilerOptions.target,
@@ -2366,16 +2367,10 @@ namespace ts {
 
         function emitParenthesizedExpression(node: ParenthesizedExpression) {
             const openParenPos = emitTokenWithComment(SyntaxKind.OpenParenToken, node.pos, writePunctuation, node);
-            const leadingNewlines = preserveSourceNewlines && getLeadingLineTerminatorCount(node, [node.expression], ListFormat.None);
-            if (leadingNewlines) {
-                writeLinesAndIndent(leadingNewlines, /*writeLinesIfNotIndenting*/ false);
-            }
+            const indented = writeLineSeparatorsAndIndentBefore(node.expression, node);
             emitExpression(node.expression);
-            const trailingNewlines = preserveSourceNewlines && getClosingLineTerminatorCount(node, [node.expression], ListFormat.None);
-            if (trailingNewlines) {
-                writeLine(trailingNewlines);
-            }
-            decreaseIndentIf(leadingNewlines);
+            writeLineSeparatorsAfter(node.expression, node);
+            decreaseIndentIf(indented);
             emitTokenWithComment(SyntaxKind.CloseParenToken, node.expression ? node.expression.end : openParenPos, writePunctuation, node);
         }
 
@@ -3293,12 +3288,15 @@ namespace ts {
             writePunctuation("<");
 
             if (isJsxOpeningElement(node)) {
+                const indented = writeLineSeparatorsAndIndentBefore(node.tagName, node);
                 emitJsxTagName(node.tagName);
                 emitTypeArguments(node, node.typeArguments);
                 if (node.attributes.properties && node.attributes.properties.length > 0) {
                     writeSpace();
                 }
                 emit(node.attributes);
+                writeLineSeparatorsAfter(node.attributes, node);
+                decreaseIndentIf(indented);
             }
 
             writePunctuation(">");
@@ -3687,7 +3685,9 @@ namespace ts {
             const statements = node.statements;
             pushNameGenerationScope(node);
             forEach(node.statements, generateNames);
-            emitHelpers(node);
+            if (emitHelpers(node)) {
+                writeLine();
+            }
             const index = findIndex(statements, statement => !isPrologueDirective(statement));
             emitTripleSlashDirectivesIfNeeded(node);
             emitList(node, statements, ListFormat.MultiLine, index === -1 ? statements.length : index);
@@ -4302,6 +4302,7 @@ namespace ts {
                         return getEffectiveLines(
                             includeComments => getLinesBetweenPositionAndPrecedingNonWhitespaceCharacter(
                                 firstChild.pos,
+                                parentNode.pos,
                                 currentSourceFile!,
                                 includeComments));
                     }
@@ -4323,12 +4324,12 @@ namespace ts {
                     // JsxText will be written with its leading whitespace, so don't add more manually.
                     return 0;
                 }
-                else if (!nodeIsSynthesized(previousNode) && !nodeIsSynthesized(nextNode) && previousNode.parent === nextNode.parent) {
+                else if (siblingNodePositionsAreComparable(previousNode, nextNode)) {
                     if (preserveSourceNewlines) {
                         return getEffectiveLines(
                             includeComments => getLinesBetweenRangeEndAndRangeStart(
-                                previousNode,
-                                nextNode,
+                                getOriginalNode(previousNode),
+                                getOriginalNode(nextNode),
                                 currentSourceFile!,
                                 includeComments));
                     }
@@ -4342,6 +4343,22 @@ namespace ts {
                 return 1;
             }
             return format & ListFormat.MultiLine ? 1 : 0;
+        }
+
+        function siblingNodePositionsAreComparable(previousNode: Node, nextNode: Node) {
+            if (previousNode.kind === SyntaxKind.NotEmittedStatement && nextNode.kind === SyntaxKind.NotEmittedStatement) {
+                return false;
+            }
+            if (nodeIsSynthesized(previousNode) || nodeIsSynthesized(nextNode)) {
+                return false;
+            }
+
+            if (!previousNode.parent || !nextNode.parent) {
+                const previousParent = getOriginalNode(previousNode).parent;
+                return previousParent && previousParent === getOriginalNode(nextNode).parent;
+            }
+
+            return nextNode.pos >= previousNode.end;
         }
 
         function getClosingLineTerminatorCount(parentNode: TextRange, children: readonly Node[], format: ListFormat): number {
@@ -4359,6 +4376,7 @@ namespace ts {
                         return getEffectiveLines(
                             includeComments => getLinesBetweenPositionAndNextNonWhitespaceCharacter(
                                 lastChild.end,
+                                parentNode.end,
                                 currentSourceFile!,
                                 includeComments));
                     }
@@ -4396,6 +4414,21 @@ namespace ts {
                 return getLineDifference(/*includeComments*/ false);
             }
             return lines;
+        }
+
+        function writeLineSeparatorsAndIndentBefore(node: Node, parent: Node): boolean {
+            const leadingNewlines = preserveSourceNewlines && getLeadingLineTerminatorCount(parent, [node], ListFormat.None);
+            if (leadingNewlines) {
+                writeLinesAndIndent(leadingNewlines, /*writeLinesIfNotIndenting*/ false);
+            }
+            return !!leadingNewlines;
+        }
+
+        function writeLineSeparatorsAfter(node: Node, parent: Node) {
+            const trailingNewlines = preserveSourceNewlines && getClosingLineTerminatorCount(parent, [node], ListFormat.None);
+            if (trailingNewlines) {
+                writeLine(trailingNewlines);
+            }
         }
 
         function synthesizedNodeStartsOnNewLine(node: Node, format: ListFormat) {

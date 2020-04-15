@@ -9,6 +9,8 @@ type object = I;
 
 
 //// [reservedNamesInAliases.js]
-type;
-void ;
-I;
+
+
+
+
+type;void ;I;

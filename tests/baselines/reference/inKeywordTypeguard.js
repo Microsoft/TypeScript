@@ -108,13 +108,11 @@ function positiveIntersectionTest(x: { a: string } & { b: string }) {
 
 //// [inKeywordTypeguard.js]
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 var B = /** @class */ (function () {
-    function B() {
-    }
+    function B() {}
     return B;
 }());
 function negativeClassesTest(x) {
@@ -125,6 +123,7 @@ function negativeClassesTest(x) {
         x.a = "1";
     }
 }
+
 function positiveClassesTest(x) {
     if ("a" in x) {
         x.b = "1";
@@ -133,14 +132,13 @@ function positiveClassesTest(x) {
         x.a = "1";
     }
 }
+
 var AWithOptionalProp = /** @class */ (function () {
-    function AWithOptionalProp() {
-    }
+    function AWithOptionalProp() {}
     return AWithOptionalProp;
 }());
 var BWithOptionalProp = /** @class */ (function () {
-    function BWithOptionalProp() {
-    }
+    function BWithOptionalProp() {}
     return BWithOptionalProp;
 }());
 function positiveTestClassesWithOptionalProperties(x) {
@@ -151,6 +149,7 @@ function positiveTestClassesWithOptionalProperties(x) {
         x.b = "1";
     }
 }
+
 var AWithMethod = /** @class */ (function () {
     function AWithMethod() {
     }
@@ -171,6 +170,7 @@ function negativeTestClassesWithMembers(x) {
     else {
     }
 }
+
 function negativeTestClassesWithMemberMissingInBothClasses(x) {
     if ("c" in x) {
         x.a();
@@ -181,14 +181,13 @@ function negativeTestClassesWithMemberMissingInBothClasses(x) {
         x.b();
     }
 }
+
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var D = /** @class */ (function () {
-    function D() {
-    }
+    function D() {}
     return D;
 }());
 function negativeMultipleClassesTest(x) {
@@ -199,9 +198,9 @@ function negativeMultipleClassesTest(x) {
         x.a = "1";
     }
 }
+
 var ClassWithUnionProp = /** @class */ (function () {
-    function ClassWithUnionProp() {
-    }
+    function ClassWithUnionProp() {}
     return ClassWithUnionProp;
 }());
 function negativePropTest(x) {
@@ -212,6 +211,7 @@ function negativePropTest(x) {
         var z = x.prop.a;
     }
 }
+
 var NegativeClassTest = /** @class */ (function () {
     function NegativeClassTest() {
     }

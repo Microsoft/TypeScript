@@ -26,8 +26,11 @@ import i = I;
 
 //// [invalidImportAliasIdentifiers.js]
 // none of these should work, since non are actually modules
+
 var V = 12;
+
 var v = V;
+
 var C = /** @class */ (function () {
     function C() {
     }
@@ -40,4 +43,6 @@ var E;
     E[E["Blue"] = 1] = "Blue";
 })(E || (E = {}));
 var e = E;
+
+
 var i = I;

@@ -17,6 +17,7 @@ Biz(new Foo());
 
 
 //// [assignmentCompatInterfaceWithStringIndexSignature.js]
+
 var Foo = /** @class */ (function () {
     function Foo() {
     }
@@ -24,4 +25,5 @@ var Foo = /** @class */ (function () {
     return Foo;
 }());
 function Biz(map) { }
+
 Biz(new Foo());

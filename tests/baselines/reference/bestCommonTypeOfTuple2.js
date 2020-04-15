@@ -37,18 +37,15 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var D = /** @class */ (function () {
-    function D() {
-    }
+    function D() {}
     return D;
 }());
 var E = /** @class */ (function () {
-    function E() {
-    }
+    function E() {}
     return E;
 }());
 var F = /** @class */ (function (_super) {
@@ -78,6 +75,7 @@ var t2;
 var t3;
 var t4;
 var t5;
+
 var e11 = t1[4]; // base
 var e21 = t2[4]; // {}
 var e31 = t3[4]; // C1

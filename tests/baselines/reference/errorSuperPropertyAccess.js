@@ -152,10 +152,15 @@ var NoBase = /** @class */ (function () {
         var a = _super.prototype.prototype;
         var b = _super.prototype.hasOwnProperty.call(this, '');
     }
+
     NoBase.prototype.fn = function () {
         var a = _super.prototype.prototype;
         var b = _super.prototype.hasOwnProperty.call(this, '');
     };
+
+
+
+
     //super static property access in static member function of class with no base type
     //super static property access in static member accessor(get and set) of class with no base type
     NoBase.static1 = function () {
@@ -180,8 +185,14 @@ var SomeBase = /** @class */ (function () {
         this.publicMember = 0;
     }
     SomeBase.prototype.privateFunc = function () { };
+
+
     SomeBase.prototype.publicFunc = function () { };
+
+
     SomeBase.privateStaticFunc = function () { };
+
+
     SomeBase.publicStaticFunc = function () { };
     SomeBase.privateStaticMember = 0;
     SomeBase.publicStaticMember = 0;
@@ -198,6 +209,7 @@ var SomeDerived1 = /** @class */ (function (_super) {
         _super.prototype.publicMember = 1;
         return _this;
     }
+
     SomeDerived1.prototype.fn = function () {
         var x = _super.prototype.publicMember;
     };
@@ -232,6 +244,7 @@ var SomeDerived2 = /** @class */ (function (_super) {
         _super.prototype.privateMember = 1;
         return _this;
     }
+
     SomeDerived2.prototype.fn = function () {
         var x = _super.prototype.privateMember;
     };

@@ -29,9 +29,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var x;
+
 function foo() {
     this.x = 1;
 }
+
 var C1 = /** @class */ (function (_super) {
     __extends(C1, _super);
     function C1() {

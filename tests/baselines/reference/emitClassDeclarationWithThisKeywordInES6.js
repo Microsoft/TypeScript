@@ -28,9 +28,11 @@ class B {
     foo() {
         B.log(this.x);
     }
+
     get X() {
         return this.x;
     }
+
     set bX(y) {
         this.x = y;
     }

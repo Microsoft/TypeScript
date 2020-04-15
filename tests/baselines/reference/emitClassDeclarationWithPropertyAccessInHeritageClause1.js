@@ -20,8 +20,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var B = /** @class */ (function () {
-    function B() {
-    }
+    function B() {}
     return B;
 }());
 function foo() {

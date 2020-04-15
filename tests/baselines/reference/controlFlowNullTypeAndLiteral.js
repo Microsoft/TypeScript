@@ -32,14 +32,17 @@ var objWithValMaybeNull = { val: 1 };
 var addOne = function (num) {
     return num + 1;
 };
+
 if (objWithValMaybeNull.val !== null)
     addOne(objWithValMaybeNull.val);
 if (objWithValMaybeNull.val !== myNull)
     addOne(objWithValMaybeNull.val);
+
 if (objWithValMaybeNull.val === null)
     addOne(objWithValMaybeNull.val); // Error
 if (objWithValMaybeNull.val === myNull)
     addOne(objWithValMaybeNull.val); // Error
+
 function f(x) {
     if (x === myNull) {
         var s = x; // Error

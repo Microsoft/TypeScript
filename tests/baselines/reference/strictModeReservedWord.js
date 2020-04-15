@@ -42,6 +42,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var let = 10;
+
 function foo() {
     "use strict";
     var public = 10;
@@ -53,6 +54,7 @@ function foo() {
     function baz() { }
     function barn(cb) { }
     barn(function (private, public, package) { });
+
     var myClass = /** @class */ (function (_super) {
         __extends(package, _super);
         function package() {
@@ -60,7 +62,9 @@ function foo() {
         }
         return package;
     }(public));
+
     var b;
+
     function foo(x) { }
     function foo1(x) { }
     function foo2(x) { }
@@ -68,3 +72,4 @@ function foo() {
     ublic();
     static();
 }
+

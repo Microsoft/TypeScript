@@ -35,7 +35,9 @@ module P {
 var P;
 (function (P) {
     {
+
         export = M;
+
         var v;
         function foo() { }
         export * from "ambient";
@@ -43,12 +45,12 @@ var P;
         export { baz as b } from "ambient";
         export default v;
         var C = /** @class */ (function () {
-            function C() {
-            }
+            function C() {}
             return C;
         }());
         export default C;
         export function bee() { }
+
         import I2 = require("foo");
         import * as Foo from "ambient";
         import bar from "ambient";

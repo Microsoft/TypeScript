@@ -32,25 +32,31 @@ export const l = async () => {
 export async function fn() {
     const req = await import('./test'); // ONE
 }
+
 export class cl1 {
     async m() {
         const req = await import('./test'); // TWO
     }
 }
+
+
 export const obj = {
     m: async () => {
         const req = await import('./test'); // THREE
     }
 };
+
 export class cl2 {
+
     constructor() {
         this.p = {
             m: async () => {
                 const req = await import('./test'); // FOUR
             }
         };
-    }
-}
+    }}
+
+
 export const l = async () => {
     const req = await import('./test'); // FIVE
 };

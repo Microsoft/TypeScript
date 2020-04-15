@@ -15,5 +15,8 @@ const v = chain({a: 1, b: 2}).mapValues(square).value();
 
 //// [mappedTypeNestedGenericInstantiation.js]
 // Repro from #13346
+
+
 var square = function (x) { return x * x; };
+
 var v = chain({ a: 1, b: 2 }).mapValues(square).value();

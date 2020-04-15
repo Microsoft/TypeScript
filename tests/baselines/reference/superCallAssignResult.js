@@ -25,8 +25,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var E = /** @class */ (function () {
-    function E(arg) {
-    }
+    function E(arg) {}
     return E;
 }());
 var H = /** @class */ (function (_super) {

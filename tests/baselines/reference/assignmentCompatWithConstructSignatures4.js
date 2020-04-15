@@ -116,8 +116,7 @@ var __extends = (this && this.__extends) || (function () {
 var Errors;
 (function (Errors) {
     var Base = /** @class */ (function () {
-        function Base() {
-        }
+        function Base() {}
         return Base;
     }());
     var Derived = /** @class */ (function (_super) {
@@ -154,33 +153,44 @@ var Errors;
         var a15;
         var a16;
         var a17;
+
         var b2;
         a2 = b2; // ok
         b2 = a2; // ok
+
         var b7;
         a7 = b7; // ok
         b7 = a7; // ok
+
         var b8;
         a8 = b8; // error, type mismatch
         b8 = a8; // error
+
+
         var b10;
         a10 = b10; // ok
         b10 = a10; // ok
+
         var b11;
         a11 = b11; // ok
         b11 = a11; // ok
+
         var b12;
         a12 = b12; // ok
         b12 = a12; // ok
+
         var b15;
         a15 = b15; // ok
         b15 = a15; // ok
+
         var b15a;
         a15 = b15a; // ok
         b15a = a15; // ok
+
         var b16;
         a16 = b16; // error
         b16 = a16; // error
+
         var b17;
         a17 = b17; // error
         b17 = a17; // error
@@ -192,6 +202,8 @@ var Errors;
         var b2;
         a2 = b2; // ok
         b2 = a2; // ok
+
+
         // target type has generic call signature
         var a3;
         var b3;

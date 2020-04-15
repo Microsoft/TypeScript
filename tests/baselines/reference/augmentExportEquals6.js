@@ -31,20 +31,17 @@ let c = x.B.b;
 define(["require", "exports"], function (require, exports) {
     "use strict";
     var foo = /** @class */ (function () {
-        function foo() {
-        }
+        function foo() {}
         return foo;
     }());
     (function (foo) {
         var A = /** @class */ (function () {
-            function A() {
-            }
+            function A() {}
             return A;
         }());
         foo.A = A;
         var B;
-        (function (B) {
-        })(B = foo.B || (foo.B = {}));
+        (function (B) {})(B = foo.B || (foo.B = {}));
     })(foo || (foo = {}));
     return foo;
 });
@@ -53,6 +50,7 @@ define(["require", "exports", "./file1"], function (require, exports, x) {
     "use strict";
     exports.__esModule = true;
     x.B.b = 1;
+
 });
 //// [file3.js]
 define(["require", "exports", "./file1", "./file2"], function (require, exports, x) {

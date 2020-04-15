@@ -18,7 +18,9 @@ var A = /** @class */ (function () {
     function A() {
         _field.set(this, 123);
     }
+
     A.prototype. = function () { };
+
     A. = function () { };
     Object.defineProperty(A.prototype, "", {
         get: function () { return ""; },
@@ -34,6 +36,10 @@ var A = /** @class */ (function () {
     });
     var _field, _sField;
     _field = new WeakMap(), _sField = new WeakMap();
-    _sField.set(A, "hello world");
+    _sField.set(A,
+
+
+
+        "hello world");
     return A;
 }());

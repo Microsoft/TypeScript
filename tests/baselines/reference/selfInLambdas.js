@@ -49,14 +49,20 @@ class X {
 //// [selfInLambdas.js]
 var o = {
     counter: 0,
+
     start: function () {
         var _this = this;
         window.onmousemove = function () {
             _this.counter++;
             var f = function () { return _this.counter; };
+
         };
+
     }
 };
+
+
+
 var X = /** @class */ (function () {
     function X() {
         this.value = "value";
@@ -68,6 +74,7 @@ var X = /** @class */ (function () {
             var inner = function () {
                 var y = _this.value;
             };
+
             inner();
         };
         outer();

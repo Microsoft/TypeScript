@@ -27,7 +27,9 @@ var C = /** @class */ (function () {
     }
     return C;
 }());
+
 var a;
+
 var b = {
     "a b": 1,
     "a b": 1

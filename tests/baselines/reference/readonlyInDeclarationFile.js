@@ -54,6 +54,7 @@ function g() {
 }
 
 //// [readonlyInDeclarationFile.js]
+
 var C = /** @class */ (function () {
     function C() {
     }
@@ -126,6 +127,7 @@ var C = /** @class */ (function () {
     return C;
 }());
 var z;
+
 function f() {
     return {
         get x() { return 1; },
@@ -133,6 +135,7 @@ function f() {
         set y(value) { }
     };
 }
+
 function g() {
     var x;
     return x;

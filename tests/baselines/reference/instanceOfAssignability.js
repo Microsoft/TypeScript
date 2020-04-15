@@ -103,6 +103,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 // Derived1 is assignable to, but not a subtype of, Base
 var Derived1 = /** @class */ (function () {
     function Derived1() {
@@ -141,6 +142,7 @@ function fn1(x) {
         var y = x;
     }
 }
+
 function fn2(x) {
     if (x instanceof Derived1) {
         // 1.5: y: Base
@@ -148,6 +150,7 @@ function fn2(x) {
         var y = x;
     }
 }
+
 function fn3(x) {
     if (x instanceof Derived2) {
         // 1.5: y: Derived2
@@ -155,6 +158,7 @@ function fn3(x) {
         var y = x;
     }
 }
+
 function fn4(x) {
     if (x instanceof Derived1) {
         // 1.5: y: {}
@@ -162,6 +166,7 @@ function fn4(x) {
         var y = x;
     }
 }
+
 function fn5(x) {
     if (x instanceof Derived2) {
         // 1.5: y: Derived1
@@ -169,6 +174,7 @@ function fn5(x) {
         var y = x;
     }
 }
+
 function fn6(x) {
     if (x instanceof Giraffe) {
         // 1.5: y: Derived1
@@ -176,6 +182,7 @@ function fn6(x) {
         var y = x;
     }
 }
+
 function fn7(x) {
     if (x instanceof Array) {
         // 1.5: y: Array<number>|Array<string>
@@ -183,9 +190,9 @@ function fn7(x) {
         var y = x;
     }
 }
+
 var ABC = /** @class */ (function () {
-    function ABC() {
-    }
+    function ABC() {}
     return ABC;
 }());
 function fn8(x) {
@@ -193,3 +200,5 @@ function fn8(x) {
         var y = x;
     }
 }
+
+

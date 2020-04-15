@@ -13,6 +13,7 @@ var a: A;
 a[""]; // Should be {}
 
 //// [hidingIndexSignatures.js]
+
 var b;
 b[""]; // Should be number
 var a;

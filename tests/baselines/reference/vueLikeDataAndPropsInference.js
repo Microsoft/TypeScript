@@ -46,6 +46,7 @@ test({
 })
 
 //// [vueLikeDataAndPropsInference.js]
+
 test({
     props: {
         foo: ''

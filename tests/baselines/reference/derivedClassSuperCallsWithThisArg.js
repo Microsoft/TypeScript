@@ -43,8 +43,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Base = /** @class */ (function () {
-    function Base(a) {
-    }
+    function Base(a) {}
     return Base;
 }());
 var Derived = /** @class */ (function (_super) {

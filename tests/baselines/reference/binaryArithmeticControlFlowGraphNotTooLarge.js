@@ -1301,6 +1301,7 @@ const foo = function (this: any) {
 // Repro from #29926 (expanded 10x for good measure)
 var foo = function () {
     var a, b, c, d, ab, bc, cd, da, blocks = this.blocks;
+
     if (this.first) {
         a = blocks[0] - 1;
         a = (a << 3) | (a >>> 29);
@@ -1325,6 +1326,7 @@ var foo = function () {
         b += ((c & d) | (~c & a)) + blocks[3];
         b = (b << 19) | (b >>> 13);
     }
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -1349,6 +1351,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -1396,6 +1399,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -1436,6 +1440,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -1460,6 +1465,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -1507,6 +1513,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -1547,6 +1554,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -1571,6 +1579,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -1618,6 +1627,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -1658,6 +1668,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -1682,6 +1693,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -1729,6 +1741,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -1769,6 +1782,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -1793,6 +1807,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -1840,6 +1855,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -1880,6 +1896,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -1904,6 +1921,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -1951,6 +1969,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -1991,6 +2010,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -2015,6 +2035,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -2062,6 +2083,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -2102,6 +2124,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -2126,6 +2149,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -2173,6 +2197,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -2213,6 +2238,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -2237,6 +2263,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -2284,6 +2311,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -2324,6 +2352,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -2348,6 +2377,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -2395,6 +2425,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -2435,6 +2466,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     a += ((b & c) | (~b & d)) + blocks[4];
     a = (a << 3) | (a >>> 29);
     d += ((a & b) | (~a & c)) + blocks[5];
@@ -2459,6 +2491,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += ((c & d) | (~c & a)) + blocks[15];
     b = (b << 19) | (b >>> 13);
+
     bc = b & c;
     a += (bc | (b & d) | (c & d)) + blocks[0] + 1518500249;
     a = (a << 3) | (a >>> 29);
@@ -2506,6 +2539,7 @@ var foo = function () {
     c = (c << 9) | (c >>> 23);
     b += ((c & d) | (c & a) | da) + blocks[15] + 1518500249;
     b = (b << 13) | (b >>> 19);
+
     bc = b ^ c;
     a += (bc ^ d) + blocks[0] + 1859775393;
     a = (a << 3) | (a >>> 29);
@@ -2546,6 +2580,7 @@ var foo = function () {
     c = (c << 11) | (c >>> 21);
     b += (da ^ c) + blocks[15] + 1859775393;
     b = (b << 15) | (b >>> 17);
+
     if (this.first) {
         this.h0 = a + 1732584193 << 0;
         this.h1 = b - 271733879 << 0;

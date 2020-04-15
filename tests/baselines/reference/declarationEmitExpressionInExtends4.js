@@ -32,11 +32,11 @@ var __extends = (this && this.__extends) || (function () {
 })();
 function getSomething() {
     return /** @class */ (function () {
-        function D() {
-        }
+        function D() {}
         return D;
     }());
 }
+
 var C = /** @class */ (function (_super) {
     __extends(C, _super);
     function C() {

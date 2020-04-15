@@ -24,6 +24,7 @@ exports.mkdirSync = mkdirSync;
 exports.__esModule = true;
 ///<reference path='voidAsNonAmbiguousReturnType_0.ts'/>
 var fs = require("./voidAsNonAmbiguousReturnType_0");
+
 function main() {
     fs.mkdirSync('test'); // should not error - return types are the same
 }

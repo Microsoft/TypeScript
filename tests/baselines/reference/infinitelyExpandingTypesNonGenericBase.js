@@ -55,6 +55,9 @@ var A = /** @class */ (function (_super) {
     }
     return A;
 }(Base));
+
+
 function o(type) {
 }
+
 o(A);

@@ -78,6 +78,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 /// <reference path="react16.d.ts" />
 var React = require("react");
+
+
 var AsyncLoader = /** @class */ (function (_super) {
     __extends(AsyncLoader, _super);
     function AsyncLoader() {
@@ -93,4 +95,5 @@ function load() {
         });
     });
 }
+
 var loader = React.createElement(AsyncLoader, { prop1: load, prop2: function (result) { return result; } });

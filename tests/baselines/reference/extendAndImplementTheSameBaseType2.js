@@ -49,5 +49,6 @@ var D = /** @class */ (function (_super) {
 var d = new D();
 var r = d.foo;
 var r2 = d.foo;
+
 var r3 = d.bar();
 var r4 = d.bar();

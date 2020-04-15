@@ -17,8 +17,11 @@ x = y;
 //// [recursiveInheritance2.js]
 ;
 var x = a();
+
 ;
 var y = b();
+
 ;
 var z = c();
+
 x = y;

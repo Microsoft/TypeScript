@@ -10,5 +10,6 @@ v1();
 
 
 //// [interfaceInheritance2.js]
+
 var v1;
 v1();

@@ -102,10 +102,10 @@ if (var1.constructor === C2) {
     var1; // C2
     var1.property1; // number
 }
+
 // Derived classes with the same structure
 var C3 = /** @class */ (function () {
-    function C3() {
-    }
+    function C3() {}
     return C3;
 }());
 var C4 = /** @class */ (function (_super) {
@@ -122,6 +122,7 @@ if (var2.constructor === C3) {
 if (var2.constructor === C4) {
     var2; // C4
 }
+
 // Disjointly structured classes
 var C5 = /** @class */ (function () {
     function C5() {
@@ -140,6 +141,7 @@ if (let3.constructor === C5) {
 if (let3.constructor === C6) {
     let3; // C6
 }
+
 // Classes with the same structure
 var C7 = /** @class */ (function () {
     function C7() {

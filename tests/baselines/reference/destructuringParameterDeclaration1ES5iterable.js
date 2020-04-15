@@ -124,33 +124,32 @@ function a1(_a) {
 function a2(o) { }
 function a3(_a) {
     var j = _a.j, k = _a.k, _b = _a.l, m = _b.m, n = _b.n, _c = __read(_a.q, 3), a = _c[0], b = _c[1], c = _c[2];
-}
-;
+};
 function a4(_a) {
     var x = _a.x, a = _a.a;
 }
+
 a1([1, 2, [["world"]]]);
 a1([1, 2, [["world"]], 3]);
+
 // If the declaration includes an initializer expression (which is permitted only
 // when the parameter list occurs in conjunction with a function body),
 // the parameter type is the widened form (section 3.11) of the type of the initializer expression.
-function b1(z) {
-    if (z === void 0) { z = [undefined, null]; }
-}
-;
-function b2(z, o) {
-    if (z === void 0) { z = null; }
-    if (o === void 0) { o = { x: 0, y: undefined }; }
-}
+function b1(z) {if (z === void 0) { z = [undefined, null]; }};
+function b2(z, o) {if (z === void 0) { z = null; }
+    if (o === void 0) { o = { x: 0, y: undefined }; }}
 function b3(_a) {
     var _b = (_a === void 0 ? { z: { x: "hi", y: { j: 1 } } } : _a).z, x = _b.x, j = _b.y.j;
 }
+
+
 function b6(_a) {
     var _b = __read(_a === void 0 ? [undefined, null, undefined] : _a, 3), a = _b[0], z = _b[1], y = _b[2];
 }
 function b7(_a) {
     var _b = __read(_a === void 0 ? [[undefined], undefined, [[undefined, undefined]]] : _a, 3), _c = __read(_b[0], 1), a = _c[0], b = _b[1], _d = __read(_b[2], 1), _e = __read(_d[0], 2), c = _e[0], d = _e[1];
 }
+
 b1([1, 2, 3]); // z is widen to the type any[]
 b2("string", { x: 200, y: "string" });
 b2("string", { x: 200, y: true });
@@ -179,24 +178,32 @@ function c5(_a) {
 function c6(_a) {
     var _b = __read(_a, 3), a = _b[0], b = _b[1], _c = __read(_b[2], 1), _d = __read(_c[0], 1), _e = _d[0], c = _e === void 0 ? 1 : _e;
 }
+
 c0({ z: { x: 1, y: { j: "world" } } }); // Implied type is { z: {x: any, y: {j: any}} }
 c0({ z: { x: "string", y: { j: true } } }); // Implied type is { z: {x: any, y: {j: any}} }
+
 c1(); // Implied type is {z:number}?
 c1({ z: 1 }); // Implied type is {z:number}?
+
 c2({}); // Implied type is {z?: number}
 c2({ z: 1 }); // Implied type is {z?: number}
+
 c3({ b: 1 }); // Implied type is { b: number|string }.
+
 c5([1, 2, [["string"]]]); // Implied type is is [any, any, [[any]]]
 c5([1, 2, [["string"]], false, true]); // Implied type is is [any, any, [[any]]]
+
+
+
+
 // A parameter can be marked optional by following its name or binding pattern with a question mark (?)
 // or by including an initializer.
 function d0(x) { }
-function d0(x) {
-    if (x === void 0) { x = 10; }
-}
+function d0(x) {if (x === void 0) { x = 10; }}
+
+
 var C2 = /** @class */ (function () {
-    function C2() {
-    }
+    function C2() {}
     C2.prototype.d3 = function () { };
     C2.prototype.d4 = function () { };
     C2.prototype.e0 = function (_a) {
@@ -222,6 +229,11 @@ function d5(_a) {
     var _b = _a === void 0 ? { x: 1, y: 2 } : _a, x = _b.x, y = _b.y;
 }
 d5(); // Parameter is optional as its declaration included an initializer
+
+
+
+
+
 // Destructuring parameter declarations do not permit type annotations on the individual binding patterns,
 // as such annotations would conflict with the already established meaning of colons in object literals.
 // Type annotations must instead be written on the top- level parameter declaration

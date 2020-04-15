@@ -22,6 +22,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var Mixin1 = function (Base) { return /** @class */ (function (_super) {
     __extends(class_1, _super);
     function class_1() {
@@ -29,6 +30,8 @@ var Mixin1 = function (Base) { return /** @class */ (function (_super) {
     }
     return class_1;
 }(Base)); };
+
+
 var Mixin2 = function (Base) { return /** @class */ (function (_super) {
     __extends(class_2, _super);
     function class_2() {
@@ -36,6 +39,7 @@ var Mixin2 = function (Base) { return /** @class */ (function (_super) {
     }
     return class_2;
 }(Base)); };
+
 var C = /** @class */ (function (_super) {
     __extends(C, _super);
     function C() {

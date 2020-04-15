@@ -51,6 +51,7 @@ function define(constructor, instanceMembers, staticMembers) {
     }
     return constructor;
 }
+
 function derive(baseClass, constructor, instanceMembers, staticMembers) {
     if (baseClass) {
         constructor = constructor || function () { };
@@ -70,6 +71,7 @@ function derive(baseClass, constructor, instanceMembers, staticMembers) {
         return define(constructor, instanceMembers, staticMembers);
     }
 }
+
 function mix(constructor) {
     constructor = constructor || function () { };
     var i, len;

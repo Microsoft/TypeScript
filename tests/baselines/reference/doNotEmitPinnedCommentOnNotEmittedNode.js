@@ -18,3 +18,4 @@ var C = (function () {
     return C;
 }());
 var x = 10;
+

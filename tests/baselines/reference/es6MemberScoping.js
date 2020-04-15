@@ -20,6 +20,7 @@ var Foo = /** @class */ (function () {
     function Foo(store) {
         this._store = store; // should be an error.
     }
+
     Foo.prototype.foo = function () {
         return this._store.length;
     };

@@ -92,17 +92,29 @@ var AbstractClass = /** @class */ (function () {
         this.fn = function () { return _this.prop; };
         this.method(parseInt(str));
         var val = this.prop.toLowerCase();
+
         if (!str) {
             this.prop = "Hello World";
         }
         this.cb(str);
+
         // OK, reference is inside function
         var innerFunction = function () {
             return _this.prop;
         };
+
         // OK, references are to another instance
         other.cb(other.prop);
     }
+
+
+
+
+
+
+
+
+
     AbstractClass.prototype.method2 = function () {
         this.prop = this.prop + "!";
     };
@@ -115,7 +127,9 @@ var DerivedAbstractClass = /** @class */ (function (_super) {
         _this.cb = function (s) { };
         // there is no implementation of 'prop' in any base class
         _this.cb(_this.prop.toLowerCase());
+
         _this.method(1);
+
         // OK, references are to another instance
         other.cb(other.prop);
         yetAnother.cb(yetAnother.prop);
@@ -132,6 +146,7 @@ var Implementation = /** @class */ (function (_super) {
         _this.cb(_this.prop);
         return _this;
     }
+
     Implementation.prototype.method = function (n) {
         this.cb(this.prop + n);
     };

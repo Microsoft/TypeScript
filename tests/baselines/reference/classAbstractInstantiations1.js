@@ -40,9 +40,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 var B = /** @class */ (function (_super) {
@@ -63,9 +63,11 @@ new A;
 new A(1); // should report 1 error
 new B;
 new C;
+
 var a;
 var b;
 var c;
+
 a = new B;
 b = new B;
 c = new B;

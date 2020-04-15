@@ -48,6 +48,7 @@ var C = /** @class */ (function () {
     C.prototype.foo = function (x) { return x; };
     return C;
 }());
+
 var D = /** @class */ (function (_super) {
     __extends(D, _super);
     function D() {
@@ -61,9 +62,12 @@ var D = /** @class */ (function (_super) {
 var c;
 var i;
 var d;
+
 c = i;
 i = c; // error
+
 i = d;
 d = i; // error
+
 c = d;
 d = c; // error

@@ -113,25 +113,31 @@ var C = /** @class */ (function (_super) {
     }
     return C;
 }(A));
+
 var a;
 var b;
+
 // Basic
 if (isC(a)) {
     a.propC;
 }
+
 // Sub type
 var subType;
 if (isA(subType)) {
     subType.propC;
 }
+
 // Union type
 var union;
 if (isA(union)) {
     union.propA;
 }
+
 if (isC_multipleParams(a, 0)) {
     a.propC;
 }
+
 // Methods
 var obj;
 var D = /** @class */ (function () {
@@ -144,12 +150,17 @@ var D = /** @class */ (function () {
 }());
 // Arrow function
 var f1 = function (p1) { return false; };
+
+
 // Function expressions
 f2(function (p1) {
     return true;
 });
+
 acceptingBoolean(isA(a));
+
 acceptingTypeGuardFunction(isA);
+
 // Binary expressions
 var union2;
 var union3 = isA(union2) || union2;

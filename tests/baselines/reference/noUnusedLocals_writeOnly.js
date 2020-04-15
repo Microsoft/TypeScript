@@ -39,9 +39,11 @@ function f(x, b) {
     (_a = { x: b ? 1 : undefined }.x, x = _a === void 0 ? 2 : _a);
     var used = 1;
     (_b = { x: b ? 1 : undefined }.x, x = _b === void 0 ? used : _b);
+
     var y = 0;
     // This is a write access to y, but not a write-*only* access.
     f(y++);
+
     var z = 0;
     f(z = 1); // This effectively doesn't use `z`, values just pass through it.
 }

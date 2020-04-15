@@ -30,18 +30,19 @@ var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cook
     if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
     return cooked;
 };
-function tag(str) {
-    var args = [];
+function tag(str) {var args = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         args[_i - 1] = arguments[_i];
     }
     return str;
 }
+
 var a = tag(__makeTemplateObject(["123"], ["123"]));
 var b = tag(__makeTemplateObject(["123 ", ""], ["123 ", ""]), 100);
 var x = tag(__makeTemplateObject([undefined, undefined, " wonderful ", undefined], ["\\u{hello} ", " \\xtraordinary ", " wonderful ", " \\uworld"]), 100, 200, 300);
 var y = "hello} " + 100 + " traordinary " + 200 + " wonderful " + 300 + " world"; // should error with NoSubstitutionTemplate
 var z = tag(__makeTemplateObject([undefined], ["\\u{hello} \\xtraordinary wonderful \\uworld"])); // should work with Tagged NoSubstitutionTemplate
+
 var a1 = tag(__makeTemplateObject(["", "\0"], ["", "\\0"]), 100); // \0
 var a2 = tag(__makeTemplateObject(["", undefined], ["", "\\00"]), 100); // \\00
 var a3 = tag(__makeTemplateObject(["", undefined], ["", "\\u"]), 100); // \\u

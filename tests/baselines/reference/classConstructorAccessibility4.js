@@ -44,8 +44,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
+
     A.prototype.method = function () {
         var B = /** @class */ (function () {
             function B() {
@@ -66,8 +66,8 @@ var A = /** @class */ (function () {
     return A;
 }());
 var D = /** @class */ (function () {
-    function D() {
-    }
+    function D() {}
+
     D.prototype.method = function () {
         var E = /** @class */ (function () {
             function E() {

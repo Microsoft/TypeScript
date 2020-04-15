@@ -14,12 +14,12 @@ new myA;
 var M;
 (function (M) {
     var A = /** @class */ (function () {
-        function A() {
-        }
+        function A() {}
         return A;
     }());
     M.A = A;
     new A;
 })(M || (M = {}));
 var myA = M.A;
+
 new myA;

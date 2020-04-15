@@ -20,5 +20,6 @@ var C = /** @class */ (function () {
     }
     return C;
 }());
+
 function foo(f) { return null; }
 var x = foo(new C()).x; // was Error that property x does not exist on type {}

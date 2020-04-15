@@ -26,13 +26,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Foo = /** @class */ (function () {
-    function Foo() {
-    }
+    function Foo() {}
     return Foo;
 }());
 var Foo2 = /** @class */ (function () {
-    function Foo2() {
-    }
+    function Foo2() {}
     return Foo2;
 }());
 var C = /** @class */ (function () {

@@ -19,8 +19,7 @@ exports.leftPad = leftPad;
 function multiply(a, b) { return a * b; }
 exports.multiply = multiply;
 var someClass = /** @class */ (function () {
-    function someClass() {
-    }
+    function someClass() {}
     return someClass;
 }());
 

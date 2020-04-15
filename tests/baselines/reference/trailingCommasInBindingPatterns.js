@@ -30,6 +30,7 @@ var b = __rest({}, []);
 var c, d;
 (c = [].slice(0));
 (d = __rest({}, []));
+
 // Allowed for non-rest elements
 var e = [][0];
 var f = {}.f;

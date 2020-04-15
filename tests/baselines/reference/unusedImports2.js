@@ -34,5 +34,7 @@ exports.test = test;
 "use strict";
 exports.__esModule = true;
 var file1_1 = require("./file1");
+
+
 var x = new file1_1.Calculator();
 x.handleChar();

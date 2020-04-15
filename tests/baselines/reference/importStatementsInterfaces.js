@@ -52,6 +52,7 @@ var C;
 // no code gen expected
 var D;
 (function (D) {
+
     var p;
 })(D || (D = {}));
 // no code gen expected

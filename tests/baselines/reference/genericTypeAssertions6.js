@@ -43,6 +43,7 @@ var A = /** @class */ (function () {
         var y = x;
         var z = x;
     }
+
     A.prototype.f = function (x, y) {
         x = y;
         y = x;

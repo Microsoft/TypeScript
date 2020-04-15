@@ -45,6 +45,7 @@ define("index", ["require", "exports", "a"], function (require, exports, a_1) {
     var c = new a_1.Foo();
     exports.c = c;
     c.doThing({ a: 42 });
+
     exports.x = c.doThing({ a: 12 });
 });
 

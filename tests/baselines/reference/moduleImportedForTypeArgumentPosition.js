@@ -34,8 +34,7 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     exports.__esModule = true;
     var C1 = /** @class */ (function () {
-        function C1() {
-        }
+        function C1() {}
         return C1;
     }());
     var Test1 = /** @class */ (function (_super) {

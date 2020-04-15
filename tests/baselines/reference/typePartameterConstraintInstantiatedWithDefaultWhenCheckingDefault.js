@@ -26,6 +26,7 @@ let test2: Test2<number>;
 
 
 //// [typePartameterConstraintInstantiatedWithDefaultWhenCheckingDefault.js]
+
 // implement
 var Identity = /** @class */ (function () {
     function Identity(value) {
@@ -38,5 +39,7 @@ var Identity = /** @class */ (function () {
 }());
 ;
 var test1;
+
 ;
+
 var test2;

@@ -45,8 +45,10 @@ define(["require", "exports"], function (require, exports) {
     exports.MyComponent = MyComponent;
     // Should be an error
     <MyComponent bar='world'/>;
+
     // Should be OK
     <MyComponent bar={true}/>;
+
     // Should be ok
     <MyComponent data-bar='hello'/>;
 });

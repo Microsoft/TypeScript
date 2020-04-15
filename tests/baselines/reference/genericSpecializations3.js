@@ -36,8 +36,10 @@ class StringFoo3 implements IFoo<string> { // error
 var stringFoo3: StringFoo3;
 
 //// [genericSpecializations3.js]
+
 var iFoo;
 iFoo.foo(1);
+
 var IntFooBad = /** @class */ (function () {
     function IntFooBad() {
     }
@@ -45,6 +47,7 @@ var IntFooBad = /** @class */ (function () {
     return IntFooBad;
 }());
 var intFooBad;
+
 var IntFoo = /** @class */ (function () {
     function IntFoo() {
     }
@@ -52,6 +55,7 @@ var IntFoo = /** @class */ (function () {
     return IntFoo;
 }());
 var intFoo;
+
 var StringFoo2 = /** @class */ (function () {
     function StringFoo2() {
     }
@@ -60,8 +64,12 @@ var StringFoo2 = /** @class */ (function () {
 }());
 var stringFoo2;
 stringFoo2.foo("hm");
+
+
 intFoo = stringFoo2; // error
 stringFoo2 = intFoo; // error
+
+
 var StringFoo3 = /** @class */ (function () {
     function StringFoo3() {
     }

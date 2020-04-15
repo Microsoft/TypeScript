@@ -38,3 +38,4 @@ class C {
     }
 }
 _x = new WeakMap();
+

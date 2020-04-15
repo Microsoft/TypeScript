@@ -27,9 +27,11 @@ exports.__esModule = true;
 exports.E1 = exports.C1 = exports.f1 = exports.x = void 0;
 exports.x = 0;
 var y = 0;
+
 function f1() { }
 exports.f1 = f1;
 function f2() { }
+
 var C1 = /** @class */ (function () {
     function C1() {
         this.p1 = 0;
@@ -55,3 +57,4 @@ var E2;
     E2[E2["B"] = 0] = "B";
 })(E2 || (E2 = {}));
 var v = E2.B;
+

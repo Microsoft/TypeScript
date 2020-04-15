@@ -42,11 +42,12 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var a;
 var b;
+
 var Base = /** @class */ (function () {
-    function Base() {
-    }
+    function Base() {}
     return Base;
 }());
 var Derived = /** @class */ (function (_super) {
@@ -66,6 +67,7 @@ var Derived2 = /** @class */ (function (_super) {
 var base;
 var derived;
 var derived2;
+
 var r = true ? 1 : 2;
 var r3 = true ? 1 : {};
 var r4 = true ? a : b; // typeof a
@@ -75,6 +77,7 @@ var r7 = true ? function (x) { } : function (x) { };
 var r8 = true ? function (x) { } : function (x) { }; // returns Object => void
 var r10 = true ? derived : derived2; // no error since we use the contextual type in BCT
 var r11 = true ? base : derived2;
+
 function foo5(t, u) {
     return true ? t : u; // BCT is Object
 }

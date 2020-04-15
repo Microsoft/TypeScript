@@ -14,3 +14,4 @@ interface Bar implements Bar { // error
 
 
 //// [interfaceThatInheritsFromItself.js]
+

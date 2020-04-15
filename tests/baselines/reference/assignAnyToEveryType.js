@@ -47,7 +47,9 @@ function k<T>(a: T) {
 
 //// [assignAnyToEveryType.js]
 // all of these are valid
+
 var x;
+
 var a = x;
 var b = x;
 var c = x;
@@ -63,13 +65,17 @@ var E;
 var g = x;
 var g2 = E.A;
 g2 = x;
+
 var C = /** @class */ (function () {
     function C() {
     }
     return C;
 }());
 var h = x;
+
+
 var i = x;
+
 var j = x;
 var j2 = x;
 var M;
@@ -77,6 +83,7 @@ var M;
     M.foo = 1;
 })(M || (M = {}));
 M = x;
+
 function k(a) {
     a = x;
 }

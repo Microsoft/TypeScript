@@ -65,6 +65,7 @@ bigintVal = bigintVal.valueOf();
 let stringVal = bigintVal.toString();
 stringVal = bigintVal.toString(2);
 stringVal = bigintVal.toLocaleString();
+
 // Test BigInt64Array
 let bigIntArray = new BigInt64Array();
 bigIntArray = new BigInt64Array(10);
@@ -76,6 +77,7 @@ bigIntArray = new BigInt64Array(new ArrayBuffer(80), 8, 3);
 let len = bigIntArray.length;
 bigIntArray.length = 10; // should error
 let arrayBufferLike = bigIntArray;
+
 // Test BigUint64Array
 let bigUintArray = new BigUint64Array();
 bigUintArray = new BigUint64Array(10);
@@ -87,6 +89,7 @@ bigUintArray = new BigUint64Array(new ArrayBuffer(80), 8, 3);
 len = bigIntArray.length;
 bigIntArray.length = 10; // should error
 arrayBufferLike = bigIntArray;
+
 // Test added DataView methods
 const dataView = new DataView(new ArrayBuffer(80));
 dataView.setBigInt64(1, -1n);
@@ -99,6 +102,7 @@ bigintVal = dataView.getBigInt64(1);
 bigintVal = dataView.getBigInt64(1, true);
 bigintVal = dataView.getBigUint64(2);
 bigintVal = dataView.getBigUint64(2, true);
+
 // Test emitted declarations files
 const w = 12n; // should emit as const w = 12n
 const x = -12n; // should emit as const x = -12n

@@ -58,6 +58,7 @@ function Mixin(Base) {
         return class_1;
     }(Base));
 }
+
 var Empty = /** @class */ (function () {
     function Empty() {
     }

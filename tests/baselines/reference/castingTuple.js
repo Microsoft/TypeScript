@@ -55,14 +55,12 @@ var A = /** @class */ (function () {
     return A;
 }());
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 ;
 var D = /** @class */ (function () {
-    function D() {
-    }
+    function D() {}
     return D;
 }());
 ;
@@ -108,6 +106,7 @@ var unionTuple = [new C(), "foo"];
 var unionTuple2 = [new C(), "foo", new D()];
 var unionTuple3 = [10, "foo"];
 var unionTuple4 = unionTuple3;
+
 // error
 var t3 = numStrTuple;
 var t9 = classCDTuple;

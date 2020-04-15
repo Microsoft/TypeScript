@@ -40,6 +40,7 @@ createSomeObject().message;
 "use strict";
 exports.__esModule = true;
 exports.createSomeObject = void 0;
+
 function createSomeObject() {
     return {
         message: "new Object"
@@ -165,6 +166,7 @@ export function createSomeObject(): SomeObject
 "use strict";
 exports.__esModule = true;
 exports.createSomeObject = void 0;
+
 function createSomeObject() {
     return {
         message2: "new Object"
@@ -292,6 +294,7 @@ export function createSomeObject(): SomeObject
 "use strict";
 exports.__esModule = true;
 exports.createSomeObject = void 0;
+
 function createSomeObject() {
     return {
         message: "new Object"

@@ -55,9 +55,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Base = /** @class */ (function () {
-    function Base(x) {
-    }
-    Base.prototype.b = function () { };
+    function Base(x) {}Base.prototype.b = function () { };
     Object.defineProperty(Base.prototype, "c", {
         get: function () { return ''; },
         set: function (v) { },
@@ -89,6 +87,7 @@ var r4 = Derived.r;
 var r5 = Derived.s();
 var r6 = Derived.t;
 Derived.t = '';
+
 var Base2 = /** @class */ (function () {
     function Base2() {
     }
@@ -104,3 +103,4 @@ var Derived2 = /** @class */ (function (_super) {
 var d2;
 var r7 = d2[''];
 var r8 = d2[1];
+

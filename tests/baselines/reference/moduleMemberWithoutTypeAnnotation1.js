@@ -64,6 +64,7 @@ var TypeScript;
 (function (TypeScript) {
     ;
     ;
+
     var PositionedElement = /** @class */ (function () {
         function PositionedElement() {
         }
@@ -84,8 +85,7 @@ var TypeScript;
     var SyntaxNode = /** @class */ (function () {
         function SyntaxNode() {
         }
-        SyntaxNode.prototype.findToken = function (position, includeSkippedTokens) {
-            if (includeSkippedTokens === void 0) { includeSkippedTokens = false; }
+        SyntaxNode.prototype.findToken = function (position, includeSkippedTokens) {if (includeSkippedTokens === void 0) { includeSkippedTokens = false; }
             var positionedToken = this.findTokenInternal(null, position, 0);
             return null;
         };

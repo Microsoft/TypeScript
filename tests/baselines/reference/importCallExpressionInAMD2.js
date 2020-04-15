@@ -36,5 +36,6 @@ define(["require", "exports"], function (require, exports) {
             b.print();
         });
     }
+
     foo(new Promise((resolve_1, reject_1) => { require(["./0"], resolve_1, reject_1); }));
 });

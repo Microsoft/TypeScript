@@ -93,13 +93,17 @@ exports.__esModule = true;
 function f(a) {
 }
 f(0);
+
 // function expression paramter
 var fexp = function (a) {
 };
+
 fexp(0);
+
 // arrow function paramter
 var farrow = function (a) {
 };
+
 var C = /** @class */ (function () {
     function C() {
     }
@@ -130,6 +134,7 @@ var E = /** @class */ (function () {
     });
     return class_1;
 }());
+
 var o = {
     // Object literal method declaration paramter
     method: function (a) {
@@ -138,7 +143,9 @@ var o = {
     set x(v) {
     }
 };
+
 o;
+
 // in a for..in statment
 for (var i in o) {
 }
@@ -149,11 +156,13 @@ for (var _i = 0, _a = [1, 2, 3]; _i < _a.length; _i++) {
 // in a for. statment
 for (var i = 0, n = void 0; i < 10; i++) {
 }
+
 // in a block
 var condition = false;
 if (condition) {
     var c = 0;
 }
+
 // in try/catch/finally
 try {
     var a = 0;

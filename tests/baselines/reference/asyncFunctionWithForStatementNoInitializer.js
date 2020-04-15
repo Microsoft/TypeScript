@@ -73,6 +73,7 @@ function test1() {
         });
     });
 }
+
 function test2() {
     return __awaiter(this, void 0, void 0, function () {
         var i, limit;
@@ -85,6 +86,7 @@ function test2() {
         });
     });
 }
+
 function test3() {
     return __awaiter(this, void 0, void 0, function () {
         var i;
@@ -96,6 +98,7 @@ function test3() {
         });
     });
 }
+
 function test4() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {

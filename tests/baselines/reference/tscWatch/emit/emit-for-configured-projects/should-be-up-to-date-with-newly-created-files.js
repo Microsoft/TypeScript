@@ -138,8 +138,7 @@ import {Foo} from "./moduleFile1"; let y = Foo();
 //// [/a/b/file1Consumer3.js]
 "use strict";
 exports.__esModule = true;
-var moduleFile1_1 = require("./moduleFile1");
-var y = moduleFile1_1.Foo();
+var moduleFile1_1 = require("./moduleFile1");var y = moduleFile1_1.Foo();
 
 
 

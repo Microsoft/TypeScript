@@ -51,35 +51,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 // ok - usage is deferred
-function foo1(y = class {
-    constructor() {
+function foo1(y = class {constructor() {
         this.c = x;
-    }
-}, x = 1) {
+    }}, x = 1) {
     new y().c;
 }
+
 // ok - used in file
 function foo2(y = function (x) { }, z = 1) {
 }
+
 // ok -used in type
 let a;
 function foo3(y = { x: a }, z = 1) {
 }
+
 // error - used before declaration
 function foo4(y = { z }, z = 1) {
 }
+
 // error - used before declaration, IIFEs are inlined
 function foo5(y = (() => z)(), z = 1) {
 }
+
 // ok - IIFE inside another function
 function foo6(y = () => (() => z)(), z = 1) {
 }
+
 // ok - used inside immediately invoked generator function
 function foo7(y = (function* () { yield z; })(), z = 1) {
 }
+
 // ok - used inside immediately invoked async function
 function foo8(y = (() => __awaiter(this, void 0, void 0, function* () { return z; }))(), z = 1) {
 }
+
 // error - used as computed name of method
 function foo9(y = { [z]() { return z; } }, z = 1) {
 }

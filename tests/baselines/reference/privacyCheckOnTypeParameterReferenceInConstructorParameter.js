@@ -23,8 +23,7 @@ define(["require", "exports"], function (require, exports) {
     }());
     exports.A = A;
     var B = /** @class */ (function () {
-        function B(parent) {
-        }
+        function B(parent) {}
         return B;
     }());
     exports.B = B;

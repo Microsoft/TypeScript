@@ -5,6 +5,6 @@ var F = @dec () => {
 }
 
 //// [decoratorOnArrowFunction.js]
-var F = ;
-{
+
+var F = ;{
 }

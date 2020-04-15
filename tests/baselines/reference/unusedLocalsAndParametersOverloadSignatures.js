@@ -34,6 +34,8 @@ var C = /** @class */ (function () {
     function C(details, message) {
         details + message;
     }
+
+
     C.prototype.method = function (details, message) {
         return details + message;
     };

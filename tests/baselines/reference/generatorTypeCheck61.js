@@ -13,8 +13,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 function* g() {
     let C = /** @class */ (() => {
-        let C = class C {
-        };
+        let C = class C {};
         C = __decorate([
             (yield 0)
         ], C);

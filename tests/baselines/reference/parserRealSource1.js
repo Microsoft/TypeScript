@@ -163,8 +163,11 @@ var TypeScript;
     var CompilerDiagnostics;
     (function (CompilerDiagnostics) {
         CompilerDiagnostics.debug = false;
+
         CompilerDiagnostics.diagnosticWriter = null;
+
         CompilerDiagnostics.analysisPass = 0;
+
         function Alert(output) {
             if (CompilerDiagnostics.diagnosticWriter) {
                 CompilerDiagnostics.diagnosticWriter.Alert(output);
@@ -186,6 +189,7 @@ var TypeScript;
         }
         CompilerDiagnostics.assert = assert;
     })(CompilerDiagnostics = TypeScript.CompilerDiagnostics || (TypeScript.CompilerDiagnostics = {}));
+
     var NullLogger = /** @class */ (function () {
         function NullLogger() {
         }
@@ -208,6 +212,8 @@ var TypeScript;
             this._error = this.logger.error();
             this._fatal = this.logger.fatal();
         }
+
+
         LoggerAdapter.prototype.information = function () { return this._information; };
         LoggerAdapter.prototype.debug = function () { return this._debug; };
         LoggerAdapter.prototype.warning = function () { return this._warning; };
@@ -244,6 +250,7 @@ var TypeScript;
     TypeScript.timeFunction = timeFunction;
     function stringToLiteral(value, length) {
         var result = "";
+
         var addChar = function (index) {
             var ch = value.charCodeAt(index);
             switch (ch) {
@@ -275,6 +282,7 @@ var TypeScript;
                     result += value.charAt(index);
             }
         };
+
         var tooLong = (value.length > length);
         if (tooLong) {
             var mid = length >> 1;

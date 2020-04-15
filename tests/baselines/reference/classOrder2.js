@@ -47,4 +47,5 @@ var B = /** @class */ (function () {
     return B;
 }());
 var a = new A();
+
 a.foo();

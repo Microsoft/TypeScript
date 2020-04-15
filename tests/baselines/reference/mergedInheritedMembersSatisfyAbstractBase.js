@@ -46,7 +46,9 @@ var Broken = /** @class */ (function (_super) {
     }
     return Broken;
 }(BaseClass));
+
 new Broken().bar;
+
 var IncorrectlyExtends = /** @class */ (function (_super) {
     __extends(IncorrectlyExtends, _super);
     function IncorrectlyExtends() {

@@ -42,8 +42,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var Promise = /** @class */ (function () {
-    function Promise() {
-    }
+    function Promise() {}
     return Promise;
 }());
 function foo() {

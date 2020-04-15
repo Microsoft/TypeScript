@@ -35,6 +35,8 @@ exports.zzz = 123;
 "use strict";
 exports.__esModule = true;
 var B = require("./b");
+
+
 var x = { x: "" };
 B.zzz;
 //// [index.js]
@@ -42,6 +44,8 @@ B.zzz;
 exports.__esModule = true;
 var x = { x: "" };
 B.zzz;
+
 var OriginalB = require("./b");
 OriginalB.zzz;
+
 var y = x;

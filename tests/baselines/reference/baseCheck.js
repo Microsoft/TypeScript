@@ -44,8 +44,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var C = /** @class */ (function () {
-    function C(x, y) {
-    }
+    function C(x, y) {}
     return C;
 }());
 var ELoc = /** @class */ (function (_super) {
@@ -60,6 +59,7 @@ var ELocVar = /** @class */ (function (_super) {
     function ELocVar(x) {
         return _super.call(this, 0, loc) || this;
     }
+
     ELocVar.prototype.m = function () {
         var loc = 10;
     };

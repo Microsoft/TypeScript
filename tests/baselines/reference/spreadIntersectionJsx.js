@@ -20,13 +20,11 @@ var __assign = (this && this.__assign) || function () {
 };
 var React = null;
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var intersected;

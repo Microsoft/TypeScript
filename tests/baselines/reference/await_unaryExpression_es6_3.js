@@ -29,22 +29,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 function bar1() {
     return __awaiter(this, void 0, void 0, function* () {
-        ++;
-        yield 42; // Error
+        ++;yield 42; // Error
     });
 }
+
 function bar2() {
     return __awaiter(this, void 0, void 0, function* () {
-        --;
-        yield 42; // Error
+        --;yield 42; // Error
     });
 }
+
 function bar3() {
     return __awaiter(this, void 0, void 0, function* () {
         var x = 42;
         yield x++; // OK but shouldn't need parenthesis
     });
 }
+
 function bar4() {
     return __awaiter(this, void 0, void 0, function* () {
         var x = 42;

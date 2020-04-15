@@ -68,6 +68,7 @@ var r = new Derived(); // error
 var r2 = new Derived(1);
 var r3 = new Derived(1, 2);
 var r4 = new Derived(1, 2, 3);
+
 var Base2 = /** @class */ (function () {
     function Base2(x) {
         this.a = x;

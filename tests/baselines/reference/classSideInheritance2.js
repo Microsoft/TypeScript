@@ -34,6 +34,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var SubText = /** @class */ (function (_super) {
     __extends(SubText, _super);
     function SubText(text, span) {
@@ -45,6 +46,7 @@ var TextBase = /** @class */ (function () {
     function TextBase() {
     }
     TextBase.prototype.subText = function (span) {
+
         return new SubText(this, span);
     };
     return TextBase;

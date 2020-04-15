@@ -26,8 +26,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Base = /** @class */ (function () {
-    function Base() {
-    }
+    function Base() {}
     Base.prototype.foo = function () { };
     return Base;
 }());
@@ -58,4 +57,5 @@ var Derived3 = /** @class */ (function (_super) {
 function foo(name) {
     return null;
 }
+
 foo("HI");

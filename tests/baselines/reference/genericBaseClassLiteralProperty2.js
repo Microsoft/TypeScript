@@ -30,8 +30,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var CollectionItem2 = /** @class */ (function () {
-    function CollectionItem2() {
-    }
+    function CollectionItem2() {}
     return CollectionItem2;
 }());
 var BaseCollection2 = /** @class */ (function () {

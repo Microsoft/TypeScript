@@ -37,6 +37,7 @@ exports.nfoo = nonexportedFoo;
 // sanity checks
 exports.foo = exports.exportedFoo = null;
 exports.nfoo = exports.nonexportedFoo = nonexportedFoo = null;
+
 if (null) {
     (_a = null, exports.foo = exports.exportedFoo = _a.exportedFoo, exports.nfoo = exports.nonexportedFoo = nonexportedFoo = _a.nonexportedFoo);
 }
@@ -52,3 +53,4 @@ else if (null) {
 else {
     (_e = null[0], exports.foo = exports.exportedFoo = _e[0], exports.nfoo = exports.nonexportedFoo = nonexportedFoo = _e[1]);
 }
+

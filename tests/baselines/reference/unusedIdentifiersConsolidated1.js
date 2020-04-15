@@ -118,17 +118,21 @@ var __extends = (this && this.__extends) || (function () {
 function greeter(person) {
     var unused = 20;
 }
+
 var Dummy = /** @class */ (function () {
     function Dummy(message) {
         var unused2 = 22;
         this.greeting = "Dummy Message";
     }
+
     Dummy.prototype.greeter = function (person) {
         var unused = 20;
         this.usedPrivateFunction();
     };
+
     Dummy.prototype.usedPrivateFunction = function () {
     };
+
     Dummy.prototype.unUsedPrivateFunction = function () {
     };
     return Dummy;
@@ -137,14 +141,17 @@ var user = "Jane User";
 var user2 = "Jane2 User2";
 var Validation;
 (function (Validation) {
+
     var lettersRegexp = /^[A-Za-z]+$/;
     var numberRegexp = /^[0-9]+$/;
+
     var LettersOnlyValidator = /** @class */ (function () {
         function LettersOnlyValidator() {
         }
         LettersOnlyValidator.prototype.isAcceptable = function (s2) {
             return lettersRegexp.test(s2);
         };
+
         LettersOnlyValidator.prototype.unUsedPrivateFunction = function () {
         };
         return LettersOnlyValidator;
@@ -159,6 +166,7 @@ var Validation;
         return ZipCodeValidator;
     }());
     Validation.ZipCodeValidator = ZipCodeValidator;
+
     var dummy = /** @class */ (function () {
         function dummy() {
         }

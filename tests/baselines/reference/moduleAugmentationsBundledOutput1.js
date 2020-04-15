@@ -71,20 +71,19 @@ define("m2", ["require", "exports", "m1"], function (require, exports, m1_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     m1_1.Cls.prototype.foo = function () { return 1; };
     m1_1.Cls.prototype.bar = function () { return "1"; };
+
 });
 define("m3", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.C2 = exports.C1 = void 0;
     var C1 = /** @class */ (function () {
-        function C1() {
-        }
+        function C1() {}
         return C1;
     }());
     exports.C1 = C1;
     var C2 = /** @class */ (function () {
-        function C2() {
-        }
+        function C2() {}
         return C2;
     }());
     exports.C2 = C2;
@@ -94,6 +93,7 @@ define("m4", ["require", "exports", "m1"], function (require, exports, m1_2) {
     Object.defineProperty(exports, "__esModule", { value: true });
     m1_2.Cls.prototype.baz1 = function () { return undefined; };
     m1_2.Cls.prototype.baz2 = function () { return undefined; };
+
 });
 define("test", ["require", "exports", "m2", "m4"], function (require, exports) {
     "use strict";

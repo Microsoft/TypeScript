@@ -55,11 +55,13 @@ function f0() {
     var a7 = __spread([1], a, [2], a);
     var a8 = __spread(a, a, a);
 }
+
 function f1() {
     var a = [1, 2, 3];
     var b = __spread(["hello"], a, [true]);
     var b;
 }
+
 function f2() {
     var a = __spread([]);
     var b = __spread([5]);

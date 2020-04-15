@@ -31,6 +31,7 @@ var Foo = /** @class */ (function (_super) {
     Foo.prototype.m1 = function () {
         return _super.prototype.m1.call(this);
     };
+
     Foo.m2 = function () {
         return _super.m2.call(this);
     };

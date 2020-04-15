@@ -78,16 +78,16 @@ async function doStatement18() {
 }
 
 //// [es5-asyncFunctionDoStatements.js]
+
 function doStatement0() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            do {
-                x;
-            } while (y);
+            do {x;} while (y);
             return [2 /*return*/];
         });
     });
 }
+
 function doStatement1() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -104,6 +104,7 @@ function doStatement1() {
         });
     });
 }
+
 function doStatement2() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -120,16 +121,16 @@ function doStatement2() {
         });
     });
 }
+
 function doStatement3() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            do {
-                continue;
-            } while (y);
+            do {continue;} while (y);
             return [2 /*return*/];
         });
     });
 }
+
 function doStatement4() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -146,6 +147,7 @@ function doStatement4() {
         });
     });
 }
+
 function doStatement5() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -165,6 +167,7 @@ function doStatement5() {
         });
     });
 }
+
 function doStatement6() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -179,16 +182,16 @@ function doStatement6() {
         });
     });
 }
+
 function doStatement7() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            A: do {
-                continue A;
-            } while (y);
+            A: do {continue A;} while (y);
             return [2 /*return*/];
         });
     });
 }
+
 function doStatement8() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -205,6 +208,7 @@ function doStatement8() {
         });
     });
 }
+
 function doStatement9() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -224,6 +228,7 @@ function doStatement9() {
         });
     });
 }
+
 function doStatement10() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -238,16 +243,16 @@ function doStatement10() {
         });
     });
 }
+
 function doStatement11() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            do {
-                break;
-            } while (y);
+            do {break;} while (y);
             return [2 /*return*/];
         });
     });
 }
+
 function doStatement12() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -264,6 +269,7 @@ function doStatement12() {
         });
     });
 }
+
 function doStatement13() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -283,6 +289,7 @@ function doStatement13() {
         });
     });
 }
+
 function doStatement14() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -297,16 +304,16 @@ function doStatement14() {
         });
     });
 }
+
 function doStatement15() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            E: do {
-                break E;
-            } while (y);
+            E: do {break E;} while (y);
             return [2 /*return*/];
         });
     });
 }
+
 function doStatement16() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -323,6 +330,7 @@ function doStatement16() {
         });
     });
 }
+
 function doStatement17() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -342,6 +350,7 @@ function doStatement17() {
         });
     });
 }
+
 function doStatement18() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {

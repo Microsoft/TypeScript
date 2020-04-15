@@ -47,6 +47,7 @@ var Bar = /** @class */ (function (_super) {
         _this.x = 2;
         return _this;
     }
+
     Bar.prototype.bar = function () {
         _super.prototype.bar.call(this);
         _super.prototype.bar.call(this);

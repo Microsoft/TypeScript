@@ -45,6 +45,7 @@ var Foo;
             function Greeter(greeting) {
                 this.greeting = greeting;
             }
+
             Greeter.prototype.greet = function () {
                 return "<h1>" + this.greeting + "</h1>";
             };
@@ -53,10 +54,11 @@ var Foo;
         function foo(greeting) {
             return new Greeter(greeting);
         }
+
         var greeter = new Greeter("Hello, world!");
         var str = greeter.greet();
-        function foo2(greeting) {
-            var restGreetings = [];
+
+        function foo2(greeting) {var restGreetings = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 restGreetings[_i - 1] = arguments[_i];
             }
@@ -65,8 +67,10 @@ var Foo;
             for (var i = 0; i < restGreetings.length; i++) {
                 greeters.push(new Greeter(restGreetings[i]));
             }
+
             return greeters;
         }
+
         var b = foo2("Hello", "World", "!");
         for (var j = 0; j < b.length; j++) {
             b[j].greet();

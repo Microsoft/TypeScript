@@ -46,15 +46,19 @@ define(["require", "exports"], function (require, exports) {
     p1.then(zero => {
         return zero.foo();
     });
+
     exports.p2 = new Promise((resolve_3, reject_3) => { require(["./0"], resolve_3, reject_3); });
+
     function foo() {
         const p2 = new Promise((resolve_4, reject_4) => { require(["./0"], resolve_4, reject_4); });
     }
+
     class C {
         method() {
             const loadAsync = new Promise((resolve_5, reject_5) => { require(["./0"], resolve_5, reject_5); });
         }
     }
+
     class D {
         method() {
             const loadAsync = new Promise((resolve_6, reject_6) => { require(["./0"], resolve_6, reject_6); });

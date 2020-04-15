@@ -99,6 +99,7 @@ var obj = {
         _super.method.call(_this);
     }
 };
+
 var A = /** @class */ (function () {
     function A() {
     }

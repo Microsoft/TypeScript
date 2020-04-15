@@ -151,8 +151,7 @@ exports.__esModule = true;
 exports.Foo = exports.T = void 0;
 function Foo() { }
 exports.Foo = Foo;
-;
-var T1;
+;var T1;
 
 
 

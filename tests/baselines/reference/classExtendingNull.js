@@ -20,14 +20,12 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var C1 = /** @class */ (function (_super) {
     __extends(C1, _super);
-    function C1() {
-    }
+    function C1() {}
     return C1;
 }(null));
 var C2 = /** @class */ (function (_super) {
     __extends(C2, _super);
-    function C2() {
-    }
+    function C2() {}
     return C2;
 }((null)));
 var C3 = /** @class */ (function (_super) {

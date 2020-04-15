@@ -27,6 +27,7 @@ function test(_a) {
     method;
     p;
 }
+
 test({});
 test({ method: 'x', nested: { p: 'a' } });
 test({ method: 'z', nested: { p: 'b' } });

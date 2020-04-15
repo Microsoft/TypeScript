@@ -54,9 +54,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var Base = /** @class */ (function () {
-    function Base() {
-    }
+    function Base() {}
     return Base;
 }());
 var Derived1 = /** @class */ (function (_super) {
@@ -80,12 +80,18 @@ var C = /** @class */ (function () {
     return C;
 }());
 var c = new C('a');
+
 var i;
+
 var a;
+
 c = i;
 c = a;
+
 i = a;
+
 a = i;
+
 var r1 = new C('hi');
 var r2 = new i('bye');
 var r3 = new a('hm');

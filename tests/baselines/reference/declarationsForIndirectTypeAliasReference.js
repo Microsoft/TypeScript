@@ -43,13 +43,15 @@ exports.doSome = void 0;
 var MAP = {
     a: "a"
 };
+
 var MAP2 = {
     a: "a"
 };
-function doSome(arg1, arg2, arg3) {
-    if (arg2 === void 0) { arg2 = MAP; }
-    if (arg3 === void 0) { arg3 = MAP2; }
-}
+
+function doSome(arg1,
+    arg2,
+    arg3) {if (arg2 === void 0) { arg2 = MAP; }
+    if (arg3 === void 0) { arg3 = MAP2; }}
 exports.doSome = doSome;
 
 

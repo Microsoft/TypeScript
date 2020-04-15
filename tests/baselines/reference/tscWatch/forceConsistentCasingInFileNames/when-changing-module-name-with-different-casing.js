@@ -26,8 +26,7 @@ interface Array<T> { length: number; [n: number]: T; }
 exports.__esModule = true;
 exports.logger = void 0;
 var logger = /** @class */ (function () {
-    function logger() {
-    }
+    function logger() {}
     return logger;
 }());
 exports.logger = logger;
@@ -36,8 +35,7 @@ exports.logger = logger;
 //// [/user/username/projects/myproject/another.js]
 "use strict";
 exports.__esModule = true;
-var logger_1 = require("./logger");
-new logger_1.logger();
+var logger_1 = require("./logger");new logger_1.logger();
 
 
 
@@ -90,8 +88,7 @@ import { logger } from "./Logger"; new logger();
 //// [/user/username/projects/myproject/another.js]
 "use strict";
 exports.__esModule = true;
-var Logger_1 = require("./Logger");
-new Logger_1.logger();
+var Logger_1 = require("./Logger");new Logger_1.logger();
 
 
 

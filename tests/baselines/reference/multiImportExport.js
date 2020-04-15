@@ -38,6 +38,7 @@ module.exports = Adder;
 //// [Math.js]
 "use strict";
 var Adder = require("./Adder");
+
 var Math = {
     Adder: Adder
 };

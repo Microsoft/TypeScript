@@ -30,16 +30,19 @@ function bar() {
         !(yield 42); // OK
     });
 }
+
 function bar1() {
     return __awaiter(this, void 0, void 0, function* () {
         +(yield 42); // OK
     });
 }
+
 function bar3() {
     return __awaiter(this, void 0, void 0, function* () {
         -(yield 42); // OK
     });
 }
+
 function bar4() {
     return __awaiter(this, void 0, void 0, function* () {
         ~(yield 42); // OK

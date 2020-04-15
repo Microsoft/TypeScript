@@ -39,8 +39,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Base = /** @class */ (function () {
-    function Base() {
-    }
+    function Base() {}
     return Base;
 }());
 var Derived = /** @class */ (function (_super) {
@@ -52,6 +51,7 @@ var Derived = /** @class */ (function (_super) {
 }(Base));
 var x = null;
 var y = x[0];
+
 /*
 // Note - the equivalent for normal interface methods works fine:
 interface A {

@@ -76,6 +76,7 @@ var C = /** @class */ (function (_super) {
     });
     C.foo = function () { return this.x; };
     C.bar = function () { this.foo(); };
+
     C.prototype.bar = function () {
         var D = /** @class */ (function () {
             function D() {
@@ -87,6 +88,7 @@ var C = /** @class */ (function (_super) {
                 var c3 = c.foo;
                 var c4 = c.bar;
                 var c5 = c.z; // error
+
                 var sc1 = C.x;
                 var sc2 = C.y;
                 var sc3 = C.foo;

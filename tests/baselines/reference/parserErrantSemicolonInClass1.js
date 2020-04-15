@@ -39,6 +39,7 @@ class a {
 var a = /** @class */ (function () {
     function a(ns) {
     }
+
     a.prototype.pgF = function () { };
     ;
     Object.defineProperty(a.prototype, "d", {

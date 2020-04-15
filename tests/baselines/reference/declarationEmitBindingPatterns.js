@@ -9,6 +9,7 @@ function f({} = a, [] = a, { p: {} = a} = a) {
 var k = function (_a) {
     var _b = _a.x, z = _b === void 0 ? 'y' : _b;
 };
+
 var a;
 function f(_a, _b, _c) {
     _a = a;

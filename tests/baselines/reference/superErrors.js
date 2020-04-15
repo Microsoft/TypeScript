@@ -71,6 +71,7 @@ function foo() {
     var y = function () { return _super.; };
     var z = function () { return function () { return function () { return _super.; }; }; };
 }
+
 var User = /** @class */ (function () {
     function User() {
         this.name = "Bob";
@@ -89,11 +90,13 @@ var RegisteredUser = /** @class */ (function (_super) {
         function inner() {
             _super.sayHello.call(this);
         }
+
         // super call in a lambda in an inner function in a constructor 
         function inner2() {
             var _this = this;
             var x = function () { return _super.sayHello.call(_this); };
         }
+
         // super call in a lambda in a function expression in a constructor 
         (function () { return function () { return _super.; }; })();
         return _this;
@@ -101,11 +104,13 @@ var RegisteredUser = /** @class */ (function (_super) {
     RegisteredUser.prototype.sayHello = function () {
         // super call in a method
         _super.prototype.sayHello.call(this);
+
         // super call in a lambda in an inner function in a method
         function inner() {
             var _this = this;
             var x = function () { return _super.sayHello.call(_this); };
         }
+
         // super call in a lambda in a function expression in a constructor 
         (function () { return function () { return _super.; }; })();
     };

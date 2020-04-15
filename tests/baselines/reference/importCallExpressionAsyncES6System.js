@@ -65,14 +65,14 @@ System.register([], function (exports_1, context_1) {
                 })
             });
             cl2 = class cl2 {
+
                 constructor() {
                     this.p = {
                         m: () => __awaiter(this, void 0, void 0, function* () {
                             const req = yield context_1.import('./test'); // FOUR
                         })
                     };
-                }
-            };
+                }};
             exports_1("cl2", cl2);
             exports_1("l", l = () => __awaiter(void 0, void 0, void 0, function* () {
                 const req = yield context_1.import('./test'); // FIVE

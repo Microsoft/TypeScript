@@ -36,6 +36,7 @@ define(["require", "exports"], function (require, exports) {
         return A;
     }());
     exports.A = A;
+
     var B = /** @class */ (function () {
         function B(parent) {
             this.parent = parent;

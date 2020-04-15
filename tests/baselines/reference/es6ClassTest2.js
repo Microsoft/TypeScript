@@ -178,6 +178,7 @@ var BasicMonster = /** @class */ (function () {
         this.health = health;
         this.isAlive = true;
     }
+
     BasicMonster.prototype.attack = function (target) {
         // WScript.Echo("Attacks " + target);
     };
@@ -188,11 +189,13 @@ var m2 = new BasicMonster("2", 100);
 m1.attack(m2);
 m1.health = 0;
 console.log(m5.isAlive.toString());
+
 var GetSetMonster = /** @class */ (function () {
     function GetSetMonster(name, _health) {
         this.name = name;
         this._health = _health;
     }
+
     GetSetMonster.prototype.attack = function (target) {
         // WScript.Echo("Attacks " + target);
     };
@@ -224,12 +227,16 @@ var m4 = new BasicMonster("2", 100);
 m3.attack(m4);
 m3.health = 0;
 var x = m5.isAlive.toString();
+
 var OverloadedMonster = /** @class */ (function () {
     function OverloadedMonster(name, health) {
         this.name = name;
         this.health = health;
         this.isAlive = true;
     }
+
+
+
     OverloadedMonster.prototype.attack = function (target) {
         //WScript.Echo("Attacks " + target);
     };
@@ -240,15 +247,14 @@ var m6 = new OverloadedMonster("2");
 m5.attack(m6);
 m5.health = 0;
 var y = m5.isAlive.toString();
+
 var SplatMonster = /** @class */ (function () {
-    function SplatMonster() {
-        var args = [];
+    function SplatMonster() {var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
     }
-    SplatMonster.prototype.roar = function (name) {
-        var args = [];
+    SplatMonster.prototype.roar = function (name) {var args = [];
         for (var _i = 1; _i < arguments.length; _i++) {
             args[_i - 1] = arguments[_i];
         }
@@ -266,8 +272,10 @@ var PrototypeMonster = /** @class */ (function () {
 var SuperParent = /** @class */ (function () {
     function SuperParent(a) {
     }
+
     SuperParent.prototype.b = function (b) {
     };
+
     SuperParent.prototype.c = function () {
     };
     return SuperParent;
@@ -277,9 +285,11 @@ var SuperChild = /** @class */ (function (_super) {
     function SuperChild() {
         return _super.call(this, 1) || this;
     }
+
     SuperChild.prototype.b = function () {
         _super.prototype.b.call(this, 'str');
     };
+
     SuperChild.prototype.c = function () {
         _super.prototype.c.call(this);
     };
@@ -295,6 +305,8 @@ var Statics = /** @class */ (function () {
     return Statics;
 }());
 var stat = new Statics();
+
+
 var ImplementsInterface = /** @class */ (function () {
     function ImplementsInterface() {
         this.x = 1;
@@ -306,8 +318,7 @@ var Visibility = /** @class */ (function () {
     function Visibility() {
         this.x = 1;
         this.y = 2;
-    }
-    Visibility.prototype.foo = function () { };
+    }Visibility.prototype.foo = function () { };
     Visibility.prototype.bar = function () { };
     return Visibility;
 }());
@@ -327,3 +338,4 @@ var ChildClassWithoutConstructor = /** @class */ (function (_super) {
     return ChildClassWithoutConstructor;
 }(BaseClassWithConstructor));
 var ccwc = new ChildClassWithoutConstructor(1, "s");
+

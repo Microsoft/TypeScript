@@ -39,8 +39,7 @@ class A {
         A.#bar(30);
         A.#quux = A.#quux + 1;
         A.#quux++;
-    }
-    static #foo(a) { }
+    }static #foo(a) { }
     static async #bar(a) { }
     static async *#baz(a) {
         return 3;
@@ -53,6 +52,7 @@ class A {
         this.#_quux = val;
     }
 }
+
 class B extends A {
     static #foo(a) { }
     constructor() {

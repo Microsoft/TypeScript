@@ -65,9 +65,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var Class = /** @class */ (function () {
-    function Class() {
-    }
+    function Class() {}
     return Class;
 }());
 var SubClass = /** @class */ (function (_super) {
@@ -78,8 +78,7 @@ var SubClass = /** @class */ (function (_super) {
     return SubClass;
 }(Class));
 var D = /** @class */ (function () {
-    function D() {
-    }
+    function D() {}
     return D;
 }());
 var SubD = /** @class */ (function (_super) {
@@ -104,15 +103,19 @@ function d3(_a) {
 function d4(_a) {
     var y = (_a === void 0 ? { y: new D() } : _a).y;
 }
+
 var obj = new Class();
 d0({ x: 1 });
 d0({ x: {} });
 d0({ x: "string" });
+
 d1({ x: new Class() });
 d1({ x: {} });
 d1({ x: "string" });
+
 d2({ x: new SubClass() });
 d2({ x: {} });
+
 d3({ y: new SubD() });
 d3({ y: new SubClass() });
 // Error

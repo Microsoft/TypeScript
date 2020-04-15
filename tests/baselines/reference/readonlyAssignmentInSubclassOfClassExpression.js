@@ -30,7 +30,6 @@ var C = /** @class */ (function (_super) {
     }
     return C;
 }(/** @class */ (function () {
-    function class_1() {
-    }
+    function class_1() {}
     return class_1;
 }())));

@@ -48,24 +48,26 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var x = asdf;
 var y;
+
 function foo(x, y) { }
 function foo2() {
     return asdf;
 }
+
 var z = x; // should be an error
+
 var C = /** @class */ (function () {
     function C() {
     }
     return C;
 }());
 var C2 = /** @class */ (function () {
-    function C2() {
-    }
+    function C2() {}
     return C2;
 }());
+
 var C3 = /** @class */ (function () {
-    function C3(x) {
-    }
+    function C3(x) {}
     return C3;
 }());
 var C4 = /** @class */ (function (_super) {
@@ -76,6 +78,7 @@ var C4 = /** @class */ (function (_super) {
     return C4;
 }(C3));
 var x2 = this.asdf; // no error, this is any
+
 var C5 = /** @class */ (function () {
     function C5() {
         this.asdf = asdf;

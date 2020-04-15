@@ -11,8 +11,7 @@ export default function foo() {}
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    class Foo {
-    }
+    class Foo {}
     exports.default = Foo;
 });
 //// [b.js]

@@ -49,8 +49,7 @@ define(["require", "exports"], function (require, exports) {
     exports.__esModule = true;
     exports.A = void 0;
     var A = /** @class */ (function () {
-        function A() {
-        }
+        function A() {}
         return A;
     }());
     exports.A = A;
@@ -61,12 +60,19 @@ define(["require", "exports", "withImportDecl_0"], function (require, exports, m
     exports.__esModule = true;
     ///<reference path='withImportDecl_0.ts'/>
     var simpleVar;
+
     var anotherVar;
     var varWithSimpleType;
     var varWithArrayType;
+
     var varWithInitialValue = 30;
+
     var withComplicatedValue = { x: 30, y: 70, desc: "position" };
+
+
     var arrayVar = ['a', 'b'];
+
+
     function simpleFunction() {
         return {
             x: "Hello",

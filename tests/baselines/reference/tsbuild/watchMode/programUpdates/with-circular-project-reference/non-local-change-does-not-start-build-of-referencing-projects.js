@@ -223,8 +223,10 @@ exports.__esModule = true;
 exports.m = void 0;
 var c = require("../core/index");
 var logic = require("../logic/index");
+
 c.leftPad("", 10);
 logic.getSecondsInDay();
+
 var mod = require("../core/anotherModule");
 exports.m = mod;
 

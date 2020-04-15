@@ -73,6 +73,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var C1 = /** @class */ (function () {
     function C1() {
     }
@@ -112,6 +113,7 @@ var c2 = new C2();
 var c3 = new C3();
 var o1 = { one: 1 };
 var f1 = function () { return new C1(); };
+
 var arr_any = [];
 var arr_i1 = [];
 var arr_c1 = [];
@@ -120,10 +122,12 @@ var arr_i1_2 = [];
 var arr_c1_2 = [];
 var arr_c2_2 = [];
 var arr_c3 = [];
+
 // "clean up error" occurs at this point
 arr_c3 = arr_c2_2; // should be an error - is
 arr_c3 = arr_c1_2; // should be an error - is
 arr_c3 = arr_i1_2; // should be an error - is
+
 arr_any = f1; // should be an error - is
 arr_any = function () { return null; }; // should be an error - is
 arr_any = o1; // should be an error - is

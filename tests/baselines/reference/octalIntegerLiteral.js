@@ -45,6 +45,7 @@ var oct1 = 19230;
 var oct2 = 19230;
 var oct3 = Infinity;
 var oct4 = 5.462437423415177e+244;
+
 var obj1 = {
     19230: "Hello",
     a: 19230,
@@ -52,6 +53,7 @@ var obj1 = {
     oct1: oct1,
     Infinity: true
 };
+
 var obj2 = {
     19230: "hi",
     a: 19230,
@@ -59,6 +61,7 @@ var obj2 = {
     oct2: oct2,
     5.462437423415177e+244: false,
 };
+
 obj1[19230]; // string
 obj1["0o45436"]; // any
 obj1["19230"]; // string
@@ -67,6 +70,7 @@ obj1["a"]; // number
 obj1["b"]; // number
 obj1["oct1"]; // number
 obj1["Infinity"]; // boolean
+
 obj2[19230]; // string
 obj2["0O45436"]; // any
 obj2["19230"]; // string

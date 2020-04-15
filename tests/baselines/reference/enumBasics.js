@@ -90,10 +90,12 @@ var E1;
 })(E1 || (E1 = {}));
 // Enum type is a subtype of Number
 var x = E1.A;
+
 // Enum object type is anonymous with properties of the enum type and numeric indexer
 var e = E1;
 var e;
 var e;
+
 // Reverse mapping of enum returns string name of property 
 var s = E1[e.A];
 var s;
@@ -156,3 +158,4 @@ var doNotPropagate = [
 var doPropagate = [
     E9.A, E9.B, E6.B, E6.C, E6.A, E5.A, E5.B, E5.C
 ];
+

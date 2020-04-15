@@ -29,6 +29,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var x = true ? function (a) { return a.toExponential(); } : function (b) { return b.toFixed(); };
+
 var A = /** @class */ (function () {
     function A() {
     }

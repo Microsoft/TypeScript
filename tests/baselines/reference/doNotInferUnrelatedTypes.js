@@ -8,4 +8,5 @@ let foo: LiteralType = dearray(alt);
 
 
 //// [doNotInferUnrelatedTypes.js]
+
 var foo = dearray(alt);

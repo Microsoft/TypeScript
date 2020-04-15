@@ -80,6 +80,7 @@ var Control = /** @class */ (function () {
     }
     return Control;
 }());
+
 var Button = /** @class */ (function (_super) {
     __extends(Button, _super);
     function Button() {
@@ -124,31 +125,37 @@ var Locations1 = /** @class */ (function () {
 }());
 var sc;
 var c;
+
 var b;
 sc = b;
 c = b;
 b = sc;
 b = c;
+
 var t;
 sc = t;
 c = t;
 t = sc;
 t = c;
+
 var i;
 sc = i;
 c = i;
 i = sc;
 i = c;
+
 var i1;
 sc = i1;
 c = i1;
 i1 = sc;
 i1 = c;
+
 var l;
 sc = l;
 c = l;
 l = sc;
 l = c;
+
 var l1;
 sc = l1;
 c = l1;

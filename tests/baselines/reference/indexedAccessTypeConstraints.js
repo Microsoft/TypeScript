@@ -53,6 +53,11 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.Bar = exports.Foo = void 0;
+
+
+
+
+
 var Parent = /** @class */ (function () {
     function Parent(data) {
         this.data = data;

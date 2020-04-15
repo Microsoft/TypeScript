@@ -27,8 +27,7 @@ var George = /** @class */ (function (_super) {
     }
     return George;
 }(/** @class */ (function () {
-    function class_1() {
-    }
+    function class_1() {}
     class_1.prototype.reset = function () { return this.y; };
     return class_1;
 }())));

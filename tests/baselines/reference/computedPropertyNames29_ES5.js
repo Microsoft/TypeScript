@@ -16,13 +16,14 @@ var C = /** @class */ (function () {
     }
     C.prototype.bar = function () {
         var _this = this;
-        (function () {
-            var _a;
-            var obj = (_a = {},
-                _a[_this.bar()] = function () { } // needs capture
-            ,
-                _a);
-        });
+        (
+            function () {
+                var _a;
+                var obj = (_a = {},
+                    _a[_this.bar()] = function () { } // needs capture
+                ,
+                    _a);
+            });
         return 0;
     };
     return C;

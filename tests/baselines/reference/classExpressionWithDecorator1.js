@@ -10,8 +10,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var v = ;
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     C.p = 1;
     C = __decorate([
         decorate

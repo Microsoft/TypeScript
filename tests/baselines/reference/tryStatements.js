@@ -22,6 +22,7 @@ function fn() {
 function fn() {
     try { }
     catch (_a) { }
+
     try { }
     catch (_b) {
         try { }
@@ -32,15 +33,17 @@ function fn() {
         try { }
         catch (_e) { }
     }
+
     try { }
-    catch (x) {
-        var x;
-    }
+    catch (x) {var x;}
+
     try { }
     finally { }
+
     try { }
     catch (_f) { }
     finally { }
+
     try { }
     catch (z) { }
     finally { }

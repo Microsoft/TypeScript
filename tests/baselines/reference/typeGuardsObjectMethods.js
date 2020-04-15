@@ -61,32 +61,45 @@ var obj1 = {
     method: function (param) {
         // global vars in function declaration
         num = typeof var1 === "string" && var1.length; // string
+
+
         // variables in function declaration
         var var2;
         num = typeof var2 === "string" && var2.length; // string
+
+
         // parameters in function declaration
         num = typeof param === "string" && param.length; // string
+
         return strOrNum;
     },
     get prop() {
         // global vars in function declaration
         num = typeof var1 === "string" && var1.length; // string
+
+
         // variables in function declaration
         var var2;
         num = typeof var2 === "string" && var2.length; // string
+
         return strOrNum;
     },
     set prop(param) {
         // global vars in function declaration
         num = typeof var1 === "string" && var1.length; // string
+
+
         // variables in function declaration
         var var2;
         num = typeof var2 === "string" && var2.length; // string
+
+
         // parameters in function declaration
         num = typeof param === "string" && param.length; // string
     }
 };
 // return expression of the method
 strOrNum = typeof obj1.method(strOrNum) === "string" && obj1.method(strOrNum);
+
 // accessing getter property
 strOrNum = typeof obj1.prop === "string" && obj1.prop;

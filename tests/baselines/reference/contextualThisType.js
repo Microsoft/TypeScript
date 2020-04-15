@@ -16,9 +16,11 @@ var y = x.a(x);
 
 
 //// [contextualThisType.js]
+
 var x = {
     a: function (p) {
         return p;
     }
 };
+
 var y = x.a(x);

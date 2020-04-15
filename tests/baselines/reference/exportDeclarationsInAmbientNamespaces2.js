@@ -10,3 +10,4 @@ declare namespace N {
 
 
 //// [exportDeclarationsInAmbientNamespaces2.js]
+

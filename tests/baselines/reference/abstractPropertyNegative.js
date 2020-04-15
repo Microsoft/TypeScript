@@ -78,6 +78,7 @@ var C = /** @class */ (function (_super) {
 }(B));
 var c = new C();
 c.ro = "error: lhs of assignment can't be readonly";
+
 var WrongTypeProperty = /** @class */ (function () {
     function WrongTypeProperty() {
     }

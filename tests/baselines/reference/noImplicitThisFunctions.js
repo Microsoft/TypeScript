@@ -28,19 +28,22 @@ function f1(x) {
     // implicit any is still allowed
     return x + 1;
 }
+
 function f2(y) {
     // ok: no reference to this
     return y + 1;
 }
+
 function f3(z) {
     // error: this is implicitly any
     return this.a + z;
 }
+
 // error: `this` is `window`, but is still of type `any`
 var f4 = function (b) { return _this.c + b; };
 var f5 = function () { return function () { return _this; }; };
+
 var f6 = function () {
     var _this = this;
-    return function () { return _this; };
-};
+    return function () { return _this; };};
 var f7 = function () { return function () { return this; }; };

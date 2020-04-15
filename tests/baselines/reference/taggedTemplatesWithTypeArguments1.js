@@ -46,6 +46,7 @@ c.returnedObjProp.y;
 c.returnedObjProp.z;
 
 //// [taggedTemplatesWithTypeArguments1.js]
+
 export const a = f `
     hello
     ${stuff => stuff.x}
@@ -54,6 +55,8 @@ export const a = f `
     world
     ${stuff => stuff.z}
 `;
+
+
 export const b = g `
     hello
     ${stuff => stuff.x}
@@ -62,10 +65,13 @@ export const b = g `
     world
     ${stuff => stuff.z}
 `;
+
+
 export let c = obj["prop"] `${(input) => ({ ...input })}`;
 c.returnedObjProp.x;
 c.returnedObjProp.y;
 c.returnedObjProp.z;
+
 c = obj.prop `${(input) => ({ ...input })}`;
 c.returnedObjProp.x;
 c.returnedObjProp.y;

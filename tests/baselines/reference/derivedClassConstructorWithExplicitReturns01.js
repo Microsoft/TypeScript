@@ -56,14 +56,12 @@ var C = /** @class */ (function () {
                 return "well this looks kinda C-ish.";
             }
         };
-    }
-    C.prototype.foo = function () { return "this never gets used."; };
+    }C.prototype.foo = function () { return "this never gets used."; };
     return C;
 }());
 var D = /** @class */ (function (_super) {
     __extends(D, _super);
-    function D(a) {
-        if (a === void 0) { a = 100; }
+    function D(a) {if (a === void 0) { a = 100; }
         var _this = _super.call(this, a) || this;
         _this.dProp = function () { return _this; };
         if (Math.random() < 0.5) {

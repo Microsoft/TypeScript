@@ -17,6 +17,8 @@ if(null === isVoid()) { }
 var n = (null);
 var s = (null);
 var b = (n);
+
 function isVoid() { }
+
 // Expected error: Values of type null and void cannot be compared
 if (null === isVoid()) { }

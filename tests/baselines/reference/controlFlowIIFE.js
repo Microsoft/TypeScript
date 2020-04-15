@@ -74,6 +74,7 @@ function f6() {
 }
 
 //// [controlFlowIIFE.js]
+
 function f1() {
     let x = getStringOrNumber();
     if (typeof x === "string") {
@@ -82,6 +83,7 @@ function f1() {
         }();
     }
 }
+
 function f2() {
     let x = getStringOrNumber();
     if (typeof x === "string") {
@@ -90,6 +92,7 @@ function f2() {
         })();
     }
 }
+
 function f3() {
     let x = getStringOrNumber();
     let y;
@@ -97,6 +100,7 @@ function f3() {
         let n = (z => x.length + y + z)(y = 1);
     }
 }
+
 // Repros from #8381
 let maybeNumber;
 (function () {
@@ -106,6 +110,7 @@ maybeNumber++;
 if (maybeNumber !== undefined) {
     maybeNumber++;
 }
+
 let test;
 if (!test) {
     throw new Error('Test is not defined');
@@ -113,6 +118,7 @@ if (!test) {
 (() => {
     test.slice(1); // No error
 })();
+
 // Repro from #23565
 function f4() {
     let v;
@@ -121,6 +127,7 @@ function f4() {
     })();
     v;
 }
+
 function f5() {
     let v;
     (function* () {
@@ -129,6 +136,7 @@ function f5() {
     })();
     v; // still undefined
 }
+
 function f6() {
     let v;
     (async function () {

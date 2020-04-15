@@ -199,11 +199,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+
 var simpleAction = function (payload) { return ({
     type: "SIMPLE_ACTION",
     payload: payload
 }); };
-var thunkAction = function (param1, param2) { return function (dispatch, _a) {
+var thunkAction = function (param1, param2) { return function (
+dispatch,
+    _a
+) {
     var foo = _a.foo;
     return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_b) {
@@ -219,4 +223,11 @@ var TestComponent = /** @class */ (function (_super) {
     return TestComponent;
 }(Component));
 var mapDispatchToProps = { simpleAction: simpleAction, thunkAction: thunkAction };
-var Test1 = connect(null, mapDispatchToProps)(TestComponent);
+
+
+
+var Test1 = connect(
+null,
+    mapDispatchToProps
+)(TestComponent);
+

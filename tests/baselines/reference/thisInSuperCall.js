@@ -37,8 +37,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Base = /** @class */ (function () {
-    function Base(x) {
-    }
+    function Base(x) {}
     return Base;
 }());
 var Foo = /** @class */ (function (_super) {

@@ -102,18 +102,23 @@ for ([...multiRobotAInfo] of [multiRobotA, multiRobotB]) {
 
 //// [sourceMapValidationDestructuringForOfArrayBindingPattern2.js]
 var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
+
+
+
 var robotA = [1, "mower", "mowing"];
 var robotB = [2, "trimmer", "trimming"];
 var robots = [robotA, robotB];
 function getRobots() {
     return robots;
 }
+
 var multiRobotA = ["mower", ["mowing", ""]];
 var multiRobotB = ["trimmer", ["trimming", "edging"]];
 var multiRobots = [multiRobotA, multiRobotB];
 function getMultiRobots() {
     return multiRobots;
 }
+
 var nameA, primarySkillA, secondarySkillA;
 var numberB, nameB;
 var numberA2, nameA2, skillA2, nameMA;

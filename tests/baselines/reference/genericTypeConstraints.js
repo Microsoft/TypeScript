@@ -34,13 +34,11 @@ var Foo = /** @class */ (function () {
     return Foo;
 }());
 var FooExtended = /** @class */ (function () {
-    function FooExtended() {
-    }
+    function FooExtended() {}
     return FooExtended;
 }());
 var Bar = /** @class */ (function () {
-    function Bar() {
-    }
+    function Bar() {}
     return Bar;
 }());
 var BarExtended = /** @class */ (function (_super) {

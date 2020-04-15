@@ -61,6 +61,8 @@ bigintVal = bigintVal.valueOf(); // should error - bigintVal inferred as {}
 var stringVal = bigintVal.toString(); // should not error - bigintVal inferred as {}
 stringVal = bigintVal.toString(2); // should error - bigintVal inferred as {}
 stringVal = bigintVal.toLocaleString(); // should not error - bigintVal inferred as {}
+
+
 // Test BigInt64Array
 var bigIntArray = new BigInt64Array();
 bigIntArray = new BigInt64Array(10);
@@ -72,6 +74,7 @@ bigIntArray = new BigInt64Array(new ArrayBuffer(80), 8, 3);
 var len = bigIntArray.length;
 bigIntArray.length = 10;
 var arrayBufferLike = bigIntArray;
+
 // Test BigUint64Array
 var bigUintArray = new BigUint64Array();
 bigUintArray = new BigUint64Array(10);
@@ -83,6 +86,7 @@ bigUintArray = new BigUint64Array(new ArrayBuffer(80), 8, 3);
 len = bigIntArray.length;
 bigIntArray.length = 10;
 arrayBufferLike = bigIntArray;
+
 // Test added DataView methods
 var dataView = new DataView(new ArrayBuffer(80));
 dataView.setBigInt64(1, -1n);

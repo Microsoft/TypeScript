@@ -77,16 +77,21 @@ var B = /** @class */ (function () {
     return B;
 }());
 new B; // error
+
 var BB = B;
 var AA = BB; // error, AA is not of abstract type.
 new AA;
+
 function constructB(Factory) {
     new Factory; // error -- Factory is of type typeof B.
 }
+
 var BB = B;
 new BB; // error -- BB is of type typeof B.
+
 var x = C;
 new x; // okay -- undefined behavior at runtime
+
 var C = /** @class */ (function (_super) {
     __extends(C, _super);
     function C() {

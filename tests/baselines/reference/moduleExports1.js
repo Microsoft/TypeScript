@@ -34,8 +34,11 @@ define(["require", "exports"], function (require, exports) {
         })(Strasse = TypeScript.Strasse || (TypeScript.Strasse = {}));
     })(TypeScript = exports.TypeScript || (exports.TypeScript = {}));
     var rue = new TypeScript.Strasse.Street.Rue();
+
     rue.address = "1 Main Street";
+
     void 0;
+
     if (!module.exports)
         module.exports = "";
 });

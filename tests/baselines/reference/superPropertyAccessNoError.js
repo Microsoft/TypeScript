@@ -90,15 +90,19 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
+
 var SomeBaseClass = /** @class */ (function () {
     function SomeBaseClass() {
     }
     SomeBaseClass.prototype.func = function () {
         return '';
     };
+
     SomeBaseClass.func = function () {
         return 3;
     };
+
     SomeBaseClass.prototype.returnThis = function () {
         return this;
     };
@@ -112,6 +116,7 @@ var SomeDerivedClass = /** @class */ (function (_super) {
         var x;
         return _this;
     }
+
     SomeDerivedClass.prototype.fn = function () {
         var _this = this;
         var x = _super.prototype.func.call(this);

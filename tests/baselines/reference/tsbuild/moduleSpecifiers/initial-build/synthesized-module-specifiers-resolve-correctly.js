@@ -136,6 +136,7 @@ exports.getVar = void 0;
 var variable = {
     key: 'value'
 };
+
 function getVar() {
     return 'key';
 }

@@ -43,8 +43,7 @@ define(["require", "exports"], function (require, exports) {
     exports.__esModule = true;
     exports.B = exports.A = void 0;
     var A = /** @class */ (function () {
-        function A(ctor) {
-        }
+        function A(ctor) {}
         return A;
     }());
     exports.A = A;
@@ -59,6 +58,8 @@ define(["require", "exports"], function (require, exports) {
         return B;
     }(A));
     exports.B = B;
+
+
     var reg;
     reg.register(B);
 });

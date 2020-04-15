@@ -25,22 +25,27 @@ function i<T>(a: T) {
 
 //// [validUndefinedAssignments.js]
 var x;
+
 var a = x;
 var b = x;
 var c = x;
 var d = x;
+
 var e = x;
 e = x; // should work
+
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var f;
 f = x;
+
 var g;
 g = x;
+
 var h = x;
+
 function i(a) {
     a = x;
 }

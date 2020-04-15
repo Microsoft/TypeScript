@@ -65,6 +65,7 @@ var MyDerived = /** @class */ (function (_super) {
 }(MyBase));
 var d = new MyDerived();
 var f3 = d.value;
+
 var A = /** @class */ (function () {
     function A() {
     }

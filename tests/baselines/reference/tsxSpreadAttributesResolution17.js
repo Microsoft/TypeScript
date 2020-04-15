@@ -36,6 +36,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.Empty = void 0;
+
 var Empty = /** @class */ (function (_super) {
     __extends(Empty, _super);
     function Empty() {
@@ -47,5 +48,6 @@ var Empty = /** @class */ (function (_super) {
     return Empty;
 }(React.Component));
 exports.Empty = Empty;
+
 // OK
 var unionedSpread = <Empty {...obj}/>;

@@ -46,14 +46,12 @@ console.log(c, d);
 exports.__esModule = true;
 exports.A = void 0;
 var default_1 = /** @class */ (function () {
-    function default_1() {
-    }
+    function default_1() {}
     return default_1;
 }());
 exports["default"] = default_1;
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 exports.A = A;
@@ -86,6 +84,7 @@ require("./a"); // noUnusedLocals error only
 "use strict";
 exports.__esModule = true;
 require("./a");
+
 0 /* One */;
 var c = 1 /* Two */;
 var d = 1 /* Two */;

@@ -67,6 +67,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var oneA;
+
 var A = /** @class */ (function () {
     function A() {
         return oneA;
@@ -101,7 +102,8 @@ var C = /** @class */ (function (_super) {
     function C(x) {
         var _this = _super.call(this) || this;
         var _loop_1 = function (i) {
-            (function () { return i + x; });
+            (
+                function () { return i + x; });
             if (x === 1) {
                 return { value: _this };
             }
@@ -119,9 +121,10 @@ var D = /** @class */ (function (_super) {
     __extends(D, _super);
     function D(x) {
         var _this = _super.call(this) || this;
-        (function () {
-            return;
-        });
+        (
+            function () {
+                return;
+            });
         function foo() {
             return;
         }

@@ -17,8 +17,7 @@ var r: string = m.foo;
 define(["require", "exports"], function (require, exports) {
     "use strict";
     var T = /** @class */ (function () {
-        function T() {
-        }
+        function T() {}
         return T;
     }());
     return T;

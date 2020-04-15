@@ -14,6 +14,7 @@ let x: E[] = enumValues(E);
 
 //// [mappedToToIndexSignatureInference.js]
 fn(a);
+
 var E;
 (function (E) {
     E["A"] = "foo";

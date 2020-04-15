@@ -76,13 +76,16 @@ var Other = /** @class */ (function (_super) {
     Other.staticMethod = function () {
         _super.staticMethod.call(this);
     };
+
     // in a lambda inside a static method
     Other.lambdaInsideAStaticMethod = function () {
         var _this = this;
-        (function () {
-            _super.staticMethod.call(_this);
-        });
+        (
+            function () {
+                _super.staticMethod.call(_this);
+            });
     };
+
     // in an object literal inside a static method
     Other.objectLiteralInsideAStaticMethod = function () {
         var _this = this;
@@ -97,6 +100,7 @@ var Other = /** @class */ (function (_super) {
         // in a getter
         get: function () {
             _super.staticMethod.call(this);
+
             return 0;
         },
         // in a setter
@@ -107,8 +111,7 @@ var Other = /** @class */ (function (_super) {
         configurable: true
     });
     // in static method
-    Other.initializerInAStaticMethod = function (a) {
-        if (a === void 0) { a = _super.staticMethod.call(this); }
+    Other.initializerInAStaticMethod = function (a) {if (a === void 0) { a = _super.staticMethod.call(this); }
         _super.staticMethod.call(this);
     };
     return Other;

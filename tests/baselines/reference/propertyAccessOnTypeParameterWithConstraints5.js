@@ -85,13 +85,16 @@ var C = /** @class */ (function () {
     return C;
 }());
 var r = (new C()).f();
+
 var i;
 var r2 = i.foo.notHere();
 var r2b = i.foo['foo']();
+
 var a;
 // BUG 794164
 var r3 = a().notHere();
 var r3b = a()['foo']();
+
 var b = {
     foo: function (x) {
         var a = x['foo'](); // should be string
@@ -100,4 +103,5 @@ var b = {
     // BUG 794164
     bar: b.foo(1).notHere()
 };
+
 var r4 = b.foo(new B()); // error after constraints above made illegal, doesn't matter

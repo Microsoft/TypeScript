@@ -26,8 +26,7 @@ export class B {}
 {"compilerOptions":{"target":"es6","importsNotUsedAsValues":"error"}}
 
 //// [/b.js]
-export class B {
-}
+export class B {}
 
 
 //// [/a.js]

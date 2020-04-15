@@ -74,6 +74,7 @@ var MyClass = /** @class */ (function () {
     MyClass.sppp = 123;
     return MyClass;
 }());
+
 var MyGenericClass = /** @class */ (function () {
     function MyGenericClass() {
     }
@@ -87,6 +88,7 @@ MyClass.prototype.extension1 = function (p) {
     MyClass.spp = p;
     MyClass.sppp = p;
 };
+
 MyClass.prototype.extension2 = function (p) {
     this.p = p;
     this.pp = p;
@@ -95,6 +97,7 @@ MyClass.prototype.extension2 = function (p) {
     MyClass.spp = p;
     MyClass.sppp = p;
 };
+
 function extension3(p) {
     this.p = p;
     this.pp = p;
@@ -103,7 +106,9 @@ function extension3(p) {
     MyClass.spp = p;
     MyClass.sppp = p;
 }
+
 MyClass.prototype.extension3 = extension3;
+
 function extension4(p) {
     this.p = p;
     this.pp = p;

@@ -27,5 +27,6 @@ var A;
 })(A || (A = {}));
 // not an error since exported
 var a = A.Color.Red;
+
 // error not exported
 var b = A.Day.Monday;

@@ -152,6 +152,7 @@ var E = /** @class */ (function (_super) {
 var c;
 var d;
 var e;
+
 c = d;
 c = e;
 var r = c.foo(); // e.foo would return string

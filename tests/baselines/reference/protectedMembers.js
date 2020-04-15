@@ -172,21 +172,25 @@ var C3 = /** @class */ (function (_super) {
 var c1;
 var c2;
 var c3;
+
 // All of these should be errors
 c1.x;
 c1.f();
 C1.sx;
 C1.sf();
+
 // All of these should be errors
 c2.x;
 c2.f();
 C2.sx;
 C2.sf();
+
 // All of these should be ok
 c3.x;
 c3.f();
 C3.sx;
 C3.sf();
+
 var A = /** @class */ (function () {
     function A() {
     }
@@ -220,6 +224,7 @@ var D = /** @class */ (function (_super) {
     }
     return D;
 }(C));
+
 var CC = /** @class */ (function () {
     function CC() {
     }
@@ -239,6 +244,7 @@ var a1;
 var b1;
 a1 = b1; // Error, B1 doesn't derive from A1
 b1 = a1; // Error, x is protected in A1 but public in B1
+
 var A2 = /** @class */ (function () {
     function A2() {
     }

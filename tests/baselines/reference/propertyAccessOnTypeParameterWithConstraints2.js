@@ -96,6 +96,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var A = /** @class */ (function () {
     function A() {
     }
@@ -120,6 +121,7 @@ var C = /** @class */ (function () {
         var a = x['foo'](); // should be string
         return a + x.foo();
     };
+
     C.prototype.g = function (x) {
         var a = x['foo'](); // should be string
         return a + x.foo();
@@ -139,12 +141,14 @@ var C = /** @class */ (function () {
 //}
 var r1 = (new C()).f();
 var r1b = (new C()).g(new B());
+
 //interface I<U extends T, T extends A> {
 //    foo: U;
 //}
 var i;
 var r2 = i.foo.foo();
 var r2b = i.foo['foo']();
+
 var a;
 //var a: {
 //    <U extends T, T extends A>(): U;
@@ -157,6 +161,7 @@ var r3b = a()['foo']();
 var aB = new B();
 var r3c = a(aB, aB).foo();
 var r3d = a(aB, aB)['foo']();
+
 var b = {
     foo: function (x, y) {
         var a = x['foo'](); // should be string

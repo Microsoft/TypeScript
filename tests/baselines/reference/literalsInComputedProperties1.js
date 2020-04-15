@@ -63,11 +63,14 @@ x[1].toExponential();
 x[2].toExponential();
 x[3].toExponential();
 x[4].toExponential();
+
+
 var y;
 y[1].toExponential();
 y[2].toExponential();
 y[3].toExponential();
 y[4].toExponential();
+
 var C = /** @class */ (function () {
     function C() {
     }
@@ -89,4 +92,5 @@ var X;
 })(X || (X = {}));
 var a = X["foo"];
 var a0 = X["bar"];
+
 // TODO: make sure that enum still disallow template literals as member names

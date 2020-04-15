@@ -96,5 +96,6 @@ var Y;
 // generate code.
 var D;
 (function (D) {
+
     D.E = 'hello';
 })(D || (D = {}));

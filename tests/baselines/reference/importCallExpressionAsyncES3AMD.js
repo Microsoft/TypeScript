@@ -118,6 +118,7 @@ define(["require", "exports"], function (require, exports) {
             });
         }); }
     };
+
     var cl2 = /** @class */ (function () {
         function cl2() {
             var _this = this;

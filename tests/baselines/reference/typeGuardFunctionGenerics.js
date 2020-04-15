@@ -63,6 +63,7 @@ var C = /** @class */ (function (_super) {
     }
     return C;
 }(A));
+
 var a;
 var test1 = funA(isB);
 if (funB(retC, a)) {

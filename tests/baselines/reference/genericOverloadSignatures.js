@@ -32,9 +32,12 @@ interface D {
 
 //// [genericOverloadSignatures.js]
 function f(a) { }
+
+
 var C2 = /** @class */ (function () {
     function C2() {
     }
     return C2;
 }());
 var b;
+

@@ -36,8 +36,7 @@ var bar = /** @class */ (function () {
     return bar;
 }());
 var baz = /** @class */ (function () {
-    function baz() {
-    }
+    function baz() {}
     return baz;
 }());
 var foo = /** @class */ (function (_super) {

@@ -9,8 +9,7 @@ var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cook
     return cooked;
 };
 var CtorTag = /** @class */ (function () {
-    function CtorTag() {
-    }
+    function CtorTag() {}
     return CtorTag;
 }());
 CtorTag(__makeTemplateObject(["Hello world!"], ["Hello world!"]));

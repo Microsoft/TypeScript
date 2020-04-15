@@ -31,7 +31,9 @@ var p1 = Promise.resolve().then(() => require("./0"));
 p1.then(zero => {
     return zero.foo();
 });
+
 exports.p2 = Promise.resolve().then(() => require("./0"));
+
 function foo() {
     const p2 = Promise.resolve().then(() => require("./0"));
 }

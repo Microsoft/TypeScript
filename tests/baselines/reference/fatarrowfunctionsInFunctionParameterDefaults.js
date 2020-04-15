@@ -17,4 +17,5 @@ function fn(x, y) {
     // should be 4
     return y;
 }
+
 fn.call(4); // Should be 4

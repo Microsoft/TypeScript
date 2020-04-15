@@ -61,6 +61,7 @@ var Aleph = /** @class */ (function () {
          */
         this.field = b;
     }
+
     /**
      * Doesn't actually do anything
      * @returns {void}

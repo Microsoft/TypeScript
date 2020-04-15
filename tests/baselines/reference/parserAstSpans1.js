@@ -238,11 +238,20 @@ var c1 = /** @class */ (function () {
     }
     c1.prototype.i1_f1 = function () {
     };
+
+
     c1.prototype.i1_nc_f1 = function () {
     };
+
+
+
     /** c1_f1*/
     c1.prototype.f1 = function () {
     };
+
+
+
+
     /** c1_nc_f1*/
     c1.prototype.nc_f1 = function () {
     };
@@ -276,6 +285,7 @@ i1_i.i1_l1();
 i1_i.i1_nc_l1();
 i1_i.l1();
 i1_i.nc_l1();
+
 var c2 = /** @class */ (function () {
     /** c2 constructor*/
     function c2(a) {
@@ -330,6 +340,8 @@ var c3 = /** @class */ (function (_super) {
         _this.p1 = _super.prototype.c2_p1;
         return _this;
     }
+
+
     /** c3 f1*/
     c3.prototype.f1 = function () {
     };
@@ -376,6 +388,7 @@ var c4 = /** @class */ (function (_super) {
     return c4;
 }(c2));
 var c4_i = new c4(10);
+
 var i2_i;
 var i3_i;
 i2_i.i2_f1();
@@ -404,6 +417,7 @@ i2_i.i2_l1();
 i2_i.i2_nc_l1();
 i2_i.l1();
 i2_i.nc_l1();
+
 /**c5 class*/
 var c5 = /** @class */ (function () {
     function c5() {

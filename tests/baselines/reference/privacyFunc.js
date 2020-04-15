@@ -247,35 +247,47 @@ var m1;
     var C3_public = /** @class */ (function () {
         function C3_public(m1_c3_c1_2) {
         }
+
         C3_public.prototype.f1_private = function (m1_c3_f1_arg) {
         };
+
         C3_public.prototype.f2_public = function (m1_c3_f2_arg) {
         };
+
         C3_public.prototype.f3_private = function (m1_c3_f3_arg) {
         };
+
         C3_public.prototype.f4_public = function (m1_c3_f4_arg) {
         };
+
         C3_public.prototype.f5_private = function () {
             return new C1_public();
         };
+
         C3_public.prototype.f6_public = function () {
             return new C1_public();
         };
+
         C3_public.prototype.f7_private = function () {
             return new C2_private();
         };
+
         C3_public.prototype.f8_public = function () {
             return new C2_private(); // error
         };
+
         C3_public.prototype.f9_private = function () {
             return new C1_public();
         };
+
         C3_public.prototype.f10_public = function () {
             return new C1_public();
         };
+
         C3_public.prototype.f11_private = function () {
             return new C2_private();
         };
+
         C3_public.prototype.f12_public = function () {
             return new C2_private(); //error
         };
@@ -287,33 +299,46 @@ var m1;
         }
         C4_private.prototype.f1_private = function (m1_c4_f1_arg) {
         };
+
         C4_private.prototype.f2_public = function (m1_c4_f2_arg) {
         };
+
         C4_private.prototype.f3_private = function (m1_c4_f3_arg) {
         };
+
         C4_private.prototype.f4_public = function (m1_c4_f4_arg) {
         };
+
+
         C4_private.prototype.f5_private = function () {
             return new C1_public();
         };
+
         C4_private.prototype.f6_public = function () {
             return new C1_public();
         };
+
         C4_private.prototype.f7_private = function () {
             return new C2_private();
         };
+
         C4_private.prototype.f8_public = function () {
             return new C2_private();
         };
+
+
         C4_private.prototype.f9_private = function () {
             return new C1_public();
         };
+
         C4_private.prototype.f10_public = function () {
             return new C1_public();
         };
+
         C4_private.prototype.f11_private = function () {
             return new C2_private();
         };
+
         C4_private.prototype.f12_public = function () {
             return new C2_private();
         };
@@ -343,17 +368,20 @@ var m1;
     }());
     function f1_public(m1_f1_arg) {
     }
+
     function f2_public(m1_f2_arg) {
     }
     m1.f2_public = f2_public;
     function f3_public(m1_f3_arg) {
     }
+
     function f4_public(m1_f4_arg) {
     }
     m1.f4_public = f4_public;
     function f5_public() {
         return new C1_public();
     }
+
     function f6_public() {
         return new C1_public();
     }
@@ -361,6 +389,7 @@ var m1;
     function f7_public() {
         return new C2_private();
     }
+
     function f8_public() {
         return new C2_private(); // error
     }
@@ -368,6 +397,7 @@ var m1;
     function f9_private() {
         return new C1_public();
     }
+
     function f10_public() {
         return new C1_public();
     }
@@ -375,6 +405,7 @@ var m1;
     function f11_private() {
         return new C2_private();
     }
+
     function f12_public() {
         return new C2_private(); //error
     }
@@ -390,17 +421,22 @@ var C7_public = /** @class */ (function () {
     }
     C7_public.prototype.f1_private = function (c7_f1_arg) {
     };
+
     C7_public.prototype.f2_public = function (c7_f2_arg) {
     };
+
     C7_public.prototype.f5_private = function () {
         return new C6_public();
     };
+
     C7_public.prototype.f6_public = function () {
         return new C6_public();
     };
+
     C7_public.prototype.f9_private = function () {
         return new C6_public();
     };
+
     C7_public.prototype.f10_public = function () {
         return new C6_public();
     };
@@ -413,9 +449,14 @@ var C9_public = /** @class */ (function () {
 }());
 function f4_public(f4_arg) {
 }
+
+
+
 function f6_public() {
     return new C6_public();
 }
+
+
 function f10_public() {
     return new C6_public();
 }

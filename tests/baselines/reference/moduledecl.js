@@ -237,13 +237,16 @@ var m0;
 (function (m0) {
     function f1() {
     }
+
     function f2(ns) {
     }
+
     var c1 = /** @class */ (function () {
         function c1() {
         }
         return c1;
     }());
+
 })(m0 || (m0 = {}));
 var m1;
 (function (m1) {
@@ -259,13 +262,13 @@ var m1;
             this.n2 = n2;
             this.n3 = n3;
             this.n4 = n4;
-        }
-        c1.prototype.d = function () {
+        }c1.prototype.d = function () {
             return "Hello";
         };
         return c1;
     }());
     m1.c1 = c1;
+
 })(m1 || (m1 = {}));
 var m;
 (function (m) {
@@ -309,6 +312,7 @@ var exportTests;
         C1_public.prototype.f2 = function () {
             return 30;
         };
+
         C1_public.prototype.f3 = function () {
             return "string";
         };
@@ -321,6 +325,7 @@ var exportTests;
         C2_private.prototype.f2 = function () {
             return 30;
         };
+
         C2_private.prototype.f3 = function () {
             return "string";
         };
@@ -357,20 +362,25 @@ var exportTests;
     }());
     exportTests.C3_public = C3_public;
 })(exportTests || (exportTests = {}));
+
 function foo() {
     return mAmbient.foo();
 }
+
 var cVar = new mAmbient.C();
 var aVar = mAmbient.aVar;
 var bB;
 var eVar;
+
 function m3foo() {
     return mAmbient.m3.foo();
 }
+
 var m3cVar = new mAmbient.m3.C();
 var m3aVar = mAmbient.m3.aVar;
 var m3bB;
 var m3eVar;
+
 
 
 //// [moduledecl.d.ts]

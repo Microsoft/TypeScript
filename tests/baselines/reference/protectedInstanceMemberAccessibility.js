@@ -76,20 +76,24 @@ var B = /** @class */ (function (_super) {
         var t2 = this.f();
         var t3 = this.y;
         var t4 = this.z; // error
+
         var s1 = _super.prototype.x; // error
         var s2 = _super.prototype.f.call(this);
         var s3 = _super.prototype.y; // error
         var s4 = _super.prototype.z; // error
+
         var a;
         var a1 = a.x; // error
         var a2 = a.f(); // error
         var a3 = a.y; // error
         var a4 = a.z; // error
+
         var b;
         var b1 = b.x;
         var b2 = b.f();
         var b3 = b.y;
         var b4 = b.z; // error
+
         var c;
         var c1 = c.x; // error
         var c2 = c.f(); // error

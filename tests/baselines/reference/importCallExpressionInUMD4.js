@@ -105,7 +105,9 @@ export class D {
             });
         }
     }
+
     class D {
+
         constructor() {
             this.myModule = __syncRequire ? Promise.resolve().then(() => require("./0")) : new Promise((resolve_4, reject_4) => { require(["./0"], resolve_4, reject_4); });
         }

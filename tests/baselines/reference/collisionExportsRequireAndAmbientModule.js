@@ -115,5 +115,6 @@ define(["require", "exports"], function (require, exports) {
 //// [collisionExportsRequireAndAmbientModule_globalFile.js]
 var m4;
 (function (m4) {
+
     var a = 10;
 })(m4 || (m4 = {}));

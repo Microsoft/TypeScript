@@ -31,8 +31,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.B = exports.A = void 0;
 var tslib_1 = require("tslib");
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 exports.A = A;
@@ -87,8 +86,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 var B = /** @class */ (function (_super) {

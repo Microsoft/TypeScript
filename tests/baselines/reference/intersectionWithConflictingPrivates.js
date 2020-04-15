@@ -59,12 +59,12 @@ class Foo {
 
 //// [intersectionWithConflictingPrivates.js]
 "use strict";
-class A {
-}
-class B {
-}
+class A {}
+class B {}
+
 ab.y = 'hello';
 ab = {};
+
 function f1(node) {
     if (node instanceof A || node instanceof A) {
         node; // A
@@ -74,21 +74,24 @@ function f1(node) {
     }
     node; // A | B
 }
+
 // Repro from #37659
-class ViewNode {
-}
-class ViewRefNode extends ViewNode {
-}
-class ViewRefFileNode extends ViewRefNode {
-}
+class ViewNode {}
+class ViewRefNode extends ViewNode {}
+class ViewRefFileNode extends ViewRefNode {}
+
 class CommitFileNode extends ViewRefFileNode {
 }
+
 class ResultsFileNode extends ViewRefFileNode {
 }
+
 class StashFileNode extends CommitFileNode {
 }
+
 class StatusFileNode extends ViewNode {
 }
+
 class Foo {
     async foo(node) {
         if (!(node instanceof CommitFileNode) &&
@@ -96,8 +99,10 @@ class Foo {
             !(node instanceof ResultsFileNode)) {
             return;
         }
+
         await this.bar(node);
     }
+
     async bar(node, options) {
         return Promise.resolve(undefined);
     }

@@ -94,15 +94,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 function f(x, y, z) {
     return Array.from(arguments);
 }
+
 f(1, 2, 3); // no error
+
+
 // Using ES6 collection
 var m = new Map();
 m.clear();
 // Using ES6 iterable
 m.keys();
+
 // Using ES6 function
 function Baz() { }
 Baz.name;
+
 // Using ES6 generator
 function* gen() {
     let i = 0;
@@ -111,6 +116,7 @@ function* gen() {
         i++;
     }
 }
+
 function* gen2() {
     let i = 0;
     while (i < 10) {
@@ -118,8 +124,10 @@ function* gen2() {
         i++;
     }
 }
+
 // Using ES6 math
 Math.sign(1);
+
 // Using ES6 object
 var o = {
     a: 2,
@@ -128,28 +136,36 @@ var o = {
     }
 };
 o.hasOwnProperty(Symbol.hasInstance);
+
 // Using ES6 promise
 function out() {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise(function (resolve, reject) { });
     });
 }
+
 out().then(() => {
     console.log("Yea!");
 });
+
 // Using Es6 proxy
 var t = {};
 var p = new Proxy(t, {});
+
 // Using ES6 reflect
 Reflect.isExtensible({});
+
 // Using Es6 regexp
 var reg = new RegExp("/s");
 reg.flags;
+
 // Using ES6 string
 var str = "Hello world";
 str.includes("hello", 0);
+
 // Using ES6 symbol
 var s = Symbol();
+
 // Using ES6 wellknown-symbol
 const o1 = {
     [Symbol.hasInstance](value) {

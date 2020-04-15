@@ -115,6 +115,7 @@ function test() {
         });
     });
 }
+
 ;
 var Foo = /** @class */ (function () {
     function Foo() {

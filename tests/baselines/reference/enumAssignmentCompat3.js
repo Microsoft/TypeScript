@@ -189,10 +189,13 @@ secondAb = abc; // missing 'c'
 secondCd = abc; // missing 'a' and 'b'
 nope = abc; // nope!
 decl = abc; // ok
+
+
 // const is only assignable to itself
 k = k;
 abc = k; // error
 k = abc;
+
 // merged enums compare all their members
 abc = merged; // missing 'd'
 merged = abc; // ok

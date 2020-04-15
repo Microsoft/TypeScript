@@ -26,7 +26,6 @@ var C = /** @class */ (function (_super) {
     return C;
 }(M));
 var C2 = /** @class */ (function () {
-    function C2() {
-    }
+    function C2() {}
     return C2;
 }());

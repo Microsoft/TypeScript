@@ -7,8 +7,7 @@ class Bar extends Foo {}
 
 //// [bundle.js]
 var Foo = /** @class */ (function () {
-    function Foo() {
-    }
+    function Foo() {}
     return Foo;
 }());
 var __extends = (this && this.__extends) || (function () {

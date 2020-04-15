@@ -84,8 +84,7 @@ var A = /** @class */ (function () {
             writable: true,
             value: this.y
         });
-    }
-    Object.defineProperty(A.prototype, "m", {
+    }Object.defineProperty(A.prototype, "m", {
         enumerable: false,
         configurable: true,
         writable: true,

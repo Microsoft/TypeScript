@@ -40,5 +40,6 @@ exports.test2 = test2;
 "use strict";
 exports.__esModule = true;
 var file1_1 = require("./file1");
+
 file1_1.test();
 file1_1.test2();

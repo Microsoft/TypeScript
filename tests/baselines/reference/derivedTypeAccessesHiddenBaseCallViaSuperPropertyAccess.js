@@ -47,6 +47,7 @@ var Derived = /** @class */ (function (_super) {
     Derived.prototype.foo = function (x) {
         return null;
     };
+
     Derived.prototype.bar = function () {
         var r = _super.prototype.foo.call(this, { a: 1 }); // { a: number }
         var r2 = _super.prototype.foo.call(this, { a: 1, b: 2 }); // { a: number }

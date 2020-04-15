@@ -28,6 +28,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 function Mixin(Base) {
     return /** @class */ (function (_super) {
         __extends(class_1, _super);
@@ -37,3 +38,4 @@ function Mixin(Base) {
         return class_1;
     }(Base));
 }
+

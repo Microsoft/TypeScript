@@ -106,9 +106,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var Base = /** @class */ (function () {
-    function Base() {
-    }
+    function Base() {}
     return Base;
 }());
 var Derived = /** @class */ (function (_super) {
@@ -128,11 +128,14 @@ var Derived2 = /** @class */ (function (_super) {
 var TargetHasOptional;
 (function (TargetHasOptional) {
     var c;
+
     var a;
     var b = { opt: new Base() };
+
     var d;
     var e;
     var f;
+
     // disallowed by weak type checking
     c = d;
     c = e;
@@ -143,6 +146,7 @@ var TargetHasOptional;
     b = d;
     b = e;
     b = f;
+
     // ok
     c = a;
     a = c;
@@ -152,19 +156,24 @@ var TargetHasOptional;
 var SourceHasOptional;
 (function (SourceHasOptional) {
     var c;
+
     var a;
     var b = { opt: new Base() };
+
     var d;
     var e;
     var f;
+
     c = d; // error
     c = e; // error
     c = f; // error
     c = a; // ok
+
     a = d; // error
     a = e; // error
     a = f; // error
     a = c; // ok
+
     b = d; // error
     b = e; // error
     b = f; // error

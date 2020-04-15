@@ -141,6 +141,7 @@ var Base = /** @class */ (function () {
                 var d2;
                 var d3;
                 var d4;
+
                 b.x; // OK, accessed within their declaring class
                 d1.x; // OK, accessed within their declaring class
                 d2.x; // OK, accessed within their declaring class
@@ -167,6 +168,7 @@ var Derived1 = /** @class */ (function (_super) {
                 var d2;
                 var d3;
                 var d4;
+
                 b.x; // Error, isn't accessed through an instance of the enclosing class
                 d1.x; // OK, accessed within a class derived from their declaring class, and through an instance of the enclosing class
                 d2.x; // Error, isn't accessed through an instance of the enclosing class
@@ -193,6 +195,7 @@ var Derived2 = /** @class */ (function (_super) {
                 var d2;
                 var d3;
                 var d4;
+
                 b.x; // Error, isn't accessed through an instance of the enclosing class
                 d1.x; // Error, isn't accessed through an instance of the enclosing class
                 d2.x; // OK, accessed within a class derived from their declaring class, and through an instance of the enclosing class
@@ -219,6 +222,7 @@ var Derived3 = /** @class */ (function (_super) {
                 var d2;
                 var d3;
                 var d4;
+
                 b.x; // Error, isn't accessed through an instance of the enclosing class
                 d1.x; // Error, isn't accessed through an instance of the enclosing class
                 d2.x; // Error, isn't accessed through an instance of the enclosing class
@@ -245,6 +249,7 @@ var Derived4 = /** @class */ (function (_super) {
                 var d2;
                 var d3;
                 var d4;
+
                 b.x; // Error, isn't accessed through an instance of the enclosing class
                 d1.x; // Error, isn't accessed through an instance of the enclosing class
                 d2.x; // Error, isn't accessed through an instance of the enclosing class
@@ -261,6 +266,7 @@ var d1;
 var d2;
 var d3;
 var d4;
+
 b.x; // Error, neither within their declaring class nor classes derived from their declaring class
 d1.x; // Error, neither within their declaring class nor classes derived from their declaring class
 d2.x; // Error, neither within their declaring class nor classes derived from their declaring class

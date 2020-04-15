@@ -54,13 +54,13 @@ var strOrNum;
 var strOrNumOrBool;
 var numOrBool;
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var c;
 var cOrBool;
 var strOrNumOrBoolOrC;
+
 // A type guard of the form expr1 || expr2
 //  - when true, narrows the type of x to T1 | T2, where T1 is the type of x narrowed by expr1 when true, 
 //    and T2 is the type of x narrowed by expr1 when false and then by expr2 when true, or

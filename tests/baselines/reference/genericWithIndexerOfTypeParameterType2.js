@@ -48,8 +48,7 @@ define(["require", "exports"], function (require, exports) {
     }(Collection));
     exports.List = List;
     var CollectionItem = /** @class */ (function () {
-        function CollectionItem() {
-        }
+        function CollectionItem() {}
         return CollectionItem;
     }());
     exports.CollectionItem = CollectionItem;

@@ -57,6 +57,7 @@ exports.noPrivates = (_a = /** @class */ (function () {
     }()),
     _a.ps = -1,
     _a);
+
 // altered repro from #15066 to add private property
 var FooItem = /** @class */ (function () {
     function FooItem() {
@@ -87,5 +88,6 @@ var Test = /** @class */ (function (_super) {
 }(WithTags(FooItem)));
 exports.Test = Test;
 var test = new Test();
+
 Test.getTags();
 test.tags();

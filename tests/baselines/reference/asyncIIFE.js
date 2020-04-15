@@ -24,5 +24,6 @@ function f1() {
         yield 10;
         throw new Error();
     }))();
+
     var x = 1;
 }

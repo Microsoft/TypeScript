@@ -45,8 +45,7 @@ var __extends = (this && this.__extends) || (function () {
 function Tagged(Base) {
     return /** @class */ (function (_super) {
         __extends(class_1, _super);
-        function class_1() {
-            var args = [];
+        function class_1() {var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
@@ -57,6 +56,7 @@ function Tagged(Base) {
         return class_1;
     }(Base));
 }
+
 var A = /** @class */ (function () {
     function A() {
     }

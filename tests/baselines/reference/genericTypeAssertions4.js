@@ -64,6 +64,7 @@ var C = /** @class */ (function (_super) {
 var a;
 var b;
 var c;
+
 function foo2(x) {
     var y = x;
     y = a; // error: cannot convert A to T

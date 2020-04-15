@@ -15,3 +15,5 @@ interface C<T> extends A<T>, B<T> { }
 
 
 //// [infinitelyExpandingBaseTypes1.js]
+
+

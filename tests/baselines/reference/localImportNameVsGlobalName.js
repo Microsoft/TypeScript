@@ -27,6 +27,7 @@ var Keyboard;
 var App;
 (function (App) {
     var Key = Keyboard.Key;
+
     function foo(key) { }
     App.foo = foo;
     foo(Key.UP);

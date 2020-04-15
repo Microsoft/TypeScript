@@ -35,11 +35,16 @@ var p_cast = <Point> ({
 var x = 0;
 var z = x;
 var y = x + z;
+
 var a = 0;
 var b = true;
 var s = "";
+
 var ar = null;
+
 var f = null;
+
+
 var p_cast = ({
     x: 0,
     y: 0,
@@ -48,3 +53,4 @@ var p_cast = ({
     },
     mult: function (p) { return p; }
 });
+

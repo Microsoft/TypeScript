@@ -57,8 +57,7 @@ var ObjectLiteral;
     };
 })(ObjectLiteral || (ObjectLiteral = {}));
 var F = /** @class */ (function () {
-    function F() {
-    }
+    function F() {}
     F.prototype.test = function () { return ""; };
     return F;
 }());

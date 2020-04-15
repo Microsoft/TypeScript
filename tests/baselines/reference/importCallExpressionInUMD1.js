@@ -51,7 +51,9 @@ function foo() {
     p1.then(zero => {
         return zero.foo();
     });
+
     exports.p2 = __syncRequire ? Promise.resolve().then(() => require("./0")) : new Promise((resolve_3, reject_3) => { require(["./0"], resolve_3, reject_3); });
+
     function foo() {
         const p2 = __syncRequire ? Promise.resolve().then(() => require("./0")) : new Promise((resolve_4, reject_4) => { require(["./0"], resolve_4, reject_4); });
     }

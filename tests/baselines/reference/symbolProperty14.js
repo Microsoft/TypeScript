@@ -19,6 +19,7 @@ bar(i);
 //// [symbolProperty14.js]
 class C {
 }
+
 foo(new C);
 var i;
 bar(i);

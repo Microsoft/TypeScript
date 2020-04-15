@@ -36,6 +36,7 @@ var C = /** @class */ (function (_super) {
 }(X));
 
 
+
 //// [declFileForFunctionTypeAsTypeParameter.d.ts]
 declare class X<T> {
 }

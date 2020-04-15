@@ -32,13 +32,16 @@ exports.A = a;
 exports.B = b;
 exports.A = b; // Should Error
 exports.B = a; // Should Error
+
 a.b; // Property 'b' does not exist on type 'Required<{ a?: 1; x: 1; }>'.
 b.a; // Property 'a' does not exist on type 'Required<{ b?: 1; x: 1; }>'.
+
 var aa = { a: { a: 1, x: 1 } };
 var bb = { a: { b: 1, x: 1 } };
 exports.AA = aa;
 exports.BB = bb;
 exports.AA = bb; // Should Error
 exports.BB = aa; // Should Error
+
 aa.a.b; // Property 'b' does not exist on type 'Required<{ a?: 1; x: 1; }>'.
 bb.a.a; // Property 'a' does not exist on type 'Required<{ b?: 1; x: 1; }>'.

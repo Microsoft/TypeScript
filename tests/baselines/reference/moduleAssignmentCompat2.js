@@ -17,8 +17,7 @@ b = a; // error
 var A;
 (function (A) {
     var C = /** @class */ (function () {
-        function C() {
-        }
+        function C() {}
         return C;
     }());
     A.C = C;
@@ -26,19 +25,18 @@ var A;
 var B;
 (function (B) {
     var C = /** @class */ (function () {
-        function C() {
-        }
+        function C() {}
         return C;
     }());
     B.C = C;
     var D = /** @class */ (function () {
-        function D() {
-        }
+        function D() {}
         return D;
     }());
     B.D = D;
 })(B || (B = {}));
 var a;
 var b;
+
 a = b;
 b = a; // error

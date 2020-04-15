@@ -40,16 +40,19 @@ var M;
     }
     else if (qwerty) {
     }
+
     try {
     }
     catch (asdf) { // no error
     }
+
     switch (asdf) {
         case qwerty:
             break;
         default:
             break;
     }
+
     var a = function () { return asdf; };
     var b = function (asdf) { return qwerty; };
     var N;

@@ -229,6 +229,7 @@ var z7 = require("function");
 var z8 = require("function-module");
 var z9 = require("class");
 var z0 = require("class-module");
+
 z1.a;
 z2.a;
 z3.a;
@@ -239,6 +240,21 @@ z7.a;
 z8.a;
 z9.a;
 z0.a;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var y2 = require("variable");
 var y3 = require("interface-variable");
 var y4 = require("module");
@@ -248,6 +264,7 @@ var y7 = require("function");
 var y8 = require("function-module");
 var y9 = require("class");
 var y0 = require("class-module");
+
 y1.a;
 y2.a;
 y3.a;
@@ -258,6 +275,7 @@ y7.a;
 y8.a;
 y9.a;
 y0.a;
+
 // named import
 var interface_1 = require("interface");
 var variable_1 = require("variable");
@@ -269,6 +287,7 @@ var function_1 = require("function");
 var function_module_1 = require("function-module");
 var class_1 = require("class");
 var class_module_1 = require("class-module");
+
 interface_1.a;
 variable_1.a;
 interface_variable_1.a;
@@ -279,6 +298,7 @@ function_1.a;
 function_module_1.a;
 class_1.a;
 class_module_1.a;
+
 // named export
 var interface_2 = require("interface");
 __createBinding(exports, interface_2, "a", "a1");

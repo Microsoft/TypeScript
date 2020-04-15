@@ -30,9 +30,9 @@ new AsyncLoader({
 
 //// [overloadedConstructorFixesInferencesAppropriately.js]
 "use strict";
+
 var AsyncLoader = /** @class */ (function () {
-    function AsyncLoader() {
-        var args = [];
+    function AsyncLoader() {var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
@@ -42,6 +42,7 @@ var AsyncLoader = /** @class */ (function () {
 function load() {
     return null;
 }
+
 new AsyncLoader({
     asyncLoad: load,
     children: function (result) { return result.success; }

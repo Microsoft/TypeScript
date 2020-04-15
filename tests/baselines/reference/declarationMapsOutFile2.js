@@ -30,6 +30,7 @@ var Foo = /** @class */ (function () {
 }());
 var c = new Foo();
 c.doThing({ a: 42 });
+
 var x = c.doThing({ a: 12 });
 
 

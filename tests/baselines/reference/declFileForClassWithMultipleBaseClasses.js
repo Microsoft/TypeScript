@@ -39,6 +39,8 @@ var B = /** @class */ (function () {
     B.prototype.bar = function () { };
     return B;
 }());
+
+
 var D = /** @class */ (function () {
     function D() {
     }

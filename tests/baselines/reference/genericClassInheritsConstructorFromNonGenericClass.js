@@ -34,7 +34,6 @@ var B = /** @class */ (function (_super) {
     return B;
 }(C));
 var C = /** @class */ (function () {
-    function C(p) {
-    }
+    function C(p) {}
     return C;
 }());

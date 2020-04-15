@@ -18,10 +18,8 @@ function fun(...[[a = new Foo], b = [new Foo]]: Bar[][]) { }
 fun(...new FooArrayIterator);
 
 //// [iterableArrayPattern20.js]
-class Bar {
-}
-class Foo extends Bar {
-}
+class Bar {}
+class Foo extends Bar {}
 class FooArrayIterator {
     next() {
         return {
@@ -29,9 +27,11 @@ class FooArrayIterator {
             done: false
         };
     }
+
     [Symbol.iterator]() {
         return this;
     }
 }
+
 function fun(...[[a = new Foo], b = [new Foo]]) { }
 fun(...new FooArrayIterator);

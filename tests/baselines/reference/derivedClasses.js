@@ -77,6 +77,7 @@ var Blue = /** @class */ (function (_super) {
 }(Color));
 var r = new Red();
 var b = new Blue();
+
 r.shade();
 r.hue();
 b.shade();

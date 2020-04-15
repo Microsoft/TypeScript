@@ -146,9 +146,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var Private = /** @class */ (function () {
-    function Private() {
-        var args = [];
+    function Private() {var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
@@ -156,8 +156,7 @@ var Private = /** @class */ (function () {
     return Private;
 }());
 var Private2 = /** @class */ (function () {
-    function Private2() {
-        var args = [];
+    function Private2() {var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
@@ -165,8 +164,7 @@ var Private2 = /** @class */ (function () {
     return Private2;
 }());
 var Protected = /** @class */ (function () {
-    function Protected() {
-        var args = [];
+    function Protected() {var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
@@ -174,8 +172,7 @@ var Protected = /** @class */ (function () {
     return Protected;
 }());
 var Protected2 = /** @class */ (function () {
-    function Protected2() {
-        var args = [];
+    function Protected2() {var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
@@ -183,8 +180,7 @@ var Protected2 = /** @class */ (function () {
     return Protected2;
 }());
 var Public = /** @class */ (function () {
-    function Public() {
-        var args = [];
+    function Public() {var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
@@ -192,8 +188,7 @@ var Public = /** @class */ (function () {
     return Public;
 }());
 var Public2 = /** @class */ (function () {
-    function Public2() {
-        var args = [];
+    function Public2() {var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
@@ -203,21 +198,28 @@ var Public2 = /** @class */ (function () {
 function f1(x) {
     x.p; // Error, private constituent makes property inaccessible
 }
+
 function f2(x) {
     x.p; // Error, private constituent makes property inaccessible
 }
+
 function f3(x) {
     x.p; // Error, private constituent makes property inaccessible
 }
+
 function f4(x) {
     x.p; // Error, protected when all constituents are protected
 }
+
 function f5(x) {
     x.p; // Ok, public if any constituent is public
 }
+
 function f6(x) {
     x.p; // Ok, public if any constituent is public
 }
+
+
 // Can't derive from type with inaccessible properties
 var C1 = /** @class */ (function (_super) {
     __extends(C1, _super);
@@ -309,10 +311,12 @@ function f7(x) {
     x.privateMethod(); // Error, private constituent makes method inaccessible
     x.protectedMethod(); // Error, protected when all constituents are protected
 }
+
 function f8(x) {
     x.privateMethod(); // Error, private constituent makes method inaccessible
     x.protectedMethod(); // Error, protected when all constituents are protected
 }
+
 function f9(x) {
     x.privateMethod(); // Error, private constituent makes method inaccessible
     x.protectedMethod(); // Error, protected when all constituents are protected

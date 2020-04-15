@@ -24,4 +24,6 @@ exports["default"] = add;
 "use strict";
 exports.__esModule = true;
 var example = require("./example");
+
+
 test(example, "default");

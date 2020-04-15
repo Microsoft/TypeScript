@@ -55,10 +55,9 @@ var Derived = /** @class */ (function (_super) {
             _this = _super.call(this) || this;
             bar();
         }
+
         try { }
-        catch (e) {
-            _this = _super.call(this) || this;
-        }
+        catch (e) {_this = _super.call(this) || this;}
         return _this;
     }
     return Derived;

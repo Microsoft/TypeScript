@@ -51,6 +51,7 @@ var Base = /** @class */ (function () {
     return Base;
 }());
 function v() { }
+
 var Derived = /** @class */ (function (_super) {
     __extends(Derived, _super);
     //super call in class constructor of derived type

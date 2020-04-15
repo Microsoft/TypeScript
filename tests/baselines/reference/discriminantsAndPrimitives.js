@@ -82,6 +82,8 @@ else {
 
 //// [discriminantsAndPrimitives.js]
 // Repro from #10257 plus other tests
+
+
 function f1(x) {
     if (typeof x !== 'string') {
         switch (x.kind) {
@@ -90,6 +92,7 @@ function f1(x) {
         }
     }
 }
+
 function f2(x) {
     if (typeof x === "object") {
         switch (x.kind) {
@@ -98,6 +101,7 @@ function f2(x) {
         }
     }
 }
+
 function f3(x) {
     if (x && typeof x !== "string") {
         switch (x.kind) {
@@ -106,6 +110,7 @@ function f3(x) {
         }
     }
 }
+
 function f4(x) {
     if (x && typeof x === "object") {
         switch (x.kind) {
@@ -114,7 +119,10 @@ function f4(x) {
         }
     }
 }
+
+
 var n;
+
 if (n.type === "Disjunction") {
     n.alternatives.slice();
 }

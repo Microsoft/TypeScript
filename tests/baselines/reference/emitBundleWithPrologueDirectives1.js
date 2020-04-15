@@ -26,8 +26,7 @@ define("test", ["require", "exports"], function (require, exports) {
     exports.Doo = void 0;
     // Class Doo Comment
     var Doo = /** @class */ (function () {
-        function Doo() {
-        }
+        function Doo() {}
         return Doo;
     }());
     exports.Doo = Doo;

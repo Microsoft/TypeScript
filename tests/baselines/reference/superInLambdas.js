@@ -97,6 +97,7 @@ var RegisteredUser = /** @class */ (function (_super) {
         _this.name = "Frank";
         // super call in a constructor
         _super.prototype.sayHello.call(_this);
+
         // super call in a lambda in a constructor 
         var x = function () { return _super.prototype.sayHello.call(_this); };
         return _this;
@@ -105,6 +106,7 @@ var RegisteredUser = /** @class */ (function (_super) {
         var _this = this;
         // super call in a method
         _super.prototype.sayHello.call(this);
+
         // super call in a lambda in a method
         var x = function () { return _super.prototype.sayHello.call(_this); };
     };

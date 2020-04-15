@@ -35,8 +35,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 // A | B is equivalent to A if B is a subtype of A
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var D = /** @class */ (function (_super) {
@@ -49,9 +48,11 @@ var D = /** @class */ (function (_super) {
 }(C));
 var x;
 var x;
+
 // A | B is equivalent to B | A.
 var y;
 var y;
+
 // AB | C is equivalent to A | BC, where AB is A | B and BC is B | C.
 var z;
 var z;

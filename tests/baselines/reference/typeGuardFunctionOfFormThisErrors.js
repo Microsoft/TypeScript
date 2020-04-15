@@ -104,14 +104,18 @@ var FollowerGuard = /** @class */ (function (_super) {
 }(RoyalGuard));
 var a = new FollowerGuard();
 var b = new LeadGuard();
+
 // Mismatched guards shouldn't be assignable
 b.isFollower = b.isLeader;
 b.isLeader = b.isFollower;
+
 a.isFollower = a.isLeader;
 a.isLeader = a.isFollower;
+
 function invalidGuard(c) {
     return false;
 }
+
 var c;
 if (invalidGuard(c)) {
     c;
@@ -119,7 +123,9 @@ if (invalidGuard(c)) {
 else {
     c;
 }
+
 var holder = { invalidGuard: invalidGuard };
+
 if (holder.invalidGuard(c)) {
     c;
     holder;
@@ -128,7 +134,9 @@ else {
     c;
     holder;
 }
+
 var detached = a.isFollower;
+
 if (detached()) {
     a.follow();
 }

@@ -8,6 +8,7 @@ async function func(): Promise<void> {
 }
 
 //// [awaitClassExpression_es5.js]
+
 function func() {
     return __awaiter(this, void 0, void 0, function () {
         var D, _a;

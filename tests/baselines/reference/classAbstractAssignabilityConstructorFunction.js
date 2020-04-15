@@ -10,12 +10,12 @@ AAA = "asdf";
 
 //// [classAbstractAssignabilityConstructorFunction.js]
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 // var AA: typeof A;
 var AAA;
+
 // AA = A; // okay
 AAA = A; // error. 
 AAA = "asdf";

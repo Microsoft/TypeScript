@@ -145,6 +145,7 @@ var x;
 var arr;
 var foo;
 var fooProm;
+
 fooProm = Promise["try"](Promise, function () {
     return foo;
 });

@@ -59,9 +59,11 @@ var moduleA;
     moduleA.Point = Point;
 })(moduleA || (moduleA = {}));
 var alias = moduleA;
+
 var p;
 var p;
 var p;
+
 var clodule = /** @class */ (function () {
     function clodule() {
     }
@@ -71,9 +73,12 @@ var clodule = /** @class */ (function () {
     var Point = { x: 0, y: 0 };
 })(clodule || (clodule = {}));
 var clolias = clodule;
+
 var p;
 var p;
 var p;
+
+
 function fundule() {
     return { x: 0, y: 0 };
 }
@@ -81,6 +86,7 @@ function fundule() {
     var Point = { x: 0, y: 0 };
 })(fundule || (fundule = {}));
 var funlias = fundule;
+
 var p;
 var p;
 var p;

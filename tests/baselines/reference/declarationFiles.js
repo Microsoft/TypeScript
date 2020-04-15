@@ -49,9 +49,7 @@ class C4 {
 
 //// [declarationFiles.js]
 var C1 = /** @class */ (function () {
-    function C1(x) {
-    }
-    C1.prototype.f = function (x) { return undefined; };
+    function C1(x) {}C1.prototype.f = function (x) { return undefined; };
     return C1;
 }());
 var C2 = /** @class */ (function () {
@@ -59,6 +57,7 @@ var C2 = /** @class */ (function () {
     }
     return C2;
 }());
+
 var C3 = /** @class */ (function () {
     function C3() {
     }

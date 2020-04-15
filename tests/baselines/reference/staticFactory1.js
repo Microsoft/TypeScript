@@ -45,4 +45,5 @@ var Derived = /** @class */ (function (_super) {
     return Derived;
 }(Base));
 var d = Derived.create();
+
 d.foo();

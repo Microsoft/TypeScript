@@ -20,5 +20,6 @@ var d: D<{ n: number; s: string }> = c
 
 
 //// [reorderProperties.js]
+
 var c;
 var d = c;

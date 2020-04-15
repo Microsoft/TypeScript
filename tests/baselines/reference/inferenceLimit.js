@@ -58,9 +58,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BrokenClass = void 0;
 class BrokenClass {
     constructor() { }
+
     brokenMethod(field, value) {
         return new Promise((resolve, reject) => {
+
             let result = [];
+
             let populateItems = (order) => {
                 return new Promise((resolve, reject) => {
                     this.doStuff(order.id)
@@ -70,12 +73,14 @@ class BrokenClass {
                     });
                 });
             };
+
             return Promise.all(result.map(populateItems))
                 .then((orders) => {
                 resolve(orders);
             });
         });
     }
+
     doStuff(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return;

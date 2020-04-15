@@ -56,6 +56,7 @@ var class1 = /** @class */ (function () {
                     return callback(_this_1);
                 }; }
             };
+
             return 10;
         },
         set: function (val) {
@@ -66,6 +67,7 @@ var class1 = /** @class */ (function () {
                     return callback(_this_1);
                 }; }
             };
+
         },
         enumerable: false,
         configurable: true
@@ -84,6 +86,7 @@ var class2 = /** @class */ (function () {
                     return callback(_this_1);
                 }; }
             };
+
             return 10;
         },
         set: function (val) {
@@ -94,6 +97,7 @@ var class2 = /** @class */ (function () {
                     return callback(_this_1);
                 }; }
             };
+
         },
         enumerable: false,
         configurable: true

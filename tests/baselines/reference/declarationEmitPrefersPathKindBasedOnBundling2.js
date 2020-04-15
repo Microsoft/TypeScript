@@ -24,6 +24,7 @@ define("lib/operators/scalar", ["require", "exports"], function (require, export
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.scalar = void 0;
+
     function scalar(value) {
         return null;
     }

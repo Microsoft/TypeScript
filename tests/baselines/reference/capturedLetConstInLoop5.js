@@ -280,6 +280,7 @@ function foo8_c(x) {
 }
 
 //// [capturedLetConstInLoop5.js]
+
 //====let
 function foo0(x) {
     var _loop_1 = function (x_1) {
@@ -299,6 +300,7 @@ function foo0(x) {
     }
     use(v);
 }
+
 function foo00(x) {
     var _loop_2 = function (x_2) {
         v = x_2;
@@ -314,8 +316,10 @@ function foo00(x) {
         if (typeof state_2 === "object")
             return state_2.value;
     }
+
     use(v);
 }
+
 function foo1(x) {
     var _loop_3 = function (x_3) {
         v = x_3;
@@ -331,8 +335,10 @@ function foo1(x) {
         if (typeof state_3 === "object")
             return state_3.value;
     }
+
     use(v);
 }
+
 function foo2(x) {
     var _loop_4 = function () {
         var x_4 = 1;
@@ -349,11 +355,14 @@ function foo2(x) {
         if (typeof state_4 === "object")
             return state_4.value;
     }
+
     use(v);
 }
+
 function foo3(x) {
     var _loop_5 = function () {
         var x_5;
+
         (function () { return x_5 + v; });
         (function () { return x_5 + v; });
         if (x_5 == 1) {
@@ -366,8 +375,10 @@ function foo3(x) {
         if (typeof state_5 === "object")
             return state_5.value;
     } while (1 === 1);
+
     use(v);
 }
+
 function foo4(x) {
     var _loop_6 = function (y) {
         v = y;
@@ -384,8 +395,10 @@ function foo4(x) {
         if (typeof state_6 === "object")
             return state_6.value;
     }
+
     use(v);
 }
+
 function foo5(x) {
     var _loop_7 = function (x_7, y) {
         v = x_7;
@@ -401,8 +414,11 @@ function foo5(x) {
         if (typeof state_7 === "object")
             return state_7.value;
     }
+
     use(v);
 }
+
+
 function foo6(x) {
     var _loop_8 = function () {
         var x_8, y;
@@ -418,10 +434,11 @@ function foo6(x) {
         var state_8 = _loop_8();
         if (typeof state_8 === "object")
             return state_8.value;
-    }
-    ;
+    };
+
     use(v);
 }
+
 function foo7(x) {
     var _loop_9 = function () {
         var x_9, y;
@@ -438,8 +455,11 @@ function foo7(x) {
         if (typeof state_9 === "object")
             return state_9.value;
     } while (1 === 1);
+
     use(v);
 }
+
+
 function foo8(x) {
     var _loop_10 = function (y) {
         var x_10 = 1;
@@ -456,8 +476,10 @@ function foo8(x) {
         if (typeof state_10 === "object")
             return state_10.value;
     }
+
     use(v);
 }
+
 //====const
 function foo0_c(x) {
     var _loop_11 = function (x_11) {
@@ -477,6 +499,7 @@ function foo0_c(x) {
     }
     use(v);
 }
+
 function foo00_c(x) {
     var _loop_12 = function (x_12) {
         v = x_12;
@@ -492,8 +515,10 @@ function foo00_c(x) {
         if (typeof state_12 === "object")
             return state_12.value;
     }
+
     use(v);
 }
+
 function foo1_c(x) {
     var _loop_13 = function (x_13) {
         v = x_13;
@@ -509,8 +534,10 @@ function foo1_c(x) {
         if (typeof state_13 === "object")
             return state_13.value;
     }
+
     use(v);
 }
+
 function foo2_c(x) {
     var _loop_14 = function () {
         var x_14 = 1;
@@ -527,11 +554,14 @@ function foo2_c(x) {
         if (typeof state_14 === "object")
             return state_14.value;
     }
+
     use(v);
 }
+
 function foo3_c(x) {
     var _loop_15 = function () {
         var x_15 = 1;
+
         (function () { return x_15 + v; });
         (function () { return x_15 + v; });
         if (x_15 == 1) {
@@ -544,8 +574,10 @@ function foo3_c(x) {
         if (typeof state_15 === "object")
             return state_15.value;
     } while (1 === 1);
+
     use(v);
 }
+
 function foo4_c(x) {
     var _loop_16 = function (y) {
         v = y;
@@ -562,8 +594,10 @@ function foo4_c(x) {
         if (typeof state_16 === "object")
             return state_16.value;
     }
+
     use(v);
 }
+
 function foo5_c(x) {
     var _loop_17 = function (x_17, y) {
         v = x_17;
@@ -579,8 +613,11 @@ function foo5_c(x) {
         if (typeof state_17 === "object")
             return state_17.value;
     }
+
     use(v);
 }
+
+
 function foo6_c(x) {
     var _loop_18 = function () {
         var x_18 = 1, y = 1;
@@ -597,8 +634,10 @@ function foo6_c(x) {
         if (typeof state_18 === "object")
             return state_18.value;
     }
+
     use(v);
 }
+
 function foo7_c(x) {
     var _loop_19 = function () {
         var x_19 = 1, y = 1;
@@ -615,8 +654,11 @@ function foo7_c(x) {
         if (typeof state_19 === "object")
             return state_19.value;
     } while (1 === 1);
+
     use(v);
 }
+
+
 function foo8_c(x) {
     var _loop_20 = function (y) {
         var x_20 = 1;
@@ -633,5 +675,6 @@ function foo8_c(x) {
         if (typeof state_20 === "object")
             return state_20.value;
     }
+
     use(v);
 }

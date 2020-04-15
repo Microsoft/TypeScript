@@ -26,11 +26,13 @@ function bar1() {
         delete (yield 42);
     });
 }
+
 function bar2() {
     return __awaiter(this, void 0, void 0, function* () {
         delete (yield 42);
     });
 }
+
 function bar3() {
     return __awaiter(this, void 0, void 0, function* () {
         void (yield 42);

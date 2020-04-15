@@ -58,6 +58,7 @@ var Derived = /** @class */ (function (_super) {
 }(Base));
 var r = new Derived(); // error
 var r2 = new Derived(1);
+
 var Base2 = /** @class */ (function () {
     function Base2(x) {
         this.a = x;

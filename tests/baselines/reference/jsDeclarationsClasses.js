@@ -212,8 +212,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExtendsStatics = exports.HasStatics = exports.VariableBase = exports.O = exports.N = exports.M = exports.L = exports.K = exports.J = exports.JJ = exports.II = exports.I = exports.H = exports.G = exports.F = exports.E = exports.D = exports.C = exports.B = exports.A = void 0;
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 exports.A = A;
@@ -228,8 +227,7 @@ var C = /** @class */ (function () {
     function C() {
     }
     C.Cls = /** @class */ (function () {
-        function class_1() {
-        }
+        function class_1() {}
         return class_1;
     }());
     return C;
@@ -240,8 +238,7 @@ var D = /** @class */ (function () {
      * @param {number} a
      * @param {number} b
      */
-    function D(a, b) {
-    }
+    function D(a, b) {}
     return D;
 }());
 exports.D = D;
@@ -324,8 +321,8 @@ var F = /** @class */ (function () {
      * @param {T} a
      * @param {U} b
      */
-    function F(a, b) {
-    }
+    function F(a, b) {}
+
     /**
      * @template A,B
      * @param {A} a
@@ -336,27 +333,23 @@ var F = /** @class */ (function () {
 }());
 exports.F = F;
 var G = /** @class */ (function () {
-    function G() {
-    }
+    function G() {}
     return G;
 }());
 exports.G = G;
 var HH = /** @class */ (function () {
-    function HH() {
-    }
+    function HH() {}
     return HH;
 }());
 exports.H = HH;
 var I = /** @class */ (function () {
-    function I() {
-    }
+    function I() {}
     return I;
 }());
 exports.I = I;
 exports.II = I;
 var J = /** @class */ (function () {
-    function J() {
-    }
+    function J() {}
     return J;
 }());
 exports.JJ = J;
@@ -366,6 +359,7 @@ var K = /** @class */ (function () {
         this.p1 = 12;
         this.p2 = "ok";
     }
+
     K.prototype.method = function () {
         return this.p1;
     };
@@ -422,6 +416,7 @@ var O = /** @class */ (function (_super) {
 }(N));
 exports.O = O;
 var x = /** @type {*} */ (null);
+
 var VariableBase = /** @class */ (function (_super) {
     __extends(VariableBase, _super);
     function VariableBase() {

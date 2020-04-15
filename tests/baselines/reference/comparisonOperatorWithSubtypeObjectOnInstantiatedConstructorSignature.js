@@ -192,18 +192,25 @@ var Derived = /** @class */ (function (_super) {
 }(Base));
 var a1;
 var b1;
+
 var a2;
 var b2;
+
 var a3;
 var b3;
+
 var a4;
 var b4;
+
 var a5;
 var b5;
+
 var a6;
 var b6;
+
 //var a7: { new <T, U extends T>(x: T, y: U): T };
 var b7;
+
 // operator <
 var r1a1 = a1 < b1;
 var r1a2 = a2 < b2;

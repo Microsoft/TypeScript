@@ -22,10 +22,12 @@ o = a; // error
 a = o; // ok
 
 //// [objectTypeHidingMembersOfObjectAssignmentCompat2.js]
+
 var i;
 var o;
 o = i; // error
 i = o; // error
+
 var C = /** @class */ (function () {
     function C() {
     }
@@ -35,6 +37,7 @@ var C = /** @class */ (function () {
 var c;
 o = c; // error
 c = o; // error
+
 var a = {
     toString: function () { }
 };

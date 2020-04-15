@@ -166,10 +166,12 @@ function f1() {
         }
         return C;
     }());
+
     var a = [new C()];
     a[0].x = E.B;
     return a;
 }
+
 function f2() {
     function g() {
         var E;
@@ -183,12 +185,14 @@ function f2() {
             }
             return C;
         }());
+
         var a = [new C()];
         a[0].x = E.B;
         return a;
     }
     return g();
 }
+
 function f3(b) {
     if (true) {
         var E = void 0;
@@ -203,6 +207,7 @@ function f3(b) {
                 }
                 return C;
             }());
+
             var a = [new C()];
             a[0].x = E.B;
             return a;
@@ -213,12 +218,14 @@ function f3(b) {
                 }
                 return A;
             }());
+
             var c = [new A_1()];
             c[0].x = E.B;
             return c;
         }
     }
 }
+
 function f5() {
     var z1 = function () {
         var E;
@@ -249,6 +256,7 @@ function f5() {
         return new C();
     };
 }
+
 var A = /** @class */ (function () {
     function A() {
         var E;

@@ -19,6 +19,7 @@ var y = new enumdule.Point(0, 0);
 //// [ModuleAndEnumWithSameNameAndCommonRoot.js]
 var enumdule;
 (function (enumdule) {
+
     var Point = /** @class */ (function () {
         function Point(x, y) {
             this.x = x;
@@ -34,5 +35,6 @@ var enumdule;
 })(enumdule || (enumdule = {}));
 var x;
 var x = enumdule.Red;
+
 var y;
 var y = new enumdule.Point(0, 0);

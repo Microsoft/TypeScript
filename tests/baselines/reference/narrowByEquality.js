@@ -60,37 +60,49 @@ function test(level: number | string):number {
 
 //// [narrowByEquality.js]
 "use strict";
+
 if (x == n) {
     x;
 }
+
 if (x == s) {
     x;
 }
+
 if (x == b) {
     x;
 }
+
 if (x == 1) {
     x;
 }
+
 if (x == "") {
     x;
 }
+
 if (x == "foo") {
     x;
 }
+
 if (x == true) {
     x;
 }
+
 if (x == false) {
     x;
 }
+
+
 if (xAndObj == {}) {
     xAndObj;
 }
+
 if (x == xAndObj) {
     x;
     xAndObj;
 }
+
 // Repro from #24991
 function test(level) {
     if (level == +level) {

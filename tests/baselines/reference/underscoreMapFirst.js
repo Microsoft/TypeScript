@@ -62,6 +62,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var MyView = /** @class */ (function (_super) {
     __extends(MyView, _super);
     function MyView() {
@@ -70,6 +71,7 @@ var MyView = /** @class */ (function (_super) {
     MyView.prototype.getDataSeries = function () {
         var data = this.model.get("data");
         var allSeries = _.pluck(data, "series");
+
         return _.map(allSeries, _.first);
     };
     return MyView;

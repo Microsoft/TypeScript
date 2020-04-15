@@ -48,22 +48,28 @@ var __extends = (this && this.__extends) || (function () {
 var x = 5;
 var r = /yo/;
 r.source;
+
 x.toBAZ();
 x.toString();
+
 var n = 0;
 var N;
+
 n = N; // should not work, as 'number' has a different brand
 N = n; // should work
+
 var o = {};
 var f = function (x) { return x.length; };
 var r2 = /./g;
 var n2 = 34;
 var s = "yo";
 var b = true;
+
 var n3 = 5 || {};
+
+
 var baz = /** @class */ (function () {
-    function baz() {
-    }
+    function baz() {}
     baz.prototype.bar = function () { };
     ;
     return baz;

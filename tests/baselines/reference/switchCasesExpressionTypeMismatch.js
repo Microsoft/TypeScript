@@ -21,8 +21,7 @@ switch (s) {
 
 //// [switchCasesExpressionTypeMismatch.js]
 var Foo = /** @class */ (function () {
-    function Foo() {
-    }
+    function Foo() {}
     return Foo;
 }());
 switch (0) {
@@ -31,7 +30,9 @@ switch (0) {
     case 123: break; // Error
     case true: break; // Error
 }
+
 var s = 0;
+
 // No error for all
 switch (s) {
     case Foo: break;

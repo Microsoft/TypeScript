@@ -15,6 +15,7 @@ class D {
 }
 
 //// [noImplicitAnyForMethodParameters.js]
+
 var C = /** @class */ (function () {
     function C() {
     }

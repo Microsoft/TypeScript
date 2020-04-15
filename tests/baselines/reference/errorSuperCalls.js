@@ -95,6 +95,7 @@ var NoBase = /** @class */ (function () {
         //super call in class member initializer with no base type
         this.p = _this = _super.call(this) || this;
     }
+
     //super call in class member function with no base type
     NoBase.prototype.fn = function () {
         _this = _super.call(this) || this;
@@ -132,8 +133,7 @@ var NoBase = /** @class */ (function () {
     return NoBase;
 }());
 var Base = /** @class */ (function () {
-    function Base() {
-    }
+    function Base() {}
     return Base;
 }());
 var Derived = /** @class */ (function (_super) {

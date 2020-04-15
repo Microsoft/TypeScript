@@ -30,8 +30,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Based = /** @class */ (function () {
-    function Based() {
-    }
+    function Based() {}
     return Based;
 }());
 var Derived = /** @class */ (function (_super) {

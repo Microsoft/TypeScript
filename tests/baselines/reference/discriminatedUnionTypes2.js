@@ -157,6 +157,7 @@ function f10(x) {
         x.c;
     }
 }
+
 function f11(x) {
     switch (x.kind) {
         case false:
@@ -169,14 +170,19 @@ function f11(x) {
             x.c;
     }
 }
+
 function f13(x) {
     x = { a: null, b: "foo", c: 4 }; // Error
 }
+
 function f14(x) {
     if (x.a === 0) {
         x.b; // Error
     }
 }
+
+
+
 function f15(x) {
     if (!x.error) {
         x.value;
@@ -185,8 +191,13 @@ function f15(x) {
         x.error.message;
     }
 }
+
 f15({ value: 10 });
 f15({ error: new Error("boom") });
+
+
+
+
 function f20(carrier) {
     if (carrier.error === null) {
         var error = carrier.error;
@@ -197,6 +208,11 @@ function f20(carrier) {
         var data = carrier.data;
     }
 }
+
+
+
+
+
 function f30(foo) {
     if (foo.tag) {
         foo;
@@ -205,6 +221,7 @@ function f30(foo) {
         foo;
     }
 }
+
 function f31(foo) {
     if (foo.tag === true) {
         foo;
@@ -213,6 +230,24 @@ function f31(foo) {
         foo;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function f(problem) {
     if (problem.type === 'b') {
         problem.name;
@@ -221,6 +256,12 @@ function f(problem) {
         problem.other;
     }
 }
+
+
+
+
+
+
 function foo1(x) {
     if (x.type === 'number') {
         x.value; // number
@@ -229,6 +270,7 @@ function foo1(x) {
         x.value; // number
     }
 }
+
 function foo2(x) {
     if (x.type === 'number') {
         x.value; // number

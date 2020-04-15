@@ -89,8 +89,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var unionNumberString;
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var D = /** @class */ (function (_super) {
@@ -110,11 +109,13 @@ var E = /** @class */ (function (_super) {
     return E;
 }(C));
 var unionDE;
+
 var num;
 var str;
 var c;
 var d;
 var e;
+
 // A union type U is assignable to a type T if each type in U is assignable to T
 c = d;
 c = e;
@@ -131,6 +132,8 @@ num = unionNumberString; // error string is not assignable to number
 str = num;
 str = str;
 str = unionNumberString; // error since number is not assignable to string
+
+
 // A type T is assignable to a union type U if T is assignable to any type in U
 d = c;
 e = c;
@@ -147,18 +150,23 @@ unionNumberString = num; // ok
 num = str;
 str = str;
 unionNumberString = str; // ok
+
+
 // Any
 var anyVar;
 anyVar = unionDE;
 anyVar = unionNumberString;
 unionDE = anyVar;
 unionNumberString = anyVar;
+
 // null
 unionDE = null;
 unionNumberString = null;
+
 // undefined
 unionDE = undefined;
 unionNumberString = undefined;
+
 // type parameters
 function foo(t, u) {
     t = u; // error

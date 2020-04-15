@@ -231,6 +231,7 @@ function foo0(x) {
     }
     use(v);
 }
+
 function foo0_1(x) {
     var _loop_2 = function (x_2) {
         v = x_2;
@@ -241,8 +242,10 @@ function foo0_1(x) {
     for (var x_2 in []) {
         _loop_2(x_2);
     }
+
     use(v);
 }
+
 function foo1(x) {
     var _loop_3 = function (x_3) {
         v = x_3;
@@ -253,8 +256,10 @@ function foo1(x) {
     for (var x_3 = 0; x_3 < 1; ++x_3) {
         _loop_3(x_3);
     }
+
     use(v);
 }
+
 function foo2(x) {
     var _loop_4 = function () {
         var x_4 = 1;
@@ -266,11 +271,14 @@ function foo2(x) {
     while (1 === 1) {
         _loop_4();
     }
+
     use(v);
 }
+
 function foo3(x) {
     var _loop_5 = function () {
         var x_5;
+
         (function () { return x_5 + v; });
         (function () { return x_5 + v; });
     };
@@ -278,8 +286,10 @@ function foo3(x) {
     do {
         _loop_5();
     } while (1 === 1);
+
     use(v);
 }
+
 function foo4(x) {
     var _loop_6 = function (y) {
         v = y;
@@ -291,8 +301,10 @@ function foo4(x) {
     for (var y = 0; y < 1; ++y) {
         _loop_6(y);
     }
+
     use(v);
 }
+
 function foo5(x) {
     var _loop_7 = function (x_7, y) {
         v = x_7;
@@ -303,8 +315,11 @@ function foo5(x) {
     for (var x_7 = 0, y = 1; x_7 < 1; ++x_7) {
         _loop_7(x_7, y);
     }
+
     use(v);
 }
+
+
 function foo6(x) {
     var _loop_8 = function () {
         var x_8, y;
@@ -316,8 +331,10 @@ function foo6(x) {
     while (1 === 1) {
         _loop_8();
     }
+
     use(v);
 }
+
 function foo7(x) {
     var _loop_9 = function () {
         var x_9, y;
@@ -329,8 +346,11 @@ function foo7(x) {
     do {
         _loop_9();
     } while (1 === 1);
+
     use(v);
 }
+
+
 function foo8(x) {
     var _loop_10 = function (y) {
         var x_10 = 1;
@@ -342,6 +362,7 @@ function foo8(x) {
     for (var y = 0; y < 1; ++y) {
         _loop_10(y);
     }
+
     use(v);
 }
 //===const
@@ -358,6 +379,7 @@ function foo0_c(x) {
     }
     use(v);
 }
+
 function foo0_1_c(x) {
     var _loop_12 = function (x_12) {
         v = x_12;
@@ -368,8 +390,10 @@ function foo0_1_c(x) {
     for (var x_12 in []) {
         _loop_12(x_12);
     }
+
     use(v);
 }
+
 function foo1_c(x) {
     var _loop_13 = function (x_13) {
         v = x_13;
@@ -380,8 +404,10 @@ function foo1_c(x) {
     for (var x_13 = 0; x_13 < 1;) {
         _loop_13(x_13);
     }
+
     use(v);
 }
+
 function foo2_c(x) {
     var _loop_14 = function () {
         var x_14 = 1;
@@ -393,11 +419,14 @@ function foo2_c(x) {
     while (1 === 1) {
         _loop_14();
     }
+
     use(v);
 }
+
 function foo3_c(x) {
     var _loop_15 = function () {
         var x_15 = 1;
+
         (function () { return x_15 + v; });
         (function () { return x_15 + v; });
     };
@@ -405,8 +434,10 @@ function foo3_c(x) {
     do {
         _loop_15();
     } while (1 === 1);
+
     use(v);
 }
+
 function foo4_c(x) {
     var _loop_16 = function (y) {
         v = y;
@@ -418,8 +449,10 @@ function foo4_c(x) {
     for (var y = 0; y < 1;) {
         _loop_16(y);
     }
+
     use(v);
 }
+
 function foo5_c(x) {
     var _loop_17 = function (x_17, y) {
         v = x_17;
@@ -430,8 +463,11 @@ function foo5_c(x) {
     for (var x_17 = 0, y = 1; x_17 < 1;) {
         _loop_17(x_17, y);
     }
+
     use(v);
 }
+
+
 function foo6_c(x) {
     var _loop_18 = function () {
         var x_18 = 1, y = 1;
@@ -443,8 +479,10 @@ function foo6_c(x) {
     while (1 === 1) {
         _loop_18();
     }
+
     use(v);
 }
+
 function foo7_c(x) {
     var _loop_19 = function () {
         var x_19 = 1, y = 1;
@@ -456,8 +494,11 @@ function foo7_c(x) {
     do {
         _loop_19();
     } while (1 === 1);
+
     use(v);
 }
+
+
 function foo8_c(x) {
     var _loop_20 = function (y) {
         var x_20 = 1;
@@ -469,5 +510,6 @@ function foo8_c(x) {
     for (var y = 0; y < 1;) {
         _loop_20(y);
     }
+
     use(v);
 }

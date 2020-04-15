@@ -32,31 +32,26 @@ function a(_a) {
 function a1(_a) {
     var public = _a.public;
 }
-function a4(_a) { }
-while (, )
+function a4(_a) { }while (, )
     for (, public; ; )
-        ;
-{ }
-function a5() {
-    var  = [];
+        ;{ }
+function a5() {var  = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         [_i] = arguments[_i];
     }
-}
-while () { }
-function a6() {
-    var public = [];
+}while () { }
+function a6() {var public = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         public[_i] = arguments[_i];
     }
 }
-function a7() {
-    var a = [];
+function a7() {var a = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         a[_i] = arguments[_i];
     }
 }
 a({ "while": 1 });
+
 // No Error
 function b1(_a) {
     var x = _a.public;

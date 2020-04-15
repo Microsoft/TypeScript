@@ -21,6 +21,8 @@ var X = /** @class */ (function () {
     });
     return X;
 }());
-(function (x) { return 0; });
+(
+    function (x) { return 0; });
 // OK to use `readonly` as a name
-(function (readonly) { return 0; });
+(
+    function (readonly) { return 0; });

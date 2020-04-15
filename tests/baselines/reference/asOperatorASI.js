@@ -17,13 +17,15 @@ var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cook
     return cooked;
 };
 var Foo = /** @class */ (function () {
-    function Foo() {
-    }
+    function Foo() {}
     return Foo;
 }());
+
 // Example 1
 var x = 10;
 as(__makeTemplateObject(["Hello world"], ["Hello world"])); // should not error
+
+
 // Example 2
 var y = 20;
 as(Foo); // should emit

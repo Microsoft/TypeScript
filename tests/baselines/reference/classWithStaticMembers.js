@@ -37,8 +37,7 @@ var C = /** @class */ (function () {
     function C(a, b) {
         this.a = a;
         this.b = b;
-    }
-    C.fn = function () { return this; };
+    }C.fn = function () { return this; };
     Object.defineProperty(C, "x", {
         get: function () { return 1; },
         set: function (v) { },
@@ -50,6 +49,7 @@ var C = /** @class */ (function () {
 var r = C.fn();
 var r2 = r.x;
 var r3 = r.foo;
+
 var D = /** @class */ (function (_super) {
     __extends(D, _super);
     function D() {

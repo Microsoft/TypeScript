@@ -40,7 +40,10 @@ function foo<T extends Foo | T["hello"]>() {
 
 
 //// [circularIndexedAccessErrors.js]
+
 var x2x = x2.x;
+
+
 var C1 = /** @class */ (function () {
     function C1() {
     }
@@ -51,6 +54,7 @@ var C2 = /** @class */ (function () {
     }
     return C2;
 }());
+
 function foo() {
 }
 

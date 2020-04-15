@@ -75,7 +75,9 @@ class C {
         });
     }
 }
+
 class D {
+
     constructor() {
         this.myModule = Promise.resolve().then(() => require("./0"));
     }

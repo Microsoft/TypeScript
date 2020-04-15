@@ -65,9 +65,11 @@ function f1(t1, t2, t3, t4) {
     t4 = t3;
     t4 = t4;
 }
+
 var t2;
 var t3;
 var t4;
+
 t2 = [42, "hello"];
 t3 = [42, "hello"];
 t3 = [42, , true];

@@ -16,12 +16,12 @@ try {
 
 //// [flowInFinally1.js]
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     A.prototype.method = function () { };
     return A;
 }());
 var a = null;
+
 try {
     a = new A();
 }

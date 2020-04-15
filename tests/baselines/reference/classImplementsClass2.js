@@ -28,14 +28,12 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     A.prototype.foo = function () { return 1; };
     return A;
 }());
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }()); // error
 var C2 = /** @class */ (function (_super) {

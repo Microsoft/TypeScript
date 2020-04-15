@@ -26,19 +26,16 @@ async function* test(x) {
             constructor() {
                 this[_e] = await x;
                 this[_g] = yield 2;
-            }
-        }
+            }}
         _e = await x, _f = await x, _g = yield 1, _h = yield 3;
         C[_f] = await x;
         C[_h] = yield 4;
         return C;
     })();
-    return _e = class {
-            constructor() {
+    return _e = class {constructor() {
                 this[_a] = await x;
                 this[_c] = yield 2;
-            }
-        },
+            }},
         _a = await x,
         _b = await x,
         _c = yield 1,

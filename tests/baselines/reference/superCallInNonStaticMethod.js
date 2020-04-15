@@ -84,13 +84,16 @@ var Other = /** @class */ (function (_super) {
     Other.prototype.instanceMethod = function () {
         _super.prototype.instanceMethod.call(this);
     };
+
     // in a lambda inside a instance method
     Other.prototype.lambdaInsideAnInstanceMethod = function () {
         var _this = this;
-        (function () {
-            _super.prototype.instanceMethod.call(_this);
-        });
+        (
+            function () {
+                _super.prototype.instanceMethod.call(_this);
+            });
     };
+
     // in an object literal inside a instance method
     Other.prototype.objectLiteralInsideAnInstanceMethod = function () {
         var _this = this;
@@ -105,6 +108,7 @@ var Other = /** @class */ (function (_super) {
         // in a getter
         get: function () {
             _super.prototype.instanceMethod.call(this);
+
             return 0;
         },
         // in a setter

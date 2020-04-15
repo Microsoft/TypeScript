@@ -38,7 +38,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs = __importStar(require("./fs"));
+
 fs;
+
 __exportStar(require("./fs"), exports);
 var fs_1 = require("./fs");
 Object.defineProperty(exports, "x", { enumerable: true, get: function () { return fs_1.x; } });

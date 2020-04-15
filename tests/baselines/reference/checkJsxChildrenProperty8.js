@@ -46,6 +46,8 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var React = require("react");
+
+
 var Button = /** @class */ (function (_super) {
     __extends(Button, _super);
     function Button() {
@@ -59,9 +61,11 @@ var Button = /** @class */ (function (_super) {
 function AnotherButton(p) {
     return <h1>Just Another Button</h1>;
 }
+
 function Comp(p) {
     return <div>{p.b}</div>;
 }
+
 // OK
 var k1 = <Comp a={10} b="hi"><Button />  <AnotherButton /></Comp>;
 var k2 = <Comp a={10} b="hi"><Button />

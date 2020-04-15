@@ -17,11 +17,14 @@ class D {
 //// [emitRestParametersMethodES6.js]
 class C {
     constructor(name, ...rest) { }
+
     bar(...rest) { }
     foo(x, ...rest) { }
 }
+
 class D {
     constructor(...rest) { }
+
     bar(...rest) { }
     foo(x, ...rest) { }
 }

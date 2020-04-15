@@ -19,6 +19,7 @@ exports.Foo = Foo;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var _10_lib_1 = require("./10_lib");
+
 _10_lib_1.Foo();
 
 

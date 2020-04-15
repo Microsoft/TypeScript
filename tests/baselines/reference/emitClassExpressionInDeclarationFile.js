@@ -61,6 +61,7 @@ exports.circularReference = /** @class */ (function () {
     C.prototype.tags = function (c) { return c; };
     return C;
 }());
+
 // repro from #15066
 var FooItem = /** @class */ (function () {
     function FooItem() {
@@ -90,6 +91,7 @@ var Test = /** @class */ (function (_super) {
 }(WithTags(FooItem)));
 exports.Test = Test;
 var test = new Test();
+
 Test.getTags();
 test.tags();
 

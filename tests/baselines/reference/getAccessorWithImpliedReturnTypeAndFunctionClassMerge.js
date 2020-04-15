@@ -36,6 +36,7 @@ var MyModule;
         Object.defineProperty(MyClass.prototype, "myGetter", {
             get: function () {
                 var obj = {};
+
                 return obj;
             },
             enumerable: false,

@@ -17,3 +17,5 @@ interface F { }
 var x = 10;
 //// [file1.js]
 /// <reference path="file0.ts" />
+
+

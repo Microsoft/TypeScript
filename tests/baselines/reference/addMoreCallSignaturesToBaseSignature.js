@@ -12,5 +12,6 @@ var kitty = a();
 
 
 //// [addMoreCallSignaturesToBaseSignature.js]
+
 var a;
 var kitty = a();

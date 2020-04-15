@@ -102,6 +102,7 @@ function f1() {
         return null;
     }
 }
+
 function f2() {
     if (true) {
         return 1;
@@ -113,6 +114,7 @@ function f2() {
         return 2;
     }
 }
+
 function f4() {
     try {
         return 1;
@@ -124,10 +126,12 @@ function f4() {
         return 1;
     }
 }
+
 function f5() {
     return 1;
     return new Object();
 }
+
 function f6(x) {
     if (true) {
         return x;
@@ -136,6 +140,7 @@ function f6(x) {
         return null;
     }
 }
+
 //function f7<T extends U, U>(x: T, y: U) {
 //    if (true) {
 //        return x;
@@ -154,6 +159,7 @@ function f9() {
         return b;
     }
 }
+
 // returns typeof b
 function f10() {
     if (true) {
@@ -163,6 +169,7 @@ function f10() {
         return a;
     }
 }
+
 // returns number => void
 function f11() {
     if (true) {
@@ -172,6 +179,7 @@ function f11() {
         return function (x) { };
     }
 }
+
 // returns Object => void
 function f12() {
     if (true) {

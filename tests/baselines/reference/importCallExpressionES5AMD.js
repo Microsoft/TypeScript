@@ -46,10 +46,13 @@ define(["require", "exports"], function (require, exports) {
     p1.then(function (zero) {
         return zero.foo();
     });
+
     exports.p2 = new Promise(function (resolve_3, reject_3) { require(["./0"], resolve_3, reject_3); });
+
     function foo() {
         var p2 = new Promise(function (resolve_4, reject_4) { require(["./0"], resolve_4, reject_4); });
     }
+
     var C = /** @class */ (function () {
         function C() {
         }

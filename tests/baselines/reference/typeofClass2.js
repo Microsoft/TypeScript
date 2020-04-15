@@ -36,9 +36,12 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var C = /** @class */ (function () {
-    function C(x) {
-    }
+    function C(x) {}
+
+
+
     C.foo = function (x) { };
+
     C.bar = function (x) { };
     return C;
 }());
@@ -52,5 +55,6 @@ var D = /** @class */ (function (_super) {
     return D;
 }(C));
 var d;
+
 var r1;
 var r2;

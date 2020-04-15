@@ -46,14 +46,18 @@ var Message = /** @class */ (function () {
     };
     return Message;
 }());
+
 function fetchMsg(protoCtor) {
     return null;
 }
+
 var DataProvider = /** @class */ (function () {
-    function DataProvider(message, messageList) {
+    function DataProvider(message,
+        messageList) {
         this.message = message;
         this.messageList = messageList;
     }
+
     DataProvider.prototype.fetch = function () {
         var messageList = fetchMsg(this.messageList);
         messageList.methodOnMessageList();

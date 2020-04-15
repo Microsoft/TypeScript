@@ -35,8 +35,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return privateMap.get(receiver);
 };
 var _foo, _bar;
-class A {
-    constructor() {
+class A {constructor() {
         _foo.set(this, "A's #foo");
         _bar.set(this, "A's #bar");
     }

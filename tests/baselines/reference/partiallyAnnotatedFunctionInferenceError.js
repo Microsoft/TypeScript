@@ -41,6 +41,7 @@ var D = /** @class */ (function (_super) {
     }
     return D;
 }(C));
+
 // more args
 testError(function (t1, t2, t3) { });
 testError(function (t1, t2, t3) { });

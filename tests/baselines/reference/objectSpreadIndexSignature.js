@@ -36,6 +36,8 @@ i[101];
 var ii = __assign(__assign({}, indexed1), indexed2);
 // both have indexer, so i[1001]: number | boolean
 ii[1001];
+
 indexed3 = __assign({}, b ? indexed3 : undefined);
+
 var writable = __assign({}, roindex);
 writable.a = 0; // should be ok.

@@ -17,8 +17,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var D = /** @class */ (function () {
-    function D() {
-    }
+    function D() {}
     return D;
 }());
 var v = /** @class */ (function (_super) {

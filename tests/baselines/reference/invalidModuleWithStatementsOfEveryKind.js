@@ -96,8 +96,7 @@ var __extends = (this && this.__extends) || (function () {
 var Y;
 (function (Y) {
     var A = /** @class */ (function () {
-        function A() {
-        }
+        function A() {}
         return A;
     }());
     var BB = /** @class */ (function (_super) {
@@ -111,10 +110,10 @@ var Y;
 var Y2;
 (function (Y2) {
     var AA = /** @class */ (function () {
-        function AA() {
-        }
+        function AA() {}
         return AA;
     }());
+
     var B = /** @class */ (function (_super) {
         __extends(B, _super);
         function B() {
@@ -128,8 +127,7 @@ var Y3;
     var Module;
     (function (Module) {
         var A = /** @class */ (function () {
-            function A() {
-            }
+            function A() {}
             return A;
         }());
     })(Module || (Module = {}));
@@ -145,8 +143,7 @@ var Y4;
 var YY;
 (function (YY) {
     var A = /** @class */ (function () {
-        function A() {
-        }
+        function A() {}
         return A;
     }());
     var BB = /** @class */ (function (_super) {
@@ -160,10 +157,10 @@ var YY;
 var YY2;
 (function (YY2) {
     var AA = /** @class */ (function () {
-        function AA() {
-        }
+        function AA() {}
         return AA;
     }());
+
     var B = /** @class */ (function (_super) {
         __extends(B, _super);
         function B() {
@@ -177,8 +174,7 @@ var YY3;
     var Module;
     (function (Module) {
         var A = /** @class */ (function () {
-            function A() {
-            }
+            function A() {}
             return A;
         }());
     })(Module || (Module = {}));
@@ -194,8 +190,7 @@ var YY4;
 var YYY;
 (function (YYY) {
     var A = /** @class */ (function () {
-        function A() {
-        }
+        function A() {}
         return A;
     }());
     var BB = /** @class */ (function (_super) {
@@ -209,10 +204,10 @@ var YYY;
 var YYY2;
 (function (YYY2) {
     var AA = /** @class */ (function () {
-        function AA() {
-        }
+        function AA() {}
         return AA;
     }());
+
     var B = /** @class */ (function (_super) {
         __extends(B, _super);
         function B() {
@@ -226,8 +221,7 @@ var YYY3;
     var Module;
     (function (Module) {
         var A = /** @class */ (function () {
-            function A() {
-            }
+            function A() {}
             return A;
         }());
     })(Module || (Module = {}));

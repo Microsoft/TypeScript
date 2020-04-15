@@ -80,6 +80,7 @@ function f(b) {
     }
     d.e = 12;
     d.e;
+
     if (b) {
         d.q = false;
     }
@@ -106,10 +107,12 @@ function f(b) {
 }
 // OK to access possibly-unassigned properties outside the initialising scope
 var test = f(true).s;
+
 function d() {
 }
 d.e = 12;
 d.e;
+
 if (!!false) {
     d.q = false;
 }
@@ -128,6 +131,7 @@ else {
     d.r = 2;
 }
 d.r;
+
 // test function expressions too
 var g = function () {
 };
@@ -135,6 +139,7 @@ if (!!false) {
     g.expando = 1;
 }
 g.expando; // error
+
 if (!!false) {
     g.both = 'hi';
 }

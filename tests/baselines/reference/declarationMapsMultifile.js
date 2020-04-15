@@ -44,6 +44,7 @@ exports.Foo = a_1.Foo;
 var c = new a_1.Foo();
 exports.c = c;
 c.doThing({ a: 42 });
+
 exports.x = c.doThing({ a: 12 });
 
 

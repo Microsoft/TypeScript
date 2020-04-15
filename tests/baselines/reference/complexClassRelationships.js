@@ -75,7 +75,8 @@ var Derived = /** @class */ (function (_super) {
 }(Base));
 var BaseCollection = /** @class */ (function () {
     function BaseCollection(f) {
-        (function (item) { return [item.Components]; });
+        (
+            function (item) { return [item.Components]; });
     }
     return BaseCollection;
 }());
@@ -125,8 +126,7 @@ var Foo = /** @class */ (function () {
     return Foo;
 }());
 var GenericType = /** @class */ (function () {
-    function GenericType(parent) {
-    }
+    function GenericType(parent) {}
     return GenericType;
 }());
 var FooBase = /** @class */ (function () {

@@ -228,6 +228,7 @@ function lastElementOf(arr) {
 exports.lastElementOf = lastElementOf;
 
 
+
 //// [/user/username/projects/demo/lib/core/utilities.d.ts]
 export declare function makeRandomName(): string;
 export declare function lastElementOf<T>(arr: T[]): T | undefined;
@@ -290,6 +291,8 @@ export default interface Animal {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDog = void 0;
 var animal_1 = require("./animal");
+
+
 var dog_1 = require("./dog");
 Object.defineProperty(exports, "createDog", { enumerable: true, get: function () { return dog_1.createDog; } });
 
@@ -306,6 +309,8 @@ export { createDog, Dog };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDog = void 0;
 var utilities_1 = require("../core/utilities");
+
+
 function createDog() {
     return ({
         size: "medium",
@@ -316,6 +321,7 @@ function createDog() {
     });
 }
 exports.createDog = createDog;
+
 
 
 //// [/user/username/projects/demo/lib/animals/dog.d.ts]
@@ -407,12 +413,14 @@ export declare function createDog(): Dog;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createZoo = void 0;
 var index_1 = require("../animals/index");
+
 function createZoo() {
     return [
         index_1.createDog()
     ];
 }
 exports.createZoo = createZoo;
+
 
 
 //// [/user/username/projects/demo/lib/zoo/zoo.d.ts]

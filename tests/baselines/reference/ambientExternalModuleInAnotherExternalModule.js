@@ -14,10 +14,12 @@ var x = ext;
 define(["require", "exports", "ext"], function (require, exports, ext) {
     "use strict";
     var D = /** @class */ (function () {
-        function D() {
-        }
+        function D() {}
         return D;
     }());
+
+
+
     var x = ext;
     return D;
 });

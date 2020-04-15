@@ -120,6 +120,7 @@ var DerivedC = /** @class */ (function (_super) {
 var ba = new BaseA(1);
 var bb = new BaseB(1); // error
 var bc = new BaseC(1); // error
+
 var da = new DerivedA(1);
 var db = new DerivedB(1);
 var dc = new DerivedC(1);

@@ -24,5 +24,6 @@ var M;
     M.C = C;
 })(M || (M = {}));
 var c = new M.C();
+
 c.salt(); // cool
 c.saltbar(); // crash

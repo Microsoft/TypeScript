@@ -28,6 +28,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var symbol;
+
 var Foo = /** @class */ (function () {
     function Foo() {
     }

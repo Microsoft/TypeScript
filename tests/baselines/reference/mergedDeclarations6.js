@@ -55,6 +55,7 @@ define(["require", "exports", "./a"], function (require, exports, a_1) {
     "use strict";
     exports.__esModule = true;
     exports.B = void 0;
+
     var B = /** @class */ (function (_super) {
         __extends(B, _super);
         function B() {

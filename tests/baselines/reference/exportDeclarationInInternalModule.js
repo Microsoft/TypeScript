@@ -45,16 +45,14 @@ var Aaa = /** @class */ (function (_super) {
 }(Bbb));
 (function (Aaa) {
     var SomeType = /** @class */ (function () {
-        function SomeType() {
-        }
+        function SomeType() {}
         return SomeType;
     }());
     Aaa.SomeType = SomeType;
 })(Aaa || (Aaa = {}));
 (function (Bbb) {
     var SomeType = /** @class */ (function () {
-        function SomeType() {
-        }
+        function SomeType() {}
         return SomeType;
     }());
     Bbb.SomeType = SomeType;

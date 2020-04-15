@@ -30,8 +30,7 @@ var a = /** @class */ (function () {
     }
     Object.defineProperty(a, "x", {
         get: function () {
-            return null;
-            ;
+            return null;;
         },
         set: function (aValue) {
         },

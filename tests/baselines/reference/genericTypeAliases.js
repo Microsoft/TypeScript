@@ -75,6 +75,7 @@ a = b;
 
 
 //// [genericTypeAliases.js]
+
 var tree = {
     left: {
         left: 0,
@@ -85,35 +86,50 @@ var tree = {
     },
     right: 3
 };
+
+
+
 var ls;
 ls = "eager";
 ls = function () { return "lazy"; };
+
+
+
+
 // Deeply instantiated generics
 var x;
 var y;
 x = y;
 y = x;
+
 x = "string";
 x = { x: "hello" };
 x = { x: { x: "world" } };
+
 var z;
 z = 42;
 z = { x: 42 };
 z = { x: { x: 42 } };
+
 var s;
 s = "hello";
+
+
 var p;
 p.a = 1;
 p.b = 2;
 p.tag = "test";
+
 function f() {
     var x;
     return x;
 }
+
 function g() {
     var x;
     return x;
 }
+
 // Deeply instantiated generics
 var a = f();
 var b = g();

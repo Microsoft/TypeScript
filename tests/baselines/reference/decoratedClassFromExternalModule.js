@@ -18,8 +18,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 function decorate(target) { }
 let Decorated = /** @class */ (() => {
-    let Decorated = class Decorated {
-    };
+    let Decorated = class Decorated {};
     Decorated = __decorate([
         decorate
     ], Decorated);

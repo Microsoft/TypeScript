@@ -28,8 +28,10 @@ var foos = [true, true, false, null].filter((thing): thing is boolean => thing !
 //// [booleanFilterAnyArray.js]
 var xs;
 var xs = anys.filter(Bullean);
+
 var ys;
 var ys = realanys.filter(Boolean);
+
 var foo = [{ name: 'x' }];
 var foor;
 var foor = foo.filter(function (x) { return x.name; });

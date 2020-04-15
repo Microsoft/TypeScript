@@ -62,6 +62,7 @@ var templa;
     (function (dom) {
         var mvc;
         (function (mvc) {
+
             var AbstractElementController = /** @class */ (function (_super) {
                 __extends(AbstractElementController, _super);
                 function AbstractElementController() {

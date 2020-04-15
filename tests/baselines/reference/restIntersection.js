@@ -18,5 +18,6 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 var intersection;
+
 var rest1;
 var x = intersection.x, rest1 = __rest(intersection, ["x"]);

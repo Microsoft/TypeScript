@@ -24,7 +24,9 @@ var AAA: typeof I;
 AAA = A;
 
 //// [classAbstractClinterfaceAssignability.js]
+
 var I;
+
 var A = /** @class */ (function () {
     function A() {
     }
@@ -32,5 +34,6 @@ var A = /** @class */ (function () {
 }());
 var AA;
 AA = I;
+
 var AAA;
 AAA = A;

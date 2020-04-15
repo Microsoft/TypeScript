@@ -23,7 +23,9 @@ exports.y = 5;
 "use strict";
 exports.__esModule = true;
 var foo = require("./foo");
+
 function f(map) {
     // ...
 }
+
 f(foo);

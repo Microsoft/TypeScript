@@ -32,8 +32,7 @@ define(["require", "exports"], function (require, exports) {
     exports.__esModule = true;
     exports.C = void 0;
     var C = /** @class */ (function () {
-        function C() {
-        }
+        function C() {}
         return C;
     }());
     exports.C = C;
@@ -42,8 +41,7 @@ define(["require", "exports"], function (require, exports) {
 define(["require", "exports"], function (require, exports) {
     "use strict";
     var C = /** @class */ (function () {
-        function C() {
-        }
+        function C() {}
         return C;
     }());
     return C;
@@ -52,8 +50,7 @@ define(["require", "exports"], function (require, exports) {
 define(["require", "exports"], function (require, exports) {
     "use strict";
     var D = /** @class */ (function () {
-        function D() {
-        }
+        function D() {}
         return D;
     }());
     return D;
@@ -64,8 +61,12 @@ define(["require", "exports", "externalModuleAssignToVar_core_require", "externa
     exports.__esModule = true;
     var y1 = ext;
     y1 = ext; // ok
+
+
     var y2 = ext2;
     y2 = ext2; // ok
+
+
     var y3 = ext3;
     y3 = ext3; // ok
 });

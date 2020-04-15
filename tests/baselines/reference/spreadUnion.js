@@ -23,9 +23,12 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 var union;
+
 var o3;
 var o3 = __assign({}, union);
+
 var o4;
 var o4 = __assign(__assign({}, union), { a: false });
+
 var o5;
 var o5 = __assign(__assign({}, union), union);

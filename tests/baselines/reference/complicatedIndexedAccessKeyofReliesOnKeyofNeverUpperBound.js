@@ -47,6 +47,25 @@ newTextChannel2.phoneNumber = '613-555-1234';
 "use strict";
 exports.__esModule = true;
 exports.makeNewChannel = void 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function makeNewChannel(type) {
     var localChannelId = "blahblahblah";
     return { type: type, localChannelId: localChannelId };
@@ -55,6 +74,7 @@ exports.makeNewChannel = makeNewChannel;
 var newTextChannel = makeNewChannel('text');
 // This should work
 newTextChannel.phoneNumber = '613-555-1234';
+
 var newTextChannel2 = makeNewChannel('text');
 // Compare with this, which ofc works.
 newTextChannel2.phoneNumber = '613-555-1234';

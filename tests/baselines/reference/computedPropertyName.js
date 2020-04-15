@@ -47,21 +47,31 @@ declare class H {
 export const onInit = Symbol("onInit");
 //// [component.js]
 var _a;
+
+
+
+
+
 const o = {
     [onInit]: 0 // Error
 };
+
 class C {
 }
+
 class D {
+
     constructor() {
         this[_a] = 0; // Error
-    }
-}
+    }}
 _a = onInit;
 class E {
     [onInit]() { } // Error
 }
+
 class F {
 }
+
 class G {
 }
+

@@ -191,6 +191,8 @@ if (a.isLeader()) {
 else if (a.isFollower()) {
     a.follow();
 }
+
+
 var b;
 if (b.isLeader()) {
     b.lead();
@@ -198,6 +200,7 @@ if (b.isLeader()) {
 else if (b.isFollower()) {
     b.follow();
 }
+
 // if (((a.isLeader)())) {
 //     a.lead();
 // }
@@ -211,12 +214,14 @@ else if (b.isFollower()) {
 //     a.follow();
 // }
 var holder2 = { a: a };
+
 if (holder2.a.isLeader()) {
     holder2.a;
 }
 else {
     holder2.a;
 }
+
 var ArrowGuard = /** @class */ (function () {
     function ArrowGuard() {
         var _this = this;
@@ -252,16 +257,21 @@ if (guard.isElite()) {
 else if (guard.isMedic()) {
     guard.heal();
 }
+
+
 var crate;
+
 if (crate.isSundries()) {
     crate.contents.broken = true;
 }
 else if (crate.isSupplies()) {
     crate.contents.spoiled = true;
 }
+
 // Matching guards should be assignable
 a.isFollower = b.isFollower;
 a.isLeader = b.isLeader;
+
 var MimicGuard = /** @class */ (function () {
     function MimicGuard() {
     }
@@ -288,12 +298,16 @@ var MimicFollower = /** @class */ (function (_super) {
     return MimicFollower;
 }(MimicGuard));
 var mimic = new MimicGuard();
+
 a.isLeader = mimic.isLeader;
 a.isFollower = mimic.isFollower;
+
 if (mimic.isFollower()) {
     mimic.follow();
     mimic.isFollower = a.isFollower;
 }
+
+
 
 
 //// [typeGuardFunctionOfFormThis.d.ts]

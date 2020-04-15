@@ -97,15 +97,18 @@ map[rover] = "Rover";
 //// [noImplicitAnyStringIndexerOnObject.js]
 var a = {}["hello"];
 var b = { '': 'foo' }[''];
+
 var c = {
     get: function (key) { return 'foobar'; }
 };
 c['hello'];
 var foo = c['hello'];
+
 var d = {
     set: function (key) { return 'foobar'; }
 };
 var bar = d['hello'];
+
 {
     var e = {
         get: function (key) { return 'foobar'; },
@@ -116,6 +119,7 @@ var bar = d['hello'];
     e['hello'] += 1;
     e['hello']++;
 }
+
 {
     var e = {
         get: function (key) { return 'foobar'; },
@@ -126,6 +130,7 @@ var bar = d['hello'];
     e['hello'] += 1;
     e['hello']++;
 }
+
 {
     var e = {
         get: function (key) { return 'foobar'; },
@@ -136,21 +141,28 @@ var bar = d['hello'];
     e['hello'] += 1;
     e['hello']++;
 }
+
 {
     ({ get: function (key) { return 'hello'; }, set: function (key, value) { } })['hello'];
     ({ get: function (key) { return 'hello'; }, set: function (key, value) { } })['hello'] = 'modified';
     ({ get: function (key) { return 'hello'; }, set: function (key, value) { } })['hello'] += 1;
     ({ get: function (key) { return 'hello'; }, set: function (key, value) { } })['hello']++;
 }
+
 {
     ({ foo: { get: function (key) { return 'hello'; }, set: function (key, value) { } } }).foo['hello'];
     ({ foo: { get: function (key) { return 'hello'; }, set: function (key, value) { } } }).foo['hello'] = 'modified';
     ({ foo: { get: function (key) { return 'hello'; }, set: function (key, value) { } } }).foo['hello'] += 1;
     ({ foo: { get: function (key) { return 'hello'; }, set: function (key, value) { } } }).foo['hello']++;
 }
+
 var o = { a: 0 };
+
 o[k];
+
+
 o[k2];
+
 o[sym];
 var NumEnum;
 (function (NumEnum) {
@@ -166,5 +178,8 @@ var StrEnum;
 })(StrEnum || (StrEnum = {}));
 var strEnumKey;
 o[strEnumKey];
+
+
 var rover = { bark: function () { } };
+
 map[rover] = "Rover";

@@ -104,6 +104,7 @@ var Foo = /** @class */ (function () {
     }
     return Foo;
 }());
+
 var Bar = /** @class */ (function (_super) {
     __extends(Bar, _super);
     function Bar() {
@@ -140,6 +141,7 @@ var M;
         }
         return Baz;
     }(Foo));
+
     var Bar = /** @class */ (function (_super) {
         __extends(Bar, _super);
         function Bar() {
@@ -177,6 +179,7 @@ var M2;
         }
         return Baz;
     }(Foo));
+
     var Bar = /** @class */ (function (_super) {
         __extends(Bar, _super);
         function Bar() {
@@ -188,6 +191,7 @@ var M2;
     var r1 = b.z;
     var r2 = b.x; // error
     var r3 = b.y; // error
+
     var Bar2 = /** @class */ (function (_super) {
         __extends(Bar2, _super);
         function Bar2() {

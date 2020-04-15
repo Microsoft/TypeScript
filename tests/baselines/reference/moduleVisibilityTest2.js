@@ -92,7 +92,11 @@ var M;
         E[E["C"] = 2] = "C";
     })(E || (E = {}));
     var x = 5;
+
     var y = x + x;
+
+
+
     var B = /** @class */ (function () {
         function B() {
             this.b = 0;
@@ -104,8 +108,7 @@ var M;
             this.someProp = 1;
             function someInnerFunc() { return 2; }
             var someInnerVar = 3;
-        }
-        C.prototype.someMethodThatCallsAnOuterMethod = function () { return OuterInnerAlias.someExportedOuterInnerFunc(); };
+        }C.prototype.someMethodThatCallsAnOuterMethod = function () { return OuterInnerAlias.someExportedOuterInnerFunc(); };
         C.prototype.someMethodThatCallsAnInnerMethod = function () { return InnerMod.someExportedInnerFunc(); };
         C.prototype.someMethodThatCallsAnOuterInnerMethod = function () { return OuterMod.someExportedOuterFunc(); };
         C.prototype.someMethod = function () { return 0; };
@@ -113,6 +116,7 @@ var M;
     }());
     M.C = C;
     var someModuleVar = 4;
+
     function someModuleFunction() { return 5; }
 })(M || (M = {}));
 (function (M) {
@@ -120,6 +124,7 @@ var M;
     M.meb = M.E.B;
 })(M || (M = {}));
 var cprime = null;
+
 var c = new M.C();
 var z = M.x;
 var alpha = M.E.A;

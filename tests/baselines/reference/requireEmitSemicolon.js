@@ -27,8 +27,7 @@ define(["require", "exports"], function (require, exports) {
     var Models;
     (function (Models) {
         var Person = /** @class */ (function () {
-            function Person(name) {
-            }
+            function Person(name) {}
             return Person;
         }());
         Models.Person = Person;

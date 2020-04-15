@@ -28,21 +28,21 @@ x = 1;
 x = true;
 x = '';
 x = {};
+
 var C = /** @class */ (function () {
-    function C() {
-    }
+    function C() {}
     return C;
 }());
 var c;
 x = C;
 x = c;
+
 var i;
 x = i;
 var M;
-(function (M) {
-    M.x = 1;
-})(M || (M = {}));
+(function (M) {M.x = 1;})(M || (M = {}));
 x = M;
+
 function f(a) {
     x = a;
 }

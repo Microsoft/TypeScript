@@ -55,6 +55,7 @@ class A {
     }
     bar(a) {
     }
+
     baz() {
         for (let x of [1]) {
             let a = function () { return x; };
@@ -76,6 +77,7 @@ class A {
         }
     }
 }
+
 class B {
     foo() {
         let a = () => {

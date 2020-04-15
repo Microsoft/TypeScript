@@ -55,6 +55,7 @@ var Point3D = /** @class */ (function (_super) {
         _this.z = z;
         return _this;
     }
+
     Point3D.prototype.getDist = function () {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.m);
     };

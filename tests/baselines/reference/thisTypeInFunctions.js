@@ -275,6 +275,7 @@ var implicitAnyOk = { notSpecified: 12, f: implicitThis };
 ok.f(13);
 implicitThis(12);
 implicitAnyOk.f(12);
+
 var c = new C();
 var d = new D();
 var ripped = c.explicitC;
@@ -299,10 +300,13 @@ explicitVoid(12);
 var unboundToSpecified = function (x) { return x + _this.y; }; // ok, this:any
 var specifiedToSpecified = explicitStructural;
 var anyToSpecified = function (x) { return x + 12; };
+
 var unspecifiedLambda = function (x) { return x + 12; };
 var specifiedLambda = function (x) { return x + 12; };
 var unspecifiedLambdaToSpecified = unspecifiedLambda;
 var specifiedLambdaToSpecified = specifiedLambda;
+
+
 var explicitCFunction;
 var explicitPropertyFunction;
 c.explicitC = explicitCFunction;
@@ -310,28 +314,36 @@ c.explicitC = function (m) { return this.n + m; };
 c.explicitProperty = explicitPropertyFunction;
 c.explicitProperty = function (m) { return this.n + m; };
 c.explicitProperty = reconstructed.explicitProperty;
+
 // lambdas are assignable to anything
 c.explicitC = function (m) { return m; };
 c.explicitThis = function (m) { return m; };
 c.explicitProperty = function (m) { return m; };
+
 // this inside lambdas refer to outer scope
 // the outer-scoped lambda at top-level is still just `any`
 c.explicitC = function (m) { return m + _this.n; };
 c.explicitThis = function (m) { return m + _this.n; };
 c.explicitProperty = function (m) { return m + _this.n; };
+
 //NOTE: this=C here, I guess?
 c.explicitThis = explicitCFunction;
 c.explicitThis = function (m) { return this.n + m; };
+
 // this:any compatibility
 c.explicitC = function (m) { return this.n + m; };
 c.explicitProperty = function (m) { return this.n + m; };
 c.explicitThis = function (m) { return this.n + m; };
+
 // this: contextual typing
 c.explicitThis = function (m) { return this.n + m; };
+
 // this: superclass compatibility
 c.explicitC = function (m) { return this.n + m; };
+
 // this:void compatibility
 c.explicitVoid = function (n) { return n; };
+
 // class-based assignability
 var Base1 = /** @class */ (function () {
     function Base1() {
@@ -368,11 +380,15 @@ var d1 = new Derived1();
 var d2 = new Derived2();
 d2.polymorphic = d1.polymorphic; // ok, 'x' and 'y' in { x, y }
 d1.polymorphic = d2.polymorphic; // ok, 'x' and 'y' in { x, y }
+
+
 // bivariance-allowed cases
 d1.polymorphic = b2.polymorphic; // ok, 'y' in D: { x, y }
 d2.polymorphic = d1.explicit; // ok, 'y' in { x, y }
 b1.polymorphic = d2.polymorphic; // ok, 'x' and 'y' not in Base1: { x }
 b1.explicit = d2.polymorphic; // ok, 'x' and 'y' not in Base1: { x }
+
+
 ////// use this-type for construction with new ////
 function InterfaceThis() {
     this.a = 12;
@@ -386,5 +402,7 @@ function AnyThis() {
 var interfaceThis = new InterfaceThis();
 var literalTypeThis = new LiteralTypeThis();
 var anyThis = new AnyThis();
+
 var n = f.call(12);
+
 function missingTypeIsImplicitAny(a) { return this.anything + a; }

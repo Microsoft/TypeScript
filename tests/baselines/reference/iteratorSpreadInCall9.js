@@ -36,6 +36,7 @@ new Foo(...new SymbolIterator, ...[...new _StringIterator]);
 class Foo {
     constructor(...s) { }
 }
+
 class SymbolIterator {
     next() {
         return {
@@ -43,10 +44,12 @@ class SymbolIterator {
             done: false
         };
     }
+
     [Symbol.iterator]() {
         return this;
     }
 }
+
 class _StringIterator {
     next() {
         return {
@@ -54,8 +57,10 @@ class _StringIterator {
             done: false
         };
     }
+
     [Symbol.iterator]() {
         return this;
     }
 }
+
 new Foo(...new SymbolIterator, ...[...new _StringIterator]);

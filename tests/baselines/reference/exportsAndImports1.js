@@ -58,6 +58,7 @@ var M;
 (function (M) {
 })(M || (M = {}));
 exports.M = M;
+
 var a = M.x;
 exports.a = a;
 //// [t2.js]
@@ -71,12 +72,7 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
 }));
 exports.__esModule = true;
 var t1_1 = require("./t1");
-__createBinding(exports, t1_1, "v");
-__createBinding(exports, t1_1, "f");
-__createBinding(exports, t1_1, "C");
-__createBinding(exports, t1_1, "E");
-__createBinding(exports, t1_1, "M");
-__createBinding(exports, t1_1, "a");
+__createBinding(exports, t1_1, "v");__createBinding(exports, t1_1, "f");__createBinding(exports, t1_1, "C");__createBinding(exports, t1_1, "E");__createBinding(exports, t1_1, "M");__createBinding(exports, t1_1, "a");
 //// [t3.js]
 "use strict";
 exports.__esModule = true;

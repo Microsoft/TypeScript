@@ -82,12 +82,15 @@ var TypeScript;
             this.indentStrings = [];
             this.indentAmt = 0;
         }
+
         PrintContext.prototype.increaseIndent = function () {
             this.indentAmt++;
         };
+
         PrintContext.prototype.decreaseIndent = function () {
             this.indentAmt--;
         };
+
         PrintContext.prototype.startLine = function () {
             if (this.builder.length > 0) {
                 CompilerDiagnostics.Alert(this.builder);
@@ -102,9 +105,11 @@ var TypeScript;
             }
             this.builder += indentString;
         };
+
         PrintContext.prototype.write = function (s) {
             this.builder += s;
         };
+
         PrintContext.prototype.writeLine = function (s) {
             this.builder += s;
             this.outfile.WriteLine(this.builder);
@@ -115,6 +120,7 @@ var TypeScript;
     TypeScript.PrintContext = PrintContext;
     function prePrintAST(ast, parent, walker) {
         var pc = walker.state;
+
         ast.print(pc);
         pc.increaseIndent();
         return ast;

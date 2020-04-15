@@ -141,6 +141,7 @@ var Test;
         return Directory;
     }(FileSystemObject));
     Test.Directory = Directory;
+
     var file = new File("foo/bar.txt", "foo");
     file.isNetworked = false;
     file.isFSO = file.isFile;
@@ -159,6 +160,8 @@ var Test;
     else if (file.isNetworked) {
         file.host;
     }
+
+
     var guard;
     if (guard.isLeader) {
         guard.lead();
@@ -166,6 +169,8 @@ var Test;
     else if (guard.isFollower) {
         guard.follow();
     }
+
+
     var general;
     if (general.isMoreSpecific) {
         general.do();

@@ -42,11 +42,13 @@ function f0() {
     var a7 = __spreadArrays([1], a, [2], a);
     var a8 = __spreadArrays(a, a, a);
 }
+
 function f1() {
     var a = [1, 2, 3];
     var b = __spreadArrays(["hello"], a, [true]);
     var b;
 }
+
 function f2() {
     var a = [];
     var b = [5];

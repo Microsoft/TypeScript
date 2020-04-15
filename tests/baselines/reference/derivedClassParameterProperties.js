@@ -109,6 +109,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var Base = /** @class */ (function () {
     function Base() {
     }
@@ -202,8 +203,7 @@ var Derived8 = /** @class */ (function (_super) {
 }(Base));
 // generic cases of Derived7 and Derived8
 var Base2 = /** @class */ (function () {
-    function Base2() {
-    }
+    function Base2() {}
     return Base2;
 }());
 var Derived9 = /** @class */ (function (_super) {

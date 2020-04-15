@@ -27,7 +27,9 @@ var e4 = t4[3];  // number
 
 //// [bestCommonTypeOfTuple.js]
 function f1(x) { return "foo"; }
+
 function f2(x) { return 10; }
+
 function f3(x) { return true; }
 var E1;
 (function (E1) {
@@ -41,6 +43,7 @@ var t1;
 var t2;
 var t3;
 var t4;
+
 // no error
 t1 = [f1, f2];
 t2 = [E1.one, E2.two];

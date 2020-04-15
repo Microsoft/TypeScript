@@ -31,7 +31,13 @@ var C = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(C, id.toString(), {
+    Object.defineProperty(C,
+
+
+
+
+
+        id.toString(), {
         set: function (v) { },
         enumerable: false,
         configurable: true

@@ -42,9 +42,11 @@ var a;
 var b;
 var c;
 var d;
+
 // undefined + any
 var r1 = undefined + a;
 var r2 = a + undefined;
+
 // undefined + number/enum
 var r3 = undefined + b;
 var r4 = undefined + 1;
@@ -56,6 +58,7 @@ var r9 = 1 + undefined;
 var r10 = c + undefined;
 var r11 = E.a + undefined;
 var r12 = E['a'] + undefined;
+
 // undefined + string
 var r13 = undefined + d;
 var r14 = undefined + '';

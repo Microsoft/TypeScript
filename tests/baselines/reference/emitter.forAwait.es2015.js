@@ -63,9 +63,7 @@ function f1() {
     return __awaiter(this, void 0, void 0, function* () {
         let y;
         try {
-            for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield y_1.next(), !y_1_1.done;) {
-                const x = y_1_1.value;
-            }
+            for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield y_1.next(), !y_1_1.done;) {const x = y_1_1.value;}
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
@@ -98,9 +96,7 @@ function f2() {
     return __awaiter(this, void 0, void 0, function* () {
         let x, y;
         try {
-            for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield y_1.next(), !y_1_1.done;) {
-                x = y_1_1.value;
-            }
+            for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield y_1.next(), !y_1_1.done;) {x = y_1_1.value;}
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
@@ -136,9 +132,7 @@ function f3() {
         var e_1, _a;
         let y;
         try {
-            for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield __await(y_1.next()), !y_1_1.done;) {
-                const x = y_1_1.value;
-            }
+            for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield __await(y_1.next()), !y_1_1.done;) {const x = y_1_1.value;}
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
@@ -174,9 +168,7 @@ function f4() {
         var e_1, _a;
         let x, y;
         try {
-            for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield __await(y_1.next()), !y_1_1.done;) {
-                x = y_1_1.value;
-            }
+            for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield __await(y_1.next()), !y_1_1.done;) {x = y_1_1.value;}
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
@@ -210,8 +202,7 @@ function f5() {
     return __awaiter(this, void 0, void 0, function* () {
         let y;
         try {
-            outer: for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield y_1.next(), !y_1_1.done;) {
-                const x = y_1_1.value;
+            outer: for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield y_1.next(), !y_1_1.done;) {const x = y_1_1.value;
                 continue outer;
             }
         }
@@ -250,8 +241,7 @@ function f6() {
         var e_1, _a;
         let y;
         try {
-            outer: for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield __await(y_1.next()), !y_1_1.done;) {
-                const x = y_1_1.value;
+            outer: for (var y_1 = __asyncValues(y), y_1_1; y_1_1 = yield __await(y_1.next()), !y_1_1.done;) {const x = y_1_1.value;
                 continue outer;
             }
         }

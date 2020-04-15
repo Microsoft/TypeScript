@@ -47,6 +47,8 @@ export declare function createDog(): Dog;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDog = void 0;
 var utilities_1 = require("../core/utilities");
+
+
 function createDog() {
     return ({
         size: "medium",
@@ -57,6 +59,7 @@ function createDog() {
     });
 }
 exports.createDog = createDog;
+
 
 
 //// [/src/lib/animals/index.d.ts]
@@ -71,6 +74,8 @@ export { createDog, Dog };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDog = void 0;
 var animal_1 = require("./animal");
+
+
 var dog_1 = require("./dog");
 Object.defineProperty(exports, "createDog", { enumerable: true, get: function () { return dog_1.createDog; } });
 
@@ -209,6 +214,7 @@ function lastElementOf(arr) {
 exports.lastElementOf = lastElementOf;
 
 
+
 //// [/src/lib/zoo/tsconfig.tsbuildinfo]
 {
   "program": {
@@ -298,11 +304,13 @@ export declare function createZoo(): Array<Dog>;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createZoo = void 0;
 var index_1 = require("../animals/index");
+
 function createZoo() {
     return [
         index_1.createDog()
     ];
 }
 exports.createZoo = createZoo;
+
 
 

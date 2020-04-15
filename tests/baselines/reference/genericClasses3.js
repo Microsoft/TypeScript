@@ -44,9 +44,12 @@ var C = /** @class */ (function (_super) {
     return C;
 }(B));
 var v2;
+
 var y = v2.x; // should be 'string'
 var u = v2.a; // should be 'string'
+
 var z = v2.b;
+
 
 
 //// [genericClasses3.d.ts]

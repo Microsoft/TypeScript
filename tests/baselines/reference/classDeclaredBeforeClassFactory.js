@@ -31,8 +31,7 @@ var Derived = /** @class */ (function (_super) {
 }(makeBaseClass()));
 function makeBaseClass() {
     return /** @class */ (function () {
-        function Base() {
-        }
+        function Base() {}
         return Base;
     }());
 }

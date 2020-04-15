@@ -8,7 +8,9 @@ var d = /** @class */ (function () {
 }());
 exports.d = d;
 ;
+
 function foo() {
     return new d();
 }
 exports.foo = foo;
+

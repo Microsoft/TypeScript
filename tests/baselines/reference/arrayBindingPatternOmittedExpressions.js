@@ -17,6 +17,7 @@ function f([, a, , b, , , , s, , , ] = results) {
 
 //// [arrayBindingPatternOmittedExpressions.js]
 var results;
+
 {
     let [, b, , a] = results;
     let x = {
@@ -24,6 +25,8 @@ var results;
         b
     };
 }
+
+
 function f([, a, , b, , , , s, , ,] = results) {
     a = s[1];
     b = s[2];

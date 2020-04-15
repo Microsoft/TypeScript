@@ -43,6 +43,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var React = require("react");
+
 var obj = {};
 var obj1 = {
     x: 2
@@ -51,6 +52,8 @@ var obj3 = {
     y: true,
     overwrite: "hi"
 };
+
+
 var OverWriteAttr = /** @class */ (function (_super) {
     __extends(OverWriteAttr, _super);
     function OverWriteAttr() {

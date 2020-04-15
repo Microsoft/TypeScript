@@ -439,6 +439,7 @@ var publicClass = /** @class */ (function () {
     return publicClass;
 }());
 exports.publicClass = publicClass;
+
 var publicClassWithWithPrivatePropertyTypes = /** @class */ (function () {
     function publicClassWithWithPrivatePropertyTypes() {
     }
@@ -463,6 +464,7 @@ var privateClassWithWithPublicPropertyTypes = /** @class */ (function () {
 }());
 var privateVarWithPrivatePropertyTypes;
 var privateVarWithPublicPropertyTypes;
+
 var publicClassWithPrivateModulePropertyTypes = /** @class */ (function () {
     function publicClassWithPrivateModulePropertyTypes() {
     }
@@ -488,6 +490,7 @@ var publicModule;
         return publicClass;
     }());
     publicModule.publicClass = publicClass;
+
     var publicClassWithWithPrivatePropertyTypes = /** @class */ (function () {
         function publicClassWithWithPrivatePropertyTypes() {
         }
@@ -512,6 +515,7 @@ var publicModule;
     }());
     var privateVarWithPrivatePropertyTypes;
     var privateVarWithPublicPropertyTypes;
+
     var publicClassWithPrivateModulePropertyTypes = /** @class */ (function () {
         function publicClassWithPrivateModulePropertyTypes() {
         }
@@ -538,6 +542,7 @@ var privateModule;
         return publicClass;
     }());
     privateModule.publicClass = publicClass;
+
     var publicClassWithWithPrivatePropertyTypes = /** @class */ (function () {
         function publicClassWithWithPrivatePropertyTypes() {
         }
@@ -562,6 +567,7 @@ var privateModule;
     }());
     var privateVarWithPrivatePropertyTypes;
     var privateVarWithPublicPropertyTypes;
+
     var publicClassWithPrivateModulePropertyTypes = /** @class */ (function () {
         function publicClassWithPrivateModulePropertyTypes() {
         }
@@ -613,6 +619,7 @@ var publicModuleInGlobal;
             return publicClass;
         }());
         privateModule.publicClass = publicClass;
+
         var publicClassWithWithPrivatePropertyTypes = /** @class */ (function () {
             function publicClassWithWithPrivatePropertyTypes() {
             }
@@ -637,6 +644,7 @@ var publicModuleInGlobal;
         }());
         var privateVarWithPrivatePropertyTypes;
         var privateVarWithPublicPropertyTypes;
+
         var publicClassWithPrivateModulePropertyTypes = /** @class */ (function () {
             function publicClassWithPrivateModulePropertyTypes() {
             }
@@ -650,6 +658,7 @@ var publicModuleInGlobal;
         }());
         var privateVarWithPrivateModulePropertyTypes;
     })(privateModule || (privateModule = {}));
+
     var publicClassWithWithPrivatePropertyTypes = /** @class */ (function () {
         function publicClassWithWithPrivatePropertyTypes() {
         }
@@ -674,6 +683,7 @@ var publicModuleInGlobal;
     }());
     var privateVarWithPrivatePropertyTypes;
     var privateVarWithPublicPropertyTypes;
+
     var publicClassWithPrivateModulePropertyTypes = /** @class */ (function () {
         function publicClassWithPrivateModulePropertyTypes() {
         }

@@ -15,6 +15,7 @@ async function elementAccess2() {
 
 
 //// [es5-asyncFunctionElementAccess.js]
+
 function elementAccess0() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -27,6 +28,7 @@ function elementAccess0() {
         });
     });
 }
+
 function elementAccess1() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -39,6 +41,7 @@ function elementAccess1() {
         });
     });
 }
+
 function elementAccess2() {
     return __awaiter(this, void 0, void 0, function () {
         var _a;

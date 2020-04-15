@@ -94,26 +94,32 @@ test(errorCallback);
 function error(message) {
     throw new Error(message);
 }
+
 function errorVoid(message) {
     throw new Error(message);
 }
+
 function fail() {
     return error("Something failed");
 }
+
 function failOrThrow(shouldFail) {
     if (shouldFail) {
         return fail();
     }
     throw new Error();
 }
+
 function infiniteLoop1() {
     while (true) {
     }
 }
+
 function infiniteLoop2() {
     while (true) {
     }
 }
+
 function move1(direction) {
     switch (direction) {
         case "up":
@@ -123,14 +129,17 @@ function move1(direction) {
     }
     return error("Should never get here");
 }
+
 function move2(direction) {
     return direction === "up" ? 1 :
         direction === "down" ? -1 :
             error("Should never get here");
 }
+
 function check(x) {
     return x || error("Undefined value");
 }
+
 var C = /** @class */ (function () {
     function C() {
     }
@@ -153,6 +162,7 @@ function f1(x) {
         x; // never
     }
 }
+
 function f2(x) {
     while (true) {
         if (typeof x === "boolean") {
@@ -160,11 +170,14 @@ function f2(x) {
         }
     }
 }
+
 function test(cb) {
     var s = cb();
     return s;
 }
+
 var errorCallback = function () { return error("Error callback"); };
+
 test(function () { return "hello"; });
 test(function () { return fail(); });
 test(function () { throw new Error(); });

@@ -21,6 +21,7 @@ var M;
         function C() {
         }
         C.prototype.decorator = function (target, key) { };
+
         C.prototype.method = function () { };
         __decorate([
             this.decorator

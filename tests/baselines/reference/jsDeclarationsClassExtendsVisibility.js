@@ -15,8 +15,7 @@ module.exports.Strings = Strings;
 
 //// [bar.js]
 var Bar = /** @class */ (function () {
-    function Bar() {
-    }
+    function Bar() {}
     return Bar;
 }());
 module.exports = Bar;

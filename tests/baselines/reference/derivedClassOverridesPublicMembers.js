@@ -78,10 +78,9 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var x;
 var y;
+
 var Base = /** @class */ (function () {
-    function Base(a) {
-    }
-    Base.prototype.b = function (a) { };
+    function Base(a) {}Base.prototype.b = function (a) { };
     Object.defineProperty(Base.prototype, "c", {
         get: function () { return x; },
         set: function (v) { },
@@ -101,8 +100,7 @@ var Derived = /** @class */ (function (_super) {
     __extends(Derived, _super);
     function Derived(a) {
         return _super.call(this, x) || this;
-    }
-    Derived.prototype.b = function (a) { };
+    }Derived.prototype.b = function (a) { };
     Object.defineProperty(Derived.prototype, "c", {
         get: function () { return y; },
         set: function (v) { },
@@ -129,6 +127,7 @@ var r5 = Derived.s(y);
 var r6 = Derived.t;
 var r6a = Derived.u;
 Derived.t = y;
+
 var Base2 = /** @class */ (function () {
     function Base2() {
     }
@@ -144,3 +143,4 @@ var Derived2 = /** @class */ (function (_super) {
 var d2;
 var r7 = d2[''];
 var r8 = d2[1];
+

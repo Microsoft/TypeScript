@@ -31,6 +31,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var React = require("react");
+
 var Poisoned = /** @class */ (function (_super) {
     __extends(Poisoned, _super);
     function Poisoned() {
@@ -42,6 +43,7 @@ var Poisoned = /** @class */ (function (_super) {
     return Poisoned;
 }(React.Component));
 var obj = {};
+
 // OK
 var p = <Poisoned {...obj}/>;
 var y = <Poisoned />;

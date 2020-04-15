@@ -17,6 +17,7 @@ function makePoint(x: number, y: number) {
 
 //// [objectLitPropertyScoping.js]
 // Should compile, x and y should not be picked up from the properties
+
 function makePoint(x, y) {
     return {
         get x() {
@@ -29,5 +30,4 @@ function makePoint(x, y) {
             return Math.sqrt(x * x + y * y);
         }
     };
-}
-;
+};

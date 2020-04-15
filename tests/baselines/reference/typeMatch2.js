@@ -65,9 +65,9 @@ function f1() {
     a = { x: 1, y: 2, z: 3 };
     a = { x: 1, z: 3 }; // error
 }
+
 var Animal = /** @class */ (function () {
-    function Animal() {
-    }
+    function Animal() {}
     return Animal;
 }());
 var Giraffe = /** @class */ (function (_super) {
@@ -89,6 +89,7 @@ function f2() {
     xa = xb; // Should be ok
     xb = xa; // Not ok
 }
+
 function f4() {
     var _any = 0;
     var i = 5;
@@ -106,3 +107,5 @@ function f4() {
     mf(_any);
     zf(_any);
 }
+
+

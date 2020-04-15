@@ -64,6 +64,7 @@ var r = d.foo;
 var r2 = d.bar;
 var r3 = d.thing();
 var r4 = D.other();
+
 var C2 = /** @class */ (function () {
     function C2() {
     }

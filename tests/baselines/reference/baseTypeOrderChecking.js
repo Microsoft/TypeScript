@@ -51,6 +51,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var someVariable;
+
+
+
 var Class1 = /** @class */ (function () {
     function Class1() {
     }

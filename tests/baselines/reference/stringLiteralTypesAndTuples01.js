@@ -21,8 +21,12 @@ function rawr(dino: RexOrRaptor) {
 //// [stringLiteralTypesAndTuples01.js]
 // Should all be strings.
 var _a = ["Hello", "Brave", "New", "World"], hello = _a[0], brave = _a[1], newish = _a[2], world = _a[3];
+
+
 var _b = ['I\'m', 'a', 't-rex'], im = _b[0], a = _b[1], dinosaur = _b[2];
+
 rawr(dinosaur);
+
 function rawr(dino) {
     if (dino === "t-rex") {
         return "ROAAAAR!";
@@ -30,6 +34,7 @@ function rawr(dino) {
     if (dino === "raptor") {
         return "yip yip!";
     }
+
     throw "Unexpected " + dino;
 }
 

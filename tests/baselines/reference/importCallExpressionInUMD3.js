@@ -44,8 +44,7 @@ foo();
     "use strict";
     var __syncRequire = typeof module === "object" && typeof module.exports === "object";
     async function foo() {
-        class C extends (await (__syncRequire ? Promise.resolve().then(() => require("./0")) : new Promise((resolve_1, reject_1) => { require(["./0"], resolve_1, reject_1); }))).B {
-        }
+        class C extends (await (__syncRequire ? Promise.resolve().then(() => require("./0")) : new Promise((resolve_1, reject_1) => { require(["./0"], resolve_1, reject_1); }))).B {}
         var c = new C();
         c.print();
     }

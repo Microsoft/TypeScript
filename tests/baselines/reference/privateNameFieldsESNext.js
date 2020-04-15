@@ -22,14 +22,14 @@ class C {
 
 //// [privateNameFieldsESNext.js]
 let C = /** @class */ (() => {
-    class C {
-        constructor() {
+    class C {constructor() {
             this.a = 123;
             this.#a = 10;
             this.c = "hello";
             this.#something = () => 1234;
         }
         #a;
+
         #b;
         method() {
             console.log(this.#a);

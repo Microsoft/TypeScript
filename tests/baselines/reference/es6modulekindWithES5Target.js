@@ -36,6 +36,7 @@ var C = /** @class */ (function () {
 }());
 export { C };
 export { C as C2 };
+
 var D = /** @class */ (function () {
     function D() {
         this.p = 1;
@@ -49,9 +50,9 @@ var D = /** @class */ (function () {
 }());
 export { D };
 export { D as D2 };
+
 var E = /** @class */ (function () {
-    function E() {
-    }
+    function E() {}
     return E;
 }());
 export { E };

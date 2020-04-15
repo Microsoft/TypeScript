@@ -33,6 +33,7 @@ class C2 {
 
 //// [protectedClassPropertyAccessibleWithinClass.js]
 // no errors
+
 var C = /** @class */ (function () {
     function C() {
     }
@@ -60,40 +61,35 @@ var C2 = /** @class */ (function () {
     Object.defineProperty(C2.prototype, "y", {
         get: function () {
             var _this = this;
-            (function () { return _this.x; });
-            return null;
+            (function () { return _this.x; });return null;
         },
         set: function (x) {
             var _this = this;
-            (function () { _this.y = _this.x; });
-        },
+            (function () { _this.y = _this.x; });},
         enumerable: false,
         configurable: true
     });
     C2.prototype.foo = function () {
         var _this = this;
-        (function () { return _this.foo; });
-    };
+        (function () { return _this.foo; });};
     Object.defineProperty(C2, "y", {
         get: function () {
             var _this = this;
-            (function () { return _this.x; });
-            return null;
+            (function () { return _this.x; });return null;
         },
         set: function (x) {
             var _this = this;
-            (function () { _this.y = _this.x; });
+            (
+                function () { _this.y = _this.x; });
         },
         enumerable: false,
         configurable: true
     });
     C2.foo = function () {
         var _this = this;
-        (function () { return _this.foo; });
-    };
+        (function () { return _this.foo; });};
     C2.bar = function () {
         var _this = this;
-        (function () { return _this.foo(); });
-    };
+        (function () { return _this.foo(); });};
     return C2;
 }());

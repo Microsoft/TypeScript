@@ -42,6 +42,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 const a = 'a';
+
 function f1(obj) {
     let r0 = __rest(obj, []);
     let { a: a1 } = obj, r1 = __rest(obj, ["a"]);
@@ -50,14 +51,20 @@ function f1(obj) {
     let { ['a']: a4 } = obj, r4 = __rest(obj, ['a']);
     let _a = obj, _b = a, a5 = _a[_b], r5 = __rest(_a, [typeof _b === "symbol" ? _b : _b + ""]);
 }
+
 const sa = Symbol();
 const sb = Symbol();
+
 function f2(obj) {
     let _a = obj, _b = sa, a1 = _a[_b], _c = sb, b1 = _a[_c], r1 = __rest(_a, [typeof _b === "symbol" ? _b : _b + "", typeof _c === "symbol" ? _c : _c + ""]);
 }
+
 function f3(obj, k1, k2) {
     let _a = obj, _b = k1, a1 = _a[_b], _c = k2, a2 = _a[_c], r1 = __rest(_a, [typeof _b === "symbol" ? _b : _b + "", typeof _c === "symbol" ? _c : _c + ""]);
 }
+
+
+
 function f4(obj, k1, k2) {
     let _a = obj, _b = k1, a1 = _a[_b], _c = k2, a2 = _a[_c], r1 = __rest(_a, [typeof _b === "symbol" ? _b : _b + "", typeof _c === "symbol" ? _c : _c + ""]);
 }

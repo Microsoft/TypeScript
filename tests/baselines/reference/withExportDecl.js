@@ -64,15 +64,24 @@ define(["require", "exports"], function (require, exports) {
     exports.__esModule = true;
     exports.eVar5 = exports.eVar4 = exports.eVar3 = exports.eVar2 = exports.eVar1 = exports.m3 = exports.exportedFunction = exports.exportedArrayVar = exports.exportedWithComplicatedValue = exports.exportedVarWithInitialValue = exports.exportedSimpleVar = void 0;
     var simpleVar;
+
+
     var anotherVar;
     var varWithSimpleType;
     var varWithArrayType;
+
     var varWithInitialValue = 30;
     exports.exportedVarWithInitialValue = 70;
+
     var withComplicatedValue = { x: 30, y: 70, desc: "position" };
     exports.exportedWithComplicatedValue = { x: 30, y: 70, desc: "position" };
+
+
     var arrayVar = ['a', 'b'];
+
+
     exports.exportedArrayVar.push({ x: 30, y: 'hello world' });
+
     function simpleFunction() {
         return {
             x: "Hello",
@@ -80,6 +89,7 @@ define(["require", "exports"], function (require, exports) {
             n: 2
         };
     }
+
     function exportedFunction() {
         return simpleFunction();
     }
@@ -93,6 +103,7 @@ define(["require", "exports"], function (require, exports) {
     })(m1 || (m1 = {}));
     var m3;
     (function (m3) {
+
         function foo() {
             return m1.foo();
         }

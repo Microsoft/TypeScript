@@ -66,6 +66,7 @@ exports.foo = function (p) {
         bar2: function (s) { }
     };
 };
+
 var Foo = /** @class */ (function () {
     function Foo() {
     }
@@ -82,6 +83,7 @@ exports.Foo = Foo;
 * comment5
 */
 exports.someMethod = null.someMethod;
+
 
 
 //// [declarationEmitRetainsJsdocyComments.d.ts]

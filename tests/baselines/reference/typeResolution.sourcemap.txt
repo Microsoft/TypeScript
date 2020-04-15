@@ -383,362 +383,314 @@ sourceFile:typeResolution.ts
 1->Emitted(15, 25) Source(6, 21) + SourceIndex(0)
 2 >Emitted(15, 64) Source(6, 60) + SourceIndex(0)
 ---
->>>                        var a1;
+>>>                        var a1;a1.AisIn1_1_1();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
 1 >
   >                    
 2 >                        var 
 3 >                            a1: ClassA
-4 >                              ;
+4 >                              ; 
+5 >                               a1
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
 1 >Emitted(16, 25) Source(7, 21) + SourceIndex(0)
 2 >Emitted(16, 29) Source(7, 25) + SourceIndex(0)
 3 >Emitted(16, 31) Source(7, 35) + SourceIndex(0)
-4 >Emitted(16, 32) Source(7, 36) + SourceIndex(0)
+4 >Emitted(16, 32) Source(7, 37) + SourceIndex(0)
+5 >Emitted(16, 34) Source(7, 39) + SourceIndex(0)
+6 >Emitted(16, 35) Source(7, 40) + SourceIndex(0)
+7 >Emitted(16, 45) Source(7, 50) + SourceIndex(0)
+8 >Emitted(16, 47) Source(7, 52) + SourceIndex(0)
+9 >Emitted(16, 48) Source(7, 53) + SourceIndex(0)
 ---
->>>                        a1.AisIn1_1_1();
+>>>                        var a2;a2.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        a1
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(17, 25) Source(7, 37) + SourceIndex(0)
-2 >Emitted(17, 27) Source(7, 39) + SourceIndex(0)
-3 >Emitted(17, 28) Source(7, 40) + SourceIndex(0)
-4 >Emitted(17, 38) Source(7, 50) + SourceIndex(0)
-5 >Emitted(17, 40) Source(7, 52) + SourceIndex(0)
-6 >Emitted(17, 41) Source(7, 53) + SourceIndex(0)
----
->>>                        var a2;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
+1->
   >                    
 2 >                        var 
 3 >                            a2: SubSubModule1.ClassA
-4 >                              ;
-1 >Emitted(18, 25) Source(8, 21) + SourceIndex(0)
-2 >Emitted(18, 29) Source(8, 25) + SourceIndex(0)
-3 >Emitted(18, 31) Source(8, 49) + SourceIndex(0)
-4 >Emitted(18, 32) Source(8, 50) + SourceIndex(0)
+4 >                              ; 
+5 >                               a2
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(17, 25) Source(8, 21) + SourceIndex(0)
+2 >Emitted(17, 29) Source(8, 25) + SourceIndex(0)
+3 >Emitted(17, 31) Source(8, 49) + SourceIndex(0)
+4 >Emitted(17, 32) Source(8, 51) + SourceIndex(0)
+5 >Emitted(17, 34) Source(8, 53) + SourceIndex(0)
+6 >Emitted(17, 35) Source(8, 54) + SourceIndex(0)
+7 >Emitted(17, 45) Source(8, 64) + SourceIndex(0)
+8 >Emitted(17, 47) Source(8, 66) + SourceIndex(0)
+9 >Emitted(17, 48) Source(8, 67) + SourceIndex(0)
 ---
->>>                        a2.AisIn1_1_1();
+>>>                        var a3;a3.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        a2
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(19, 25) Source(8, 51) + SourceIndex(0)
-2 >Emitted(19, 27) Source(8, 53) + SourceIndex(0)
-3 >Emitted(19, 28) Source(8, 54) + SourceIndex(0)
-4 >Emitted(19, 38) Source(8, 64) + SourceIndex(0)
-5 >Emitted(19, 40) Source(8, 66) + SourceIndex(0)
-6 >Emitted(19, 41) Source(8, 67) + SourceIndex(0)
----
->>>                        var a3;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
+1->
   >                    
 2 >                        var 
 3 >                            a3: SubModule1.SubSubModule1.ClassA
-4 >                              ;
-1 >Emitted(20, 25) Source(9, 21) + SourceIndex(0)
-2 >Emitted(20, 29) Source(9, 25) + SourceIndex(0)
-3 >Emitted(20, 31) Source(9, 60) + SourceIndex(0)
-4 >Emitted(20, 32) Source(9, 61) + SourceIndex(0)
+4 >                              ; 
+5 >                               a3
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(18, 25) Source(9, 21) + SourceIndex(0)
+2 >Emitted(18, 29) Source(9, 25) + SourceIndex(0)
+3 >Emitted(18, 31) Source(9, 60) + SourceIndex(0)
+4 >Emitted(18, 32) Source(9, 62) + SourceIndex(0)
+5 >Emitted(18, 34) Source(9, 64) + SourceIndex(0)
+6 >Emitted(18, 35) Source(9, 65) + SourceIndex(0)
+7 >Emitted(18, 45) Source(9, 75) + SourceIndex(0)
+8 >Emitted(18, 47) Source(9, 77) + SourceIndex(0)
+9 >Emitted(18, 48) Source(9, 78) + SourceIndex(0)
 ---
->>>                        a3.AisIn1_1_1();
+>>>                        var a4;a4.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        a3
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(21, 25) Source(9, 62) + SourceIndex(0)
-2 >Emitted(21, 27) Source(9, 64) + SourceIndex(0)
-3 >Emitted(21, 28) Source(9, 65) + SourceIndex(0)
-4 >Emitted(21, 38) Source(9, 75) + SourceIndex(0)
-5 >Emitted(21, 40) Source(9, 77) + SourceIndex(0)
-6 >Emitted(21, 41) Source(9, 78) + SourceIndex(0)
----
->>>                        var a4;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+1->
   >                    
 2 >                        var 
 3 >                            a4: TopLevelModule1.SubModule1.SubSubModule1.ClassA
-4 >                              ;
-1 >Emitted(22, 25) Source(10, 21) + SourceIndex(0)
-2 >Emitted(22, 29) Source(10, 25) + SourceIndex(0)
-3 >Emitted(22, 31) Source(10, 76) + SourceIndex(0)
-4 >Emitted(22, 32) Source(10, 77) + SourceIndex(0)
+4 >                              ; 
+5 >                               a4
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(19, 25) Source(10, 21) + SourceIndex(0)
+2 >Emitted(19, 29) Source(10, 25) + SourceIndex(0)
+3 >Emitted(19, 31) Source(10, 76) + SourceIndex(0)
+4 >Emitted(19, 32) Source(10, 78) + SourceIndex(0)
+5 >Emitted(19, 34) Source(10, 80) + SourceIndex(0)
+6 >Emitted(19, 35) Source(10, 81) + SourceIndex(0)
+7 >Emitted(19, 45) Source(10, 91) + SourceIndex(0)
+8 >Emitted(19, 47) Source(10, 93) + SourceIndex(0)
+9 >Emitted(19, 48) Source(10, 94) + SourceIndex(0)
 ---
->>>                        a4.AisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-7 >                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^->
-1-> 
-2 >                        a4
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(23, 25) Source(10, 78) + SourceIndex(0)
-2 >Emitted(23, 27) Source(10, 80) + SourceIndex(0)
-3 >Emitted(23, 28) Source(10, 81) + SourceIndex(0)
-4 >Emitted(23, 38) Source(10, 91) + SourceIndex(0)
-5 >Emitted(23, 40) Source(10, 93) + SourceIndex(0)
-6 >Emitted(23, 41) Source(10, 94) + SourceIndex(0)
----
+>>>
 >>>                        // Two variants of qualifying a peer type
-1->^^^^^^^^^^^^^^^^^^^^^^^^
+1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1->
+1 >
   >                    
   >                    
 2 >                        // Two variants of qualifying a peer type
-1->Emitted(24, 25) Source(12, 21) + SourceIndex(0)
-2 >Emitted(24, 66) Source(12, 62) + SourceIndex(0)
+1 >Emitted(21, 25) Source(12, 21) + SourceIndex(0)
+2 >Emitted(21, 66) Source(12, 62) + SourceIndex(0)
 ---
->>>                        var b1;
+>>>                        var b1;b1.BisIn1_1_1();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
 1 >
   >                    
 2 >                        var 
 3 >                            b1: ClassB
-4 >                              ;
-1 >Emitted(25, 25) Source(13, 21) + SourceIndex(0)
-2 >Emitted(25, 29) Source(13, 25) + SourceIndex(0)
-3 >Emitted(25, 31) Source(13, 35) + SourceIndex(0)
-4 >Emitted(25, 32) Source(13, 36) + SourceIndex(0)
+4 >                              ; 
+5 >                               b1
+6 >                                 .
+7 >                                  BisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1 >Emitted(22, 25) Source(13, 21) + SourceIndex(0)
+2 >Emitted(22, 29) Source(13, 25) + SourceIndex(0)
+3 >Emitted(22, 31) Source(13, 35) + SourceIndex(0)
+4 >Emitted(22, 32) Source(13, 37) + SourceIndex(0)
+5 >Emitted(22, 34) Source(13, 39) + SourceIndex(0)
+6 >Emitted(22, 35) Source(13, 40) + SourceIndex(0)
+7 >Emitted(22, 45) Source(13, 50) + SourceIndex(0)
+8 >Emitted(22, 47) Source(13, 52) + SourceIndex(0)
+9 >Emitted(22, 48) Source(13, 53) + SourceIndex(0)
 ---
->>>                        b1.BisIn1_1_1();
+>>>                        var b2;b2.BisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        b1
-3 >                          .
-4 >                           BisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(26, 25) Source(13, 37) + SourceIndex(0)
-2 >Emitted(26, 27) Source(13, 39) + SourceIndex(0)
-3 >Emitted(26, 28) Source(13, 40) + SourceIndex(0)
-4 >Emitted(26, 38) Source(13, 50) + SourceIndex(0)
-5 >Emitted(26, 40) Source(13, 52) + SourceIndex(0)
-6 >Emitted(26, 41) Source(13, 53) + SourceIndex(0)
----
->>>                        var b2;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+1->
   >                    
 2 >                        var 
 3 >                            b2: TopLevelModule1.SubModule1.SubSubModule1.ClassB
-4 >                              ;
-1 >Emitted(27, 25) Source(14, 21) + SourceIndex(0)
-2 >Emitted(27, 29) Source(14, 25) + SourceIndex(0)
-3 >Emitted(27, 31) Source(14, 76) + SourceIndex(0)
-4 >Emitted(27, 32) Source(14, 77) + SourceIndex(0)
+4 >                              ; 
+5 >                               b2
+6 >                                 .
+7 >                                  BisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(23, 25) Source(14, 21) + SourceIndex(0)
+2 >Emitted(23, 29) Source(14, 25) + SourceIndex(0)
+3 >Emitted(23, 31) Source(14, 76) + SourceIndex(0)
+4 >Emitted(23, 32) Source(14, 78) + SourceIndex(0)
+5 >Emitted(23, 34) Source(14, 80) + SourceIndex(0)
+6 >Emitted(23, 35) Source(14, 81) + SourceIndex(0)
+7 >Emitted(23, 45) Source(14, 91) + SourceIndex(0)
+8 >Emitted(23, 47) Source(14, 93) + SourceIndex(0)
+9 >Emitted(23, 48) Source(14, 94) + SourceIndex(0)
 ---
->>>                        b2.BisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-7 >                                        ^^^^^^^^^^^^^^^^^^^^^^->
-1-> 
-2 >                        b2
-3 >                          .
-4 >                           BisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(28, 25) Source(14, 78) + SourceIndex(0)
-2 >Emitted(28, 27) Source(14, 80) + SourceIndex(0)
-3 >Emitted(28, 28) Source(14, 81) + SourceIndex(0)
-4 >Emitted(28, 38) Source(14, 91) + SourceIndex(0)
-5 >Emitted(28, 40) Source(14, 93) + SourceIndex(0)
-6 >Emitted(28, 41) Source(14, 94) + SourceIndex(0)
----
+>>>
 >>>                        // Type only accessible from the root
-1->^^^^^^^^^^^^^^^^^^^^^^^^
+1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1->
+1 >
   >                    
   >                    
 2 >                        // Type only accessible from the root
-1->Emitted(29, 25) Source(16, 21) + SourceIndex(0)
-2 >Emitted(29, 62) Source(16, 58) + SourceIndex(0)
+1 >Emitted(25, 25) Source(16, 21) + SourceIndex(0)
+2 >Emitted(25, 62) Source(16, 58) + SourceIndex(0)
 ---
->>>                        var c1;
+>>>                        var c1;c1.AisIn1_2_2();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
 1 >
   >                    
 2 >                        var 
 3 >                            c1: TopLevelModule1.SubModule2.SubSubModule2.ClassA
-4 >                              ;
-1 >Emitted(30, 25) Source(17, 21) + SourceIndex(0)
-2 >Emitted(30, 29) Source(17, 25) + SourceIndex(0)
-3 >Emitted(30, 31) Source(17, 76) + SourceIndex(0)
-4 >Emitted(30, 32) Source(17, 77) + SourceIndex(0)
+4 >                              ; 
+5 >                               c1
+6 >                                 .
+7 >                                  AisIn1_2_2
+8 >                                            ()
+9 >                                              ;
+1 >Emitted(26, 25) Source(17, 21) + SourceIndex(0)
+2 >Emitted(26, 29) Source(17, 25) + SourceIndex(0)
+3 >Emitted(26, 31) Source(17, 76) + SourceIndex(0)
+4 >Emitted(26, 32) Source(17, 78) + SourceIndex(0)
+5 >Emitted(26, 34) Source(17, 80) + SourceIndex(0)
+6 >Emitted(26, 35) Source(17, 81) + SourceIndex(0)
+7 >Emitted(26, 45) Source(17, 91) + SourceIndex(0)
+8 >Emitted(26, 47) Source(17, 93) + SourceIndex(0)
+9 >Emitted(26, 48) Source(17, 94) + SourceIndex(0)
 ---
->>>                        c1.AisIn1_2_2();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-7 >                                        ^^^^^^^->
-1-> 
-2 >                        c1
-3 >                          .
-4 >                           AisIn1_2_2
-5 >                                     ()
-6 >                                       ;
-1->Emitted(31, 25) Source(17, 78) + SourceIndex(0)
-2 >Emitted(31, 27) Source(17, 80) + SourceIndex(0)
-3 >Emitted(31, 28) Source(17, 81) + SourceIndex(0)
-4 >Emitted(31, 38) Source(17, 91) + SourceIndex(0)
-5 >Emitted(31, 40) Source(17, 93) + SourceIndex(0)
-6 >Emitted(31, 41) Source(17, 94) + SourceIndex(0)
----
+>>>
 >>>                        // Interface reference
-1->^^^^^^^^^^^^^^^^^^^^^^^^
+1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^^^^^^^^^^^^^^^^^^^
-1->
+3 >                                              ^^->
+1 >
   >                    
   >                    
 2 >                        // Interface reference
-1->Emitted(32, 25) Source(19, 21) + SourceIndex(0)
-2 >Emitted(32, 47) Source(19, 43) + SourceIndex(0)
+1 >Emitted(28, 25) Source(19, 21) + SourceIndex(0)
+2 >Emitted(28, 47) Source(19, 43) + SourceIndex(0)
 ---
->>>                        var d1;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
+>>>                        var d1;d1.XisIn1_1_1();
+1->^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
+1->
   >                    
 2 >                        var 
 3 >                            d1: InterfaceX
-4 >                              ;
-1 >Emitted(33, 25) Source(20, 21) + SourceIndex(0)
-2 >Emitted(33, 29) Source(20, 25) + SourceIndex(0)
-3 >Emitted(33, 31) Source(20, 39) + SourceIndex(0)
-4 >Emitted(33, 32) Source(20, 40) + SourceIndex(0)
+4 >                              ; 
+5 >                               d1
+6 >                                 .
+7 >                                  XisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(29, 25) Source(20, 21) + SourceIndex(0)
+2 >Emitted(29, 29) Source(20, 25) + SourceIndex(0)
+3 >Emitted(29, 31) Source(20, 39) + SourceIndex(0)
+4 >Emitted(29, 32) Source(20, 41) + SourceIndex(0)
+5 >Emitted(29, 34) Source(20, 43) + SourceIndex(0)
+6 >Emitted(29, 35) Source(20, 44) + SourceIndex(0)
+7 >Emitted(29, 45) Source(20, 54) + SourceIndex(0)
+8 >Emitted(29, 47) Source(20, 56) + SourceIndex(0)
+9 >Emitted(29, 48) Source(20, 57) + SourceIndex(0)
 ---
->>>                        d1.XisIn1_1_1();
+>>>                        var d2;d2.XisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        d1
-3 >                          .
-4 >                           XisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(34, 25) Source(20, 41) + SourceIndex(0)
-2 >Emitted(34, 27) Source(20, 43) + SourceIndex(0)
-3 >Emitted(34, 28) Source(20, 44) + SourceIndex(0)
-4 >Emitted(34, 38) Source(20, 54) + SourceIndex(0)
-5 >Emitted(34, 40) Source(20, 56) + SourceIndex(0)
-6 >Emitted(34, 41) Source(20, 57) + SourceIndex(0)
----
->>>                        var d2;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+1->
   >                    
 2 >                        var 
 3 >                            d2: SubSubModule1.InterfaceX
-4 >                              ;
-1 >Emitted(35, 25) Source(21, 21) + SourceIndex(0)
-2 >Emitted(35, 29) Source(21, 25) + SourceIndex(0)
-3 >Emitted(35, 31) Source(21, 53) + SourceIndex(0)
-4 >Emitted(35, 32) Source(21, 54) + SourceIndex(0)
----
->>>                        d2.XisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        d2
-3 >                          .
-4 >                           XisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(36, 25) Source(21, 55) + SourceIndex(0)
-2 >Emitted(36, 27) Source(21, 57) + SourceIndex(0)
-3 >Emitted(36, 28) Source(21, 58) + SourceIndex(0)
-4 >Emitted(36, 38) Source(21, 68) + SourceIndex(0)
-5 >Emitted(36, 40) Source(21, 70) + SourceIndex(0)
-6 >Emitted(36, 41) Source(21, 71) + SourceIndex(0)
+4 >                              ; 
+5 >                               d2
+6 >                                 .
+7 >                                  XisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(30, 25) Source(21, 21) + SourceIndex(0)
+2 >Emitted(30, 29) Source(21, 25) + SourceIndex(0)
+3 >Emitted(30, 31) Source(21, 53) + SourceIndex(0)
+4 >Emitted(30, 32) Source(21, 55) + SourceIndex(0)
+5 >Emitted(30, 34) Source(21, 57) + SourceIndex(0)
+6 >Emitted(30, 35) Source(21, 58) + SourceIndex(0)
+7 >Emitted(30, 45) Source(21, 68) + SourceIndex(0)
+8 >Emitted(30, 47) Source(21, 70) + SourceIndex(0)
+9 >Emitted(30, 48) Source(21, 71) + SourceIndex(0)
 ---
 >>>                    };
 1 >^^^^^^^^^^^^^^^^^^^^
@@ -747,8 +699,8 @@ sourceFile:typeResolution.ts
 1 >
   >                
 2 >                    }
-1 >Emitted(37, 21) Source(22, 17) + SourceIndex(0)
-2 >Emitted(37, 22) Source(22, 18) + SourceIndex(0)
+1 >Emitted(31, 21) Source(22, 17) + SourceIndex(0)
+2 >Emitted(31, 22) Source(22, 18) + SourceIndex(0)
 ---
 >>>                    return ClassA;
 1->^^^^^^^^^^^^^^^^^^^^
@@ -756,8 +708,8 @@ sourceFile:typeResolution.ts
 1->
   >            
 2 >                    }
-1->Emitted(38, 21) Source(23, 13) + SourceIndex(0)
-2 >Emitted(38, 34) Source(23, 14) + SourceIndex(0)
+1->Emitted(32, 21) Source(23, 13) + SourceIndex(0)
+2 >Emitted(32, 34) Source(23, 14) + SourceIndex(0)
 ---
 >>>                }());
 1 >^^^^^^^^^^^^^^^^
@@ -788,10 +740,10 @@ sourceFile:typeResolution.ts
   >                                     var d2: SubSubModule1.InterfaceX; d2.XisIn1_1_1();
   >                                 }
   >                             }
-1 >Emitted(39, 17) Source(23, 13) + SourceIndex(0)
-2 >Emitted(39, 18) Source(23, 14) + SourceIndex(0)
-3 >Emitted(39, 18) Source(4, 13) + SourceIndex(0)
-4 >Emitted(39, 22) Source(23, 14) + SourceIndex(0)
+1 >Emitted(33, 17) Source(23, 13) + SourceIndex(0)
+2 >Emitted(33, 18) Source(23, 14) + SourceIndex(0)
+3 >Emitted(33, 18) Source(4, 13) + SourceIndex(0)
+4 >Emitted(33, 22) Source(23, 14) + SourceIndex(0)
 ---
 >>>                SubSubModule1.ClassA = ClassA;
 1->^^^^^^^^^^^^^^^^
@@ -822,23 +774,23 @@ sourceFile:typeResolution.ts
   >                                                    }
   >                                                }
 4 >                                             
-1->Emitted(40, 17) Source(4, 26) + SourceIndex(0)
-2 >Emitted(40, 37) Source(4, 32) + SourceIndex(0)
-3 >Emitted(40, 46) Source(23, 14) + SourceIndex(0)
-4 >Emitted(40, 47) Source(23, 14) + SourceIndex(0)
+1->Emitted(34, 17) Source(4, 26) + SourceIndex(0)
+2 >Emitted(34, 37) Source(4, 32) + SourceIndex(0)
+3 >Emitted(34, 46) Source(23, 14) + SourceIndex(0)
+4 >Emitted(34, 47) Source(23, 14) + SourceIndex(0)
 ---
 >>>                var ClassB = /** @class */ (function () {
 1->^^^^^^^^^^^^^^^^
 2 >                ^^^^^^^^^^^^^^^^^^^^^^^^->
 1->
   >            
-1->Emitted(41, 17) Source(24, 13) + SourceIndex(0)
+1->Emitted(35, 17) Source(24, 13) + SourceIndex(0)
 ---
 >>>                    function ClassB() {
 1->^^^^^^^^^^^^^^^^^^^^
 2 >                    ^^->
 1->
-1->Emitted(42, 21) Source(24, 13) + SourceIndex(0)
+1->Emitted(36, 21) Source(24, 13) + SourceIndex(0)
 ---
 >>>                    }
 1->^^^^^^^^^^^^^^^^^^^^
@@ -868,8 +820,8 @@ sourceFile:typeResolution.ts
   >                }
   >            
 2 >                    }
-1->Emitted(43, 21) Source(46, 13) + SourceIndex(0)
-2 >Emitted(43, 22) Source(46, 14) + SourceIndex(0)
+1->Emitted(37, 21) Source(46, 13) + SourceIndex(0)
+2 >Emitted(37, 22) Source(46, 14) + SourceIndex(0)
 ---
 >>>                    ClassB.prototype.BisIn1_1_1 = function () {
 1->^^^^^^^^^^^^^^^^^^^^
@@ -879,9 +831,9 @@ sourceFile:typeResolution.ts
 1->
 2 >                    BisIn1_1_1
 3 >                                               
-1->Emitted(44, 21) Source(25, 24) + SourceIndex(0)
-2 >Emitted(44, 48) Source(25, 34) + SourceIndex(0)
-3 >Emitted(44, 51) Source(25, 17) + SourceIndex(0)
+1->Emitted(38, 21) Source(25, 24) + SourceIndex(0)
+2 >Emitted(38, 48) Source(25, 34) + SourceIndex(0)
+3 >Emitted(38, 51) Source(25, 17) + SourceIndex(0)
 ---
 >>>                        /** Exactly the same as above in AisIn1_1_1 **/
 1->^^^^^^^^^^^^^^^^^^^^^^^^
@@ -889,8 +841,8 @@ sourceFile:typeResolution.ts
 1->public BisIn1_1_1() {
   >                    
 2 >                        /** Exactly the same as above in AisIn1_1_1 **/
-1->Emitted(45, 25) Source(26, 21) + SourceIndex(0)
-2 >Emitted(45, 72) Source(26, 68) + SourceIndex(0)
+1->Emitted(39, 25) Source(26, 21) + SourceIndex(0)
+2 >Emitted(39, 72) Source(26, 68) + SourceIndex(0)
 ---
 >>>                        // Try all qualified names of this type
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
@@ -899,401 +851,347 @@ sourceFile:typeResolution.ts
   >                    
   >                    
 2 >                        // Try all qualified names of this type
-1 >Emitted(46, 25) Source(28, 21) + SourceIndex(0)
-2 >Emitted(46, 64) Source(28, 60) + SourceIndex(0)
+1 >Emitted(40, 25) Source(28, 21) + SourceIndex(0)
+2 >Emitted(40, 64) Source(28, 60) + SourceIndex(0)
 ---
->>>                        var a1;
+>>>                        var a1;a1.AisIn1_1_1();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
 1 >
   >                    
 2 >                        var 
 3 >                            a1: ClassA
-4 >                              ;
-1 >Emitted(47, 25) Source(29, 21) + SourceIndex(0)
-2 >Emitted(47, 29) Source(29, 25) + SourceIndex(0)
-3 >Emitted(47, 31) Source(29, 35) + SourceIndex(0)
-4 >Emitted(47, 32) Source(29, 36) + SourceIndex(0)
+4 >                              ; 
+5 >                               a1
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1 >Emitted(41, 25) Source(29, 21) + SourceIndex(0)
+2 >Emitted(41, 29) Source(29, 25) + SourceIndex(0)
+3 >Emitted(41, 31) Source(29, 35) + SourceIndex(0)
+4 >Emitted(41, 32) Source(29, 37) + SourceIndex(0)
+5 >Emitted(41, 34) Source(29, 39) + SourceIndex(0)
+6 >Emitted(41, 35) Source(29, 40) + SourceIndex(0)
+7 >Emitted(41, 45) Source(29, 50) + SourceIndex(0)
+8 >Emitted(41, 47) Source(29, 52) + SourceIndex(0)
+9 >Emitted(41, 48) Source(29, 53) + SourceIndex(0)
 ---
->>>                        a1.AisIn1_1_1();
+>>>                        var a2;a2.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        a1
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(48, 25) Source(29, 37) + SourceIndex(0)
-2 >Emitted(48, 27) Source(29, 39) + SourceIndex(0)
-3 >Emitted(48, 28) Source(29, 40) + SourceIndex(0)
-4 >Emitted(48, 38) Source(29, 50) + SourceIndex(0)
-5 >Emitted(48, 40) Source(29, 52) + SourceIndex(0)
-6 >Emitted(48, 41) Source(29, 53) + SourceIndex(0)
----
->>>                        var a2;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
+1->
   >                    
 2 >                        var 
 3 >                            a2: SubSubModule1.ClassA
-4 >                              ;
-1 >Emitted(49, 25) Source(30, 21) + SourceIndex(0)
-2 >Emitted(49, 29) Source(30, 25) + SourceIndex(0)
-3 >Emitted(49, 31) Source(30, 49) + SourceIndex(0)
-4 >Emitted(49, 32) Source(30, 50) + SourceIndex(0)
+4 >                              ; 
+5 >                               a2
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(42, 25) Source(30, 21) + SourceIndex(0)
+2 >Emitted(42, 29) Source(30, 25) + SourceIndex(0)
+3 >Emitted(42, 31) Source(30, 49) + SourceIndex(0)
+4 >Emitted(42, 32) Source(30, 51) + SourceIndex(0)
+5 >Emitted(42, 34) Source(30, 53) + SourceIndex(0)
+6 >Emitted(42, 35) Source(30, 54) + SourceIndex(0)
+7 >Emitted(42, 45) Source(30, 64) + SourceIndex(0)
+8 >Emitted(42, 47) Source(30, 66) + SourceIndex(0)
+9 >Emitted(42, 48) Source(30, 67) + SourceIndex(0)
 ---
->>>                        a2.AisIn1_1_1();
+>>>                        var a3;a3.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        a2
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(50, 25) Source(30, 51) + SourceIndex(0)
-2 >Emitted(50, 27) Source(30, 53) + SourceIndex(0)
-3 >Emitted(50, 28) Source(30, 54) + SourceIndex(0)
-4 >Emitted(50, 38) Source(30, 64) + SourceIndex(0)
-5 >Emitted(50, 40) Source(30, 66) + SourceIndex(0)
-6 >Emitted(50, 41) Source(30, 67) + SourceIndex(0)
----
->>>                        var a3;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
+1->
   >                    
 2 >                        var 
 3 >                            a3: SubModule1.SubSubModule1.ClassA
-4 >                              ;
-1 >Emitted(51, 25) Source(31, 21) + SourceIndex(0)
-2 >Emitted(51, 29) Source(31, 25) + SourceIndex(0)
-3 >Emitted(51, 31) Source(31, 60) + SourceIndex(0)
-4 >Emitted(51, 32) Source(31, 61) + SourceIndex(0)
+4 >                              ; 
+5 >                               a3
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(43, 25) Source(31, 21) + SourceIndex(0)
+2 >Emitted(43, 29) Source(31, 25) + SourceIndex(0)
+3 >Emitted(43, 31) Source(31, 60) + SourceIndex(0)
+4 >Emitted(43, 32) Source(31, 62) + SourceIndex(0)
+5 >Emitted(43, 34) Source(31, 64) + SourceIndex(0)
+6 >Emitted(43, 35) Source(31, 65) + SourceIndex(0)
+7 >Emitted(43, 45) Source(31, 75) + SourceIndex(0)
+8 >Emitted(43, 47) Source(31, 77) + SourceIndex(0)
+9 >Emitted(43, 48) Source(31, 78) + SourceIndex(0)
 ---
->>>                        a3.AisIn1_1_1();
+>>>                        var a4;a4.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        a3
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(52, 25) Source(31, 62) + SourceIndex(0)
-2 >Emitted(52, 27) Source(31, 64) + SourceIndex(0)
-3 >Emitted(52, 28) Source(31, 65) + SourceIndex(0)
-4 >Emitted(52, 38) Source(31, 75) + SourceIndex(0)
-5 >Emitted(52, 40) Source(31, 77) + SourceIndex(0)
-6 >Emitted(52, 41) Source(31, 78) + SourceIndex(0)
----
->>>                        var a4;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+1->
   >                    
 2 >                        var 
 3 >                            a4: TopLevelModule1.SubModule1.SubSubModule1.ClassA
-4 >                              ;
-1 >Emitted(53, 25) Source(32, 21) + SourceIndex(0)
-2 >Emitted(53, 29) Source(32, 25) + SourceIndex(0)
-3 >Emitted(53, 31) Source(32, 76) + SourceIndex(0)
-4 >Emitted(53, 32) Source(32, 77) + SourceIndex(0)
+4 >                              ; 
+5 >                               a4
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(44, 25) Source(32, 21) + SourceIndex(0)
+2 >Emitted(44, 29) Source(32, 25) + SourceIndex(0)
+3 >Emitted(44, 31) Source(32, 76) + SourceIndex(0)
+4 >Emitted(44, 32) Source(32, 78) + SourceIndex(0)
+5 >Emitted(44, 34) Source(32, 80) + SourceIndex(0)
+6 >Emitted(44, 35) Source(32, 81) + SourceIndex(0)
+7 >Emitted(44, 45) Source(32, 91) + SourceIndex(0)
+8 >Emitted(44, 47) Source(32, 93) + SourceIndex(0)
+9 >Emitted(44, 48) Source(32, 94) + SourceIndex(0)
 ---
->>>                        a4.AisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-7 >                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^->
-1-> 
-2 >                        a4
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(54, 25) Source(32, 78) + SourceIndex(0)
-2 >Emitted(54, 27) Source(32, 80) + SourceIndex(0)
-3 >Emitted(54, 28) Source(32, 81) + SourceIndex(0)
-4 >Emitted(54, 38) Source(32, 91) + SourceIndex(0)
-5 >Emitted(54, 40) Source(32, 93) + SourceIndex(0)
-6 >Emitted(54, 41) Source(32, 94) + SourceIndex(0)
----
+>>>
 >>>                        // Two variants of qualifying a peer type
-1->^^^^^^^^^^^^^^^^^^^^^^^^
+1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1->
+1 >
   >                    
   >                    
 2 >                        // Two variants of qualifying a peer type
-1->Emitted(55, 25) Source(34, 21) + SourceIndex(0)
-2 >Emitted(55, 66) Source(34, 62) + SourceIndex(0)
+1 >Emitted(46, 25) Source(34, 21) + SourceIndex(0)
+2 >Emitted(46, 66) Source(34, 62) + SourceIndex(0)
 ---
->>>                        var b1;
+>>>                        var b1;b1.BisIn1_1_1();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
 1 >
   >                    
 2 >                        var 
 3 >                            b1: ClassB
-4 >                              ;
-1 >Emitted(56, 25) Source(35, 21) + SourceIndex(0)
-2 >Emitted(56, 29) Source(35, 25) + SourceIndex(0)
-3 >Emitted(56, 31) Source(35, 35) + SourceIndex(0)
-4 >Emitted(56, 32) Source(35, 36) + SourceIndex(0)
+4 >                              ; 
+5 >                               b1
+6 >                                 .
+7 >                                  BisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1 >Emitted(47, 25) Source(35, 21) + SourceIndex(0)
+2 >Emitted(47, 29) Source(35, 25) + SourceIndex(0)
+3 >Emitted(47, 31) Source(35, 35) + SourceIndex(0)
+4 >Emitted(47, 32) Source(35, 37) + SourceIndex(0)
+5 >Emitted(47, 34) Source(35, 39) + SourceIndex(0)
+6 >Emitted(47, 35) Source(35, 40) + SourceIndex(0)
+7 >Emitted(47, 45) Source(35, 50) + SourceIndex(0)
+8 >Emitted(47, 47) Source(35, 52) + SourceIndex(0)
+9 >Emitted(47, 48) Source(35, 53) + SourceIndex(0)
 ---
->>>                        b1.BisIn1_1_1();
+>>>                        var b2;b2.BisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        b1
-3 >                          .
-4 >                           BisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(57, 25) Source(35, 37) + SourceIndex(0)
-2 >Emitted(57, 27) Source(35, 39) + SourceIndex(0)
-3 >Emitted(57, 28) Source(35, 40) + SourceIndex(0)
-4 >Emitted(57, 38) Source(35, 50) + SourceIndex(0)
-5 >Emitted(57, 40) Source(35, 52) + SourceIndex(0)
-6 >Emitted(57, 41) Source(35, 53) + SourceIndex(0)
----
->>>                        var b2;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+1->
   >                    
 2 >                        var 
 3 >                            b2: TopLevelModule1.SubModule1.SubSubModule1.ClassB
-4 >                              ;
-1 >Emitted(58, 25) Source(36, 21) + SourceIndex(0)
-2 >Emitted(58, 29) Source(36, 25) + SourceIndex(0)
-3 >Emitted(58, 31) Source(36, 76) + SourceIndex(0)
-4 >Emitted(58, 32) Source(36, 77) + SourceIndex(0)
+4 >                              ; 
+5 >                               b2
+6 >                                 .
+7 >                                  BisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(48, 25) Source(36, 21) + SourceIndex(0)
+2 >Emitted(48, 29) Source(36, 25) + SourceIndex(0)
+3 >Emitted(48, 31) Source(36, 76) + SourceIndex(0)
+4 >Emitted(48, 32) Source(36, 78) + SourceIndex(0)
+5 >Emitted(48, 34) Source(36, 80) + SourceIndex(0)
+6 >Emitted(48, 35) Source(36, 81) + SourceIndex(0)
+7 >Emitted(48, 45) Source(36, 91) + SourceIndex(0)
+8 >Emitted(48, 47) Source(36, 93) + SourceIndex(0)
+9 >Emitted(48, 48) Source(36, 94) + SourceIndex(0)
 ---
->>>                        b2.BisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-7 >                                        ^^^^^^^^^^^^^^^^^^^^^^->
-1-> 
-2 >                        b2
-3 >                          .
-4 >                           BisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(59, 25) Source(36, 78) + SourceIndex(0)
-2 >Emitted(59, 27) Source(36, 80) + SourceIndex(0)
-3 >Emitted(59, 28) Source(36, 81) + SourceIndex(0)
-4 >Emitted(59, 38) Source(36, 91) + SourceIndex(0)
-5 >Emitted(59, 40) Source(36, 93) + SourceIndex(0)
-6 >Emitted(59, 41) Source(36, 94) + SourceIndex(0)
----
+>>>
 >>>                        // Type only accessible from the root
-1->^^^^^^^^^^^^^^^^^^^^^^^^
+1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1->
+1 >
   >                    
   >                    
 2 >                        // Type only accessible from the root
-1->Emitted(60, 25) Source(38, 21) + SourceIndex(0)
-2 >Emitted(60, 62) Source(38, 58) + SourceIndex(0)
+1 >Emitted(50, 25) Source(38, 21) + SourceIndex(0)
+2 >Emitted(50, 62) Source(38, 58) + SourceIndex(0)
 ---
->>>                        var c1;
+>>>                        var c1;c1.AisIn1_2_2();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
 1 >
   >                    
 2 >                        var 
 3 >                            c1: TopLevelModule1.SubModule2.SubSubModule2.ClassA
-4 >                              ;
-1 >Emitted(61, 25) Source(39, 21) + SourceIndex(0)
-2 >Emitted(61, 29) Source(39, 25) + SourceIndex(0)
-3 >Emitted(61, 31) Source(39, 76) + SourceIndex(0)
-4 >Emitted(61, 32) Source(39, 77) + SourceIndex(0)
+4 >                              ; 
+5 >                               c1
+6 >                                 .
+7 >                                  AisIn1_2_2
+8 >                                            ()
+9 >                                              ;
+1 >Emitted(51, 25) Source(39, 21) + SourceIndex(0)
+2 >Emitted(51, 29) Source(39, 25) + SourceIndex(0)
+3 >Emitted(51, 31) Source(39, 76) + SourceIndex(0)
+4 >Emitted(51, 32) Source(39, 78) + SourceIndex(0)
+5 >Emitted(51, 34) Source(39, 80) + SourceIndex(0)
+6 >Emitted(51, 35) Source(39, 81) + SourceIndex(0)
+7 >Emitted(51, 45) Source(39, 91) + SourceIndex(0)
+8 >Emitted(51, 47) Source(39, 93) + SourceIndex(0)
+9 >Emitted(51, 48) Source(39, 94) + SourceIndex(0)
 ---
->>>                        c1.AisIn1_2_2();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        c1
-3 >                          .
-4 >                           AisIn1_2_2
-5 >                                     ()
-6 >                                       ;
-1->Emitted(62, 25) Source(39, 78) + SourceIndex(0)
-2 >Emitted(62, 27) Source(39, 80) + SourceIndex(0)
-3 >Emitted(62, 28) Source(39, 81) + SourceIndex(0)
-4 >Emitted(62, 38) Source(39, 91) + SourceIndex(0)
-5 >Emitted(62, 40) Source(39, 93) + SourceIndex(0)
-6 >Emitted(62, 41) Source(39, 94) + SourceIndex(0)
----
->>>                        var c2;
+>>>                        var c2;c2.AisIn2_3();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^->
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^
+8 >                                          ^^
+9 >                                            ^
 1 >
   >                    
 2 >                        var 
 3 >                            c2: TopLevelModule2.SubModule3.ClassA
-4 >                              ;
-1 >Emitted(63, 25) Source(40, 21) + SourceIndex(0)
-2 >Emitted(63, 29) Source(40, 25) + SourceIndex(0)
-3 >Emitted(63, 31) Source(40, 62) + SourceIndex(0)
-4 >Emitted(63, 32) Source(40, 63) + SourceIndex(0)
+4 >                              ; 
+5 >                               c2
+6 >                                 .
+7 >                                  AisIn2_3
+8 >                                          ()
+9 >                                            ;
+1 >Emitted(52, 25) Source(40, 21) + SourceIndex(0)
+2 >Emitted(52, 29) Source(40, 25) + SourceIndex(0)
+3 >Emitted(52, 31) Source(40, 62) + SourceIndex(0)
+4 >Emitted(52, 32) Source(40, 64) + SourceIndex(0)
+5 >Emitted(52, 34) Source(40, 66) + SourceIndex(0)
+6 >Emitted(52, 35) Source(40, 67) + SourceIndex(0)
+7 >Emitted(52, 43) Source(40, 75) + SourceIndex(0)
+8 >Emitted(52, 45) Source(40, 77) + SourceIndex(0)
+9 >Emitted(52, 46) Source(40, 78) + SourceIndex(0)
 ---
->>>                        c2.AisIn2_3();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^
-5 >                                   ^^
-6 >                                     ^
-7 >                                      ^^^^^^^^^->
-1-> 
-2 >                        c2
-3 >                          .
-4 >                           AisIn2_3
-5 >                                   ()
-6 >                                     ;
-1->Emitted(64, 25) Source(40, 64) + SourceIndex(0)
-2 >Emitted(64, 27) Source(40, 66) + SourceIndex(0)
-3 >Emitted(64, 28) Source(40, 67) + SourceIndex(0)
-4 >Emitted(64, 36) Source(40, 75) + SourceIndex(0)
-5 >Emitted(64, 38) Source(40, 77) + SourceIndex(0)
-6 >Emitted(64, 39) Source(40, 78) + SourceIndex(0)
----
+>>>
 >>>                        // Interface reference
-1->^^^^^^^^^^^^^^^^^^^^^^^^
+1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^^^^^^^^^^^^^^^^^^^
-1->
+3 >                                              ^^->
+1 >
   >                    
   >                    
 2 >                        // Interface reference
-1->Emitted(65, 25) Source(42, 21) + SourceIndex(0)
-2 >Emitted(65, 47) Source(42, 43) + SourceIndex(0)
+1 >Emitted(54, 25) Source(42, 21) + SourceIndex(0)
+2 >Emitted(54, 47) Source(42, 43) + SourceIndex(0)
 ---
->>>                        var d1;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
+>>>                        var d1;d1.XisIn1_1_1();
+1->^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
+1->
   >                    
 2 >                        var 
 3 >                            d1: InterfaceX
-4 >                              ;
-1 >Emitted(66, 25) Source(43, 21) + SourceIndex(0)
-2 >Emitted(66, 29) Source(43, 25) + SourceIndex(0)
-3 >Emitted(66, 31) Source(43, 39) + SourceIndex(0)
-4 >Emitted(66, 32) Source(43, 40) + SourceIndex(0)
+4 >                              ; 
+5 >                               d1
+6 >                                 .
+7 >                                  XisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(55, 25) Source(43, 21) + SourceIndex(0)
+2 >Emitted(55, 29) Source(43, 25) + SourceIndex(0)
+3 >Emitted(55, 31) Source(43, 39) + SourceIndex(0)
+4 >Emitted(55, 32) Source(43, 41) + SourceIndex(0)
+5 >Emitted(55, 34) Source(43, 43) + SourceIndex(0)
+6 >Emitted(55, 35) Source(43, 44) + SourceIndex(0)
+7 >Emitted(55, 45) Source(43, 54) + SourceIndex(0)
+8 >Emitted(55, 47) Source(43, 56) + SourceIndex(0)
+9 >Emitted(55, 48) Source(43, 57) + SourceIndex(0)
 ---
->>>                        d1.XisIn1_1_1();
+>>>                        var d2;d2.XisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        d1
-3 >                          .
-4 >                           XisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(67, 25) Source(43, 41) + SourceIndex(0)
-2 >Emitted(67, 27) Source(43, 43) + SourceIndex(0)
-3 >Emitted(67, 28) Source(43, 44) + SourceIndex(0)
-4 >Emitted(67, 38) Source(43, 54) + SourceIndex(0)
-5 >Emitted(67, 40) Source(43, 56) + SourceIndex(0)
-6 >Emitted(67, 41) Source(43, 57) + SourceIndex(0)
----
->>>                        var d2;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+1->
   >                    
 2 >                        var 
 3 >                            d2: SubSubModule1.InterfaceX
-4 >                              ;
-1 >Emitted(68, 25) Source(44, 21) + SourceIndex(0)
-2 >Emitted(68, 29) Source(44, 25) + SourceIndex(0)
-3 >Emitted(68, 31) Source(44, 53) + SourceIndex(0)
-4 >Emitted(68, 32) Source(44, 54) + SourceIndex(0)
----
->>>                        d2.XisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        d2
-3 >                          .
-4 >                           XisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(69, 25) Source(44, 55) + SourceIndex(0)
-2 >Emitted(69, 27) Source(44, 57) + SourceIndex(0)
-3 >Emitted(69, 28) Source(44, 58) + SourceIndex(0)
-4 >Emitted(69, 38) Source(44, 68) + SourceIndex(0)
-5 >Emitted(69, 40) Source(44, 70) + SourceIndex(0)
-6 >Emitted(69, 41) Source(44, 71) + SourceIndex(0)
+4 >                              ; 
+5 >                               d2
+6 >                                 .
+7 >                                  XisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(56, 25) Source(44, 21) + SourceIndex(0)
+2 >Emitted(56, 29) Source(44, 25) + SourceIndex(0)
+3 >Emitted(56, 31) Source(44, 53) + SourceIndex(0)
+4 >Emitted(56, 32) Source(44, 55) + SourceIndex(0)
+5 >Emitted(56, 34) Source(44, 57) + SourceIndex(0)
+6 >Emitted(56, 35) Source(44, 58) + SourceIndex(0)
+7 >Emitted(56, 45) Source(44, 68) + SourceIndex(0)
+8 >Emitted(56, 47) Source(44, 70) + SourceIndex(0)
+9 >Emitted(56, 48) Source(44, 71) + SourceIndex(0)
 ---
 >>>                    };
 1 >^^^^^^^^^^^^^^^^^^^^
@@ -1302,8 +1200,8 @@ sourceFile:typeResolution.ts
 1 >
   >                
 2 >                    }
-1 >Emitted(70, 21) Source(45, 17) + SourceIndex(0)
-2 >Emitted(70, 22) Source(45, 18) + SourceIndex(0)
+1 >Emitted(57, 21) Source(45, 17) + SourceIndex(0)
+2 >Emitted(57, 22) Source(45, 18) + SourceIndex(0)
 ---
 >>>                    return ClassB;
 1->^^^^^^^^^^^^^^^^^^^^
@@ -1311,8 +1209,8 @@ sourceFile:typeResolution.ts
 1->
   >            
 2 >                    }
-1->Emitted(71, 21) Source(46, 13) + SourceIndex(0)
-2 >Emitted(71, 34) Source(46, 14) + SourceIndex(0)
+1->Emitted(58, 21) Source(46, 13) + SourceIndex(0)
+2 >Emitted(58, 34) Source(46, 14) + SourceIndex(0)
 ---
 >>>                }());
 1 >^^^^^^^^^^^^^^^^
@@ -1346,10 +1244,10 @@ sourceFile:typeResolution.ts
   >                                     var d2: SubSubModule1.InterfaceX; d2.XisIn1_1_1();
   >                                 }
   >                             }
-1 >Emitted(72, 17) Source(46, 13) + SourceIndex(0)
-2 >Emitted(72, 18) Source(46, 14) + SourceIndex(0)
-3 >Emitted(72, 18) Source(24, 13) + SourceIndex(0)
-4 >Emitted(72, 22) Source(46, 14) + SourceIndex(0)
+1 >Emitted(59, 17) Source(46, 13) + SourceIndex(0)
+2 >Emitted(59, 18) Source(46, 14) + SourceIndex(0)
+3 >Emitted(59, 18) Source(24, 13) + SourceIndex(0)
+4 >Emitted(59, 22) Source(46, 14) + SourceIndex(0)
 ---
 >>>                SubSubModule1.ClassB = ClassB;
 1->^^^^^^^^^^^^^^^^
@@ -1383,10 +1281,10 @@ sourceFile:typeResolution.ts
   >                                                    }
   >                                                }
 4 >                                             
-1->Emitted(73, 17) Source(24, 26) + SourceIndex(0)
-2 >Emitted(73, 37) Source(24, 32) + SourceIndex(0)
-3 >Emitted(73, 46) Source(46, 14) + SourceIndex(0)
-4 >Emitted(73, 47) Source(46, 14) + SourceIndex(0)
+1->Emitted(60, 17) Source(24, 26) + SourceIndex(0)
+2 >Emitted(60, 37) Source(24, 32) + SourceIndex(0)
+3 >Emitted(60, 46) Source(46, 14) + SourceIndex(0)
+4 >Emitted(60, 47) Source(46, 14) + SourceIndex(0)
 ---
 >>>                var NonExportedClassQ = /** @class */ (function () {
 1->^^^^^^^^^^^^^^^^
@@ -1394,14 +1292,14 @@ sourceFile:typeResolution.ts
 1->
   >            export interface InterfaceX { XisIn1_1_1(); }
   >            
-1->Emitted(74, 17) Source(48, 13) + SourceIndex(0)
+1->Emitted(61, 17) Source(48, 13) + SourceIndex(0)
 ---
 >>>                    function NonExportedClassQ() {
 1->^^^^^^^^^^^^^^^^^^^^
 2 >                    ^^^^^^^^^^^^^^^^^^^^->
 1->class NonExportedClassQ {
   >                
-1->Emitted(75, 21) Source(49, 17) + SourceIndex(0)
+1->Emitted(62, 21) Source(49, 17) + SourceIndex(0)
 ---
 >>>                        function QQ() {
 1->^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1412,9 +1310,9 @@ sourceFile:typeResolution.ts
   >                    
 2 >                        function 
 3 >                                 QQ
-1->Emitted(76, 25) Source(50, 21) + SourceIndex(0)
-2 >Emitted(76, 34) Source(50, 30) + SourceIndex(0)
-3 >Emitted(76, 36) Source(50, 32) + SourceIndex(0)
+1->Emitted(63, 25) Source(50, 21) + SourceIndex(0)
+2 >Emitted(63, 34) Source(50, 30) + SourceIndex(0)
+3 >Emitted(63, 36) Source(50, 32) + SourceIndex(0)
 ---
 >>>                            /* Sampling of stuff from AisIn1_1_1 */
 1->^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1422,152 +1320,130 @@ sourceFile:typeResolution.ts
 1->() {
   >                        
 2 >                            /* Sampling of stuff from AisIn1_1_1 */
-1->Emitted(77, 29) Source(51, 25) + SourceIndex(0)
-2 >Emitted(77, 68) Source(51, 64) + SourceIndex(0)
+1->Emitted(64, 29) Source(51, 25) + SourceIndex(0)
+2 >Emitted(64, 68) Source(51, 64) + SourceIndex(0)
 ---
->>>                            var a4;
+>>>                            var a4;a4.AisIn1_1_1();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                            ^^^^
 3 >                                ^^
 4 >                                  ^
-5 >                                   ^^^^^^^^^^->
+5 >                                   ^^
+6 >                                     ^
+7 >                                      ^^^^^^^^^^
+8 >                                                ^^
+9 >                                                  ^
+10>                                                   ^->
 1 >
   >                        
 2 >                            var 
 3 >                                a4: TopLevelModule1.SubModule1.SubSubModule1.ClassA
-4 >                                  ;
-1 >Emitted(78, 29) Source(52, 25) + SourceIndex(0)
-2 >Emitted(78, 33) Source(52, 29) + SourceIndex(0)
-3 >Emitted(78, 35) Source(52, 80) + SourceIndex(0)
-4 >Emitted(78, 36) Source(52, 81) + SourceIndex(0)
+4 >                                  ; 
+5 >                                   a4
+6 >                                     .
+7 >                                      AisIn1_1_1
+8 >                                                ()
+9 >                                                  ;
+1 >Emitted(65, 29) Source(52, 25) + SourceIndex(0)
+2 >Emitted(65, 33) Source(52, 29) + SourceIndex(0)
+3 >Emitted(65, 35) Source(52, 80) + SourceIndex(0)
+4 >Emitted(65, 36) Source(52, 82) + SourceIndex(0)
+5 >Emitted(65, 38) Source(52, 84) + SourceIndex(0)
+6 >Emitted(65, 39) Source(52, 85) + SourceIndex(0)
+7 >Emitted(65, 49) Source(52, 95) + SourceIndex(0)
+8 >Emitted(65, 51) Source(52, 97) + SourceIndex(0)
+9 >Emitted(65, 52) Source(52, 98) + SourceIndex(0)
 ---
->>>                            a4.AisIn1_1_1();
+>>>                            var c1;c1.AisIn1_2_2();
 1->^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                            ^^
-3 >                              ^
-4 >                               ^^^^^^^^^^
-5 >                                         ^^
-6 >                                           ^
-1-> 
-2 >                            a4
-3 >                              .
-4 >                               AisIn1_1_1
-5 >                                         ()
-6 >                                           ;
-1->Emitted(79, 29) Source(52, 82) + SourceIndex(0)
-2 >Emitted(79, 31) Source(52, 84) + SourceIndex(0)
-3 >Emitted(79, 32) Source(52, 85) + SourceIndex(0)
-4 >Emitted(79, 42) Source(52, 95) + SourceIndex(0)
-5 >Emitted(79, 44) Source(52, 97) + SourceIndex(0)
-6 >Emitted(79, 45) Source(52, 98) + SourceIndex(0)
----
->>>                            var c1;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                            ^^^^
 3 >                                ^^
 4 >                                  ^
-5 >                                   ^^^^^^^^^^->
-1 >
+5 >                                   ^^
+6 >                                     ^
+7 >                                      ^^^^^^^^^^
+8 >                                                ^^
+9 >                                                  ^
+10>                                                   ^->
+1->
   >                        
 2 >                            var 
 3 >                                c1: TopLevelModule1.SubModule2.SubSubModule2.ClassA
-4 >                                  ;
-1 >Emitted(80, 29) Source(53, 25) + SourceIndex(0)
-2 >Emitted(80, 33) Source(53, 29) + SourceIndex(0)
-3 >Emitted(80, 35) Source(53, 80) + SourceIndex(0)
-4 >Emitted(80, 36) Source(53, 81) + SourceIndex(0)
+4 >                                  ; 
+5 >                                   c1
+6 >                                     .
+7 >                                      AisIn1_2_2
+8 >                                                ()
+9 >                                                  ;
+1->Emitted(66, 29) Source(53, 25) + SourceIndex(0)
+2 >Emitted(66, 33) Source(53, 29) + SourceIndex(0)
+3 >Emitted(66, 35) Source(53, 80) + SourceIndex(0)
+4 >Emitted(66, 36) Source(53, 82) + SourceIndex(0)
+5 >Emitted(66, 38) Source(53, 84) + SourceIndex(0)
+6 >Emitted(66, 39) Source(53, 85) + SourceIndex(0)
+7 >Emitted(66, 49) Source(53, 95) + SourceIndex(0)
+8 >Emitted(66, 51) Source(53, 97) + SourceIndex(0)
+9 >Emitted(66, 52) Source(53, 98) + SourceIndex(0)
 ---
->>>                            c1.AisIn1_2_2();
+>>>                            var d1;d1.XisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                            ^^
-3 >                              ^
-4 >                               ^^^^^^^^^^
-5 >                                         ^^
-6 >                                           ^
-1-> 
-2 >                            c1
-3 >                              .
-4 >                               AisIn1_2_2
-5 >                                         ()
-6 >                                           ;
-1->Emitted(81, 29) Source(53, 82) + SourceIndex(0)
-2 >Emitted(81, 31) Source(53, 84) + SourceIndex(0)
-3 >Emitted(81, 32) Source(53, 85) + SourceIndex(0)
-4 >Emitted(81, 42) Source(53, 95) + SourceIndex(0)
-5 >Emitted(81, 44) Source(53, 97) + SourceIndex(0)
-6 >Emitted(81, 45) Source(53, 98) + SourceIndex(0)
----
->>>                            var d1;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                            ^^^^
 3 >                                ^^
 4 >                                  ^
-5 >                                   ^^^^^^^^^^->
-1 >
+5 >                                   ^^
+6 >                                     ^
+7 >                                      ^^^^^^^^^^
+8 >                                                ^^
+9 >                                                  ^
+1->
   >                        
 2 >                            var 
 3 >                                d1: InterfaceX
-4 >                                  ;
-1 >Emitted(82, 29) Source(54, 25) + SourceIndex(0)
-2 >Emitted(82, 33) Source(54, 29) + SourceIndex(0)
-3 >Emitted(82, 35) Source(54, 43) + SourceIndex(0)
-4 >Emitted(82, 36) Source(54, 44) + SourceIndex(0)
+4 >                                  ; 
+5 >                                   d1
+6 >                                     .
+7 >                                      XisIn1_1_1
+8 >                                                ()
+9 >                                                  ;
+1->Emitted(67, 29) Source(54, 25) + SourceIndex(0)
+2 >Emitted(67, 33) Source(54, 29) + SourceIndex(0)
+3 >Emitted(67, 35) Source(54, 43) + SourceIndex(0)
+4 >Emitted(67, 36) Source(54, 45) + SourceIndex(0)
+5 >Emitted(67, 38) Source(54, 47) + SourceIndex(0)
+6 >Emitted(67, 39) Source(54, 48) + SourceIndex(0)
+7 >Emitted(67, 49) Source(54, 58) + SourceIndex(0)
+8 >Emitted(67, 51) Source(54, 60) + SourceIndex(0)
+9 >Emitted(67, 52) Source(54, 61) + SourceIndex(0)
 ---
->>>                            d1.XisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                            ^^
-3 >                              ^
-4 >                               ^^^^^^^^^^
-5 >                                         ^^
-6 >                                           ^
-1-> 
-2 >                            d1
-3 >                              .
-4 >                               XisIn1_1_1
-5 >                                         ()
-6 >                                           ;
-1->Emitted(83, 29) Source(54, 45) + SourceIndex(0)
-2 >Emitted(83, 31) Source(54, 47) + SourceIndex(0)
-3 >Emitted(83, 32) Source(54, 48) + SourceIndex(0)
-4 >Emitted(83, 42) Source(54, 58) + SourceIndex(0)
-5 >Emitted(83, 44) Source(54, 60) + SourceIndex(0)
-6 >Emitted(83, 45) Source(54, 61) + SourceIndex(0)
----
->>>                            var c2;
+>>>                            var c2;c2.AisIn2_3();
 1 >^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                            ^^^^
 3 >                                ^^
 4 >                                  ^
-5 >                                   ^^^^^^^^->
+5 >                                   ^^
+6 >                                     ^
+7 >                                      ^^^^^^^^
+8 >                                              ^^
+9 >                                                ^
 1 >
   >                        
 2 >                            var 
 3 >                                c2: TopLevelModule2.SubModule3.ClassA
-4 >                                  ;
-1 >Emitted(84, 29) Source(55, 25) + SourceIndex(0)
-2 >Emitted(84, 33) Source(55, 29) + SourceIndex(0)
-3 >Emitted(84, 35) Source(55, 66) + SourceIndex(0)
-4 >Emitted(84, 36) Source(55, 67) + SourceIndex(0)
----
->>>                            c2.AisIn2_3();
-1->^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                            ^^
-3 >                              ^
-4 >                               ^^^^^^^^
-5 >                                       ^^
-6 >                                         ^
-1-> 
-2 >                            c2
-3 >                              .
-4 >                               AisIn2_3
-5 >                                       ()
-6 >                                         ;
-1->Emitted(85, 29) Source(55, 68) + SourceIndex(0)
-2 >Emitted(85, 31) Source(55, 70) + SourceIndex(0)
-3 >Emitted(85, 32) Source(55, 71) + SourceIndex(0)
-4 >Emitted(85, 40) Source(55, 79) + SourceIndex(0)
-5 >Emitted(85, 42) Source(55, 81) + SourceIndex(0)
-6 >Emitted(85, 43) Source(55, 82) + SourceIndex(0)
+4 >                                  ; 
+5 >                                   c2
+6 >                                     .
+7 >                                      AisIn2_3
+8 >                                              ()
+9 >                                                ;
+1 >Emitted(68, 29) Source(55, 25) + SourceIndex(0)
+2 >Emitted(68, 33) Source(55, 29) + SourceIndex(0)
+3 >Emitted(68, 35) Source(55, 66) + SourceIndex(0)
+4 >Emitted(68, 36) Source(55, 68) + SourceIndex(0)
+5 >Emitted(68, 38) Source(55, 70) + SourceIndex(0)
+6 >Emitted(68, 39) Source(55, 71) + SourceIndex(0)
+7 >Emitted(68, 47) Source(55, 79) + SourceIndex(0)
+8 >Emitted(68, 49) Source(55, 81) + SourceIndex(0)
+9 >Emitted(68, 50) Source(55, 82) + SourceIndex(0)
 ---
 >>>                        }
 1 >^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1575,8 +1451,8 @@ sourceFile:typeResolution.ts
 1 >
   >                    
 2 >                        }
-1 >Emitted(86, 25) Source(56, 21) + SourceIndex(0)
-2 >Emitted(86, 26) Source(56, 22) + SourceIndex(0)
+1 >Emitted(69, 25) Source(56, 21) + SourceIndex(0)
+2 >Emitted(69, 26) Source(56, 22) + SourceIndex(0)
 ---
 >>>                    }
 1 >^^^^^^^^^^^^^^^^^^^^
@@ -1585,8 +1461,8 @@ sourceFile:typeResolution.ts
 1 >
   >                
 2 >                    }
-1 >Emitted(87, 21) Source(57, 17) + SourceIndex(0)
-2 >Emitted(87, 22) Source(57, 18) + SourceIndex(0)
+1 >Emitted(70, 21) Source(57, 17) + SourceIndex(0)
+2 >Emitted(70, 22) Source(57, 18) + SourceIndex(0)
 ---
 >>>                    return NonExportedClassQ;
 1->^^^^^^^^^^^^^^^^^^^^
@@ -1594,8 +1470,8 @@ sourceFile:typeResolution.ts
 1->
   >            
 2 >                    }
-1->Emitted(88, 21) Source(58, 13) + SourceIndex(0)
-2 >Emitted(88, 45) Source(58, 14) + SourceIndex(0)
+1->Emitted(71, 21) Source(58, 13) + SourceIndex(0)
+2 >Emitted(71, 45) Source(58, 14) + SourceIndex(0)
 ---
 >>>                }());
 1 >^^^^^^^^^^^^^^^^
@@ -1617,10 +1493,10 @@ sourceFile:typeResolution.ts
   >                                     }
   >                                 }
   >                             }
-1 >Emitted(89, 17) Source(58, 13) + SourceIndex(0)
-2 >Emitted(89, 18) Source(58, 14) + SourceIndex(0)
-3 >Emitted(89, 18) Source(48, 13) + SourceIndex(0)
-4 >Emitted(89, 22) Source(58, 14) + SourceIndex(0)
+1 >Emitted(72, 17) Source(58, 13) + SourceIndex(0)
+2 >Emitted(72, 18) Source(58, 14) + SourceIndex(0)
+3 >Emitted(72, 18) Source(48, 13) + SourceIndex(0)
+4 >Emitted(72, 22) Source(58, 14) + SourceIndex(0)
 ---
 >>>            })(SubSubModule1 = SubModule1.SubSubModule1 || (SubModule1.SubSubModule1 = {}));
 1->^^^^^^^^^^^^
@@ -1698,15 +1574,15 @@ sourceFile:typeResolution.ts
   >                                                                                                    }
   >                                                                                                }
   >                                                                                            }
-1->Emitted(90, 13) Source(59, 9) + SourceIndex(0)
-2 >Emitted(90, 14) Source(59, 10) + SourceIndex(0)
-3 >Emitted(90, 16) Source(3, 23) + SourceIndex(0)
-4 >Emitted(90, 29) Source(3, 36) + SourceIndex(0)
-5 >Emitted(90, 32) Source(3, 23) + SourceIndex(0)
-6 >Emitted(90, 56) Source(3, 36) + SourceIndex(0)
-7 >Emitted(90, 61) Source(3, 23) + SourceIndex(0)
-8 >Emitted(90, 85) Source(3, 36) + SourceIndex(0)
-9 >Emitted(90, 93) Source(59, 10) + SourceIndex(0)
+1->Emitted(73, 13) Source(59, 9) + SourceIndex(0)
+2 >Emitted(73, 14) Source(59, 10) + SourceIndex(0)
+3 >Emitted(73, 16) Source(3, 23) + SourceIndex(0)
+4 >Emitted(73, 29) Source(3, 36) + SourceIndex(0)
+5 >Emitted(73, 32) Source(3, 23) + SourceIndex(0)
+6 >Emitted(73, 56) Source(3, 36) + SourceIndex(0)
+7 >Emitted(73, 61) Source(3, 23) + SourceIndex(0)
+8 >Emitted(73, 85) Source(3, 36) + SourceIndex(0)
+9 >Emitted(73, 93) Source(59, 10) + SourceIndex(0)
 ---
 >>>            // Should have no effect on S1.SS1.ClassA above because it is not exported
 1 >^^^^^^^^^^^^
@@ -1715,190 +1591,169 @@ sourceFile:typeResolution.ts
   >        
   >        
 2 >            // Should have no effect on S1.SS1.ClassA above because it is not exported
-1 >Emitted(91, 13) Source(61, 9) + SourceIndex(0)
-2 >Emitted(91, 87) Source(61, 83) + SourceIndex(0)
+1 >Emitted(74, 13) Source(61, 9) + SourceIndex(0)
+2 >Emitted(74, 87) Source(61, 83) + SourceIndex(0)
 ---
 >>>            var ClassA = /** @class */ (function () {
 1 >^^^^^^^^^^^^
 2 >            ^^^^^^^^^^^^^^^^^^^^^^^^->
 1 >
   >        
-1 >Emitted(92, 13) Source(62, 9) + SourceIndex(0)
+1 >Emitted(75, 13) Source(62, 9) + SourceIndex(0)
 ---
 >>>                function ClassA() {
 1->^^^^^^^^^^^^^^^^
 2 >                ^^^^^^^^^^^^^^^^^^^^->
 1->class ClassA {
   >            
-1->Emitted(93, 17) Source(63, 13) + SourceIndex(0)
+1->Emitted(76, 17) Source(63, 13) + SourceIndex(0)
 ---
 >>>                    function AA() {
 1->^^^^^^^^^^^^^^^^^^^^
 2 >                    ^^^^^^^^^
 3 >                             ^^
-4 >                               ^->
+4 >                               ^^^^^^^^^^^^^^^^^->
 1->constructor() {
   >                
 2 >                    function 
 3 >                             AA
-1->Emitted(94, 21) Source(64, 17) + SourceIndex(0)
-2 >Emitted(94, 30) Source(64, 26) + SourceIndex(0)
-3 >Emitted(94, 32) Source(64, 28) + SourceIndex(0)
+1->Emitted(77, 21) Source(64, 17) + SourceIndex(0)
+2 >Emitted(77, 30) Source(64, 26) + SourceIndex(0)
+3 >Emitted(77, 32) Source(64, 28) + SourceIndex(0)
 ---
->>>                        var a2;
+>>>                        var a2;a2.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
 1->() {
   >                    
 2 >                        var 
 3 >                            a2: SubSubModule1.ClassA
-4 >                              ;
-1->Emitted(95, 25) Source(65, 21) + SourceIndex(0)
-2 >Emitted(95, 29) Source(65, 25) + SourceIndex(0)
-3 >Emitted(95, 31) Source(65, 49) + SourceIndex(0)
-4 >Emitted(95, 32) Source(65, 50) + SourceIndex(0)
+4 >                              ; 
+5 >                               a2
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(78, 25) Source(65, 21) + SourceIndex(0)
+2 >Emitted(78, 29) Source(65, 25) + SourceIndex(0)
+3 >Emitted(78, 31) Source(65, 49) + SourceIndex(0)
+4 >Emitted(78, 32) Source(65, 51) + SourceIndex(0)
+5 >Emitted(78, 34) Source(65, 53) + SourceIndex(0)
+6 >Emitted(78, 35) Source(65, 54) + SourceIndex(0)
+7 >Emitted(78, 45) Source(65, 64) + SourceIndex(0)
+8 >Emitted(78, 47) Source(65, 66) + SourceIndex(0)
+9 >Emitted(78, 48) Source(65, 67) + SourceIndex(0)
 ---
->>>                        a2.AisIn1_1_1();
+>>>                        var a3;a3.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        a2
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(96, 25) Source(65, 51) + SourceIndex(0)
-2 >Emitted(96, 27) Source(65, 53) + SourceIndex(0)
-3 >Emitted(96, 28) Source(65, 54) + SourceIndex(0)
-4 >Emitted(96, 38) Source(65, 64) + SourceIndex(0)
-5 >Emitted(96, 40) Source(65, 66) + SourceIndex(0)
-6 >Emitted(96, 41) Source(65, 67) + SourceIndex(0)
----
->>>                        var a3;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+10>                                               ^->
+1->
   >                    
 2 >                        var 
 3 >                            a3: SubModule1.SubSubModule1.ClassA
-4 >                              ;
-1 >Emitted(97, 25) Source(66, 21) + SourceIndex(0)
-2 >Emitted(97, 29) Source(66, 25) + SourceIndex(0)
-3 >Emitted(97, 31) Source(66, 60) + SourceIndex(0)
-4 >Emitted(97, 32) Source(66, 61) + SourceIndex(0)
+4 >                              ; 
+5 >                               a3
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(79, 25) Source(66, 21) + SourceIndex(0)
+2 >Emitted(79, 29) Source(66, 25) + SourceIndex(0)
+3 >Emitted(79, 31) Source(66, 60) + SourceIndex(0)
+4 >Emitted(79, 32) Source(66, 62) + SourceIndex(0)
+5 >Emitted(79, 34) Source(66, 64) + SourceIndex(0)
+6 >Emitted(79, 35) Source(66, 65) + SourceIndex(0)
+7 >Emitted(79, 45) Source(66, 75) + SourceIndex(0)
+8 >Emitted(79, 47) Source(66, 77) + SourceIndex(0)
+9 >Emitted(79, 48) Source(66, 78) + SourceIndex(0)
 ---
->>>                        a3.AisIn1_1_1();
+>>>                        var a4;a4.AisIn1_1_1();
 1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        a3
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(98, 25) Source(66, 62) + SourceIndex(0)
-2 >Emitted(98, 27) Source(66, 64) + SourceIndex(0)
-3 >Emitted(98, 28) Source(66, 65) + SourceIndex(0)
-4 >Emitted(98, 38) Source(66, 75) + SourceIndex(0)
-5 >Emitted(98, 40) Source(66, 77) + SourceIndex(0)
-6 >Emitted(98, 41) Source(66, 78) + SourceIndex(0)
----
->>>                        var a4;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+1->
   >                    
 2 >                        var 
 3 >                            a4: TopLevelModule1.SubModule1.SubSubModule1.ClassA
-4 >                              ;
-1 >Emitted(99, 25) Source(67, 21) + SourceIndex(0)
-2 >Emitted(99, 29) Source(67, 25) + SourceIndex(0)
-3 >Emitted(99, 31) Source(67, 76) + SourceIndex(0)
-4 >Emitted(99, 32) Source(67, 77) + SourceIndex(0)
+4 >                              ; 
+5 >                               a4
+6 >                                 .
+7 >                                  AisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(80, 25) Source(67, 21) + SourceIndex(0)
+2 >Emitted(80, 29) Source(67, 25) + SourceIndex(0)
+3 >Emitted(80, 31) Source(67, 76) + SourceIndex(0)
+4 >Emitted(80, 32) Source(67, 78) + SourceIndex(0)
+5 >Emitted(80, 34) Source(67, 80) + SourceIndex(0)
+6 >Emitted(80, 35) Source(67, 81) + SourceIndex(0)
+7 >Emitted(80, 45) Source(67, 91) + SourceIndex(0)
+8 >Emitted(80, 47) Source(67, 93) + SourceIndex(0)
+9 >Emitted(80, 48) Source(67, 94) + SourceIndex(0)
 ---
->>>                        a4.AisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-7 >                                        ^^^^^^^->
-1-> 
-2 >                        a4
-3 >                          .
-4 >                           AisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(100, 25) Source(67, 78) + SourceIndex(0)
-2 >Emitted(100, 27) Source(67, 80) + SourceIndex(0)
-3 >Emitted(100, 28) Source(67, 81) + SourceIndex(0)
-4 >Emitted(100, 38) Source(67, 91) + SourceIndex(0)
-5 >Emitted(100, 40) Source(67, 93) + SourceIndex(0)
-6 >Emitted(100, 41) Source(67, 94) + SourceIndex(0)
----
+>>>
 >>>                        // Interface reference
-1->^^^^^^^^^^^^^^^^^^^^^^^^
+1 >^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^^^^^^^^^^^^^^^^^^^
-1->
+3 >                                              ^^->
+1 >
   >                    
   >                    
 2 >                        // Interface reference
-1->Emitted(101, 25) Source(69, 21) + SourceIndex(0)
-2 >Emitted(101, 47) Source(69, 43) + SourceIndex(0)
+1 >Emitted(82, 25) Source(69, 21) + SourceIndex(0)
+2 >Emitted(82, 47) Source(69, 43) + SourceIndex(0)
 ---
->>>                        var d2;
-1 >^^^^^^^^^^^^^^^^^^^^^^^^
+>>>                        var d2;d2.XisIn1_1_1();
+1->^^^^^^^^^^^^^^^^^^^^^^^^
 2 >                        ^^^^
 3 >                            ^^
 4 >                              ^
-5 >                               ^^^^^^^^^^->
-1 >
+5 >                               ^^
+6 >                                 ^
+7 >                                  ^^^^^^^^^^
+8 >                                            ^^
+9 >                                              ^
+1->
   >                    
 2 >                        var 
 3 >                            d2: SubSubModule1.InterfaceX
-4 >                              ;
-1 >Emitted(102, 25) Source(70, 21) + SourceIndex(0)
-2 >Emitted(102, 29) Source(70, 25) + SourceIndex(0)
-3 >Emitted(102, 31) Source(70, 53) + SourceIndex(0)
-4 >Emitted(102, 32) Source(70, 54) + SourceIndex(0)
----
->>>                        d2.XisIn1_1_1();
-1->^^^^^^^^^^^^^^^^^^^^^^^^
-2 >                        ^^
-3 >                          ^
-4 >                           ^^^^^^^^^^
-5 >                                     ^^
-6 >                                       ^
-1-> 
-2 >                        d2
-3 >                          .
-4 >                           XisIn1_1_1
-5 >                                     ()
-6 >                                       ;
-1->Emitted(103, 25) Source(70, 55) + SourceIndex(0)
-2 >Emitted(103, 27) Source(70, 57) + SourceIndex(0)
-3 >Emitted(103, 28) Source(70, 58) + SourceIndex(0)
-4 >Emitted(103, 38) Source(70, 68) + SourceIndex(0)
-5 >Emitted(103, 40) Source(70, 70) + SourceIndex(0)
-6 >Emitted(103, 41) Source(70, 71) + SourceIndex(0)
+4 >                              ; 
+5 >                               d2
+6 >                                 .
+7 >                                  XisIn1_1_1
+8 >                                            ()
+9 >                                              ;
+1->Emitted(83, 25) Source(70, 21) + SourceIndex(0)
+2 >Emitted(83, 29) Source(70, 25) + SourceIndex(0)
+3 >Emitted(83, 31) Source(70, 53) + SourceIndex(0)
+4 >Emitted(83, 32) Source(70, 55) + SourceIndex(0)
+5 >Emitted(83, 34) Source(70, 57) + SourceIndex(0)
+6 >Emitted(83, 35) Source(70, 58) + SourceIndex(0)
+7 >Emitted(83, 45) Source(70, 68) + SourceIndex(0)
+8 >Emitted(83, 47) Source(70, 70) + SourceIndex(0)
+9 >Emitted(83, 48) Source(70, 71) + SourceIndex(0)
 ---
 >>>                    }
 1 >^^^^^^^^^^^^^^^^^^^^
@@ -1906,8 +1761,8 @@ sourceFile:typeResolution.ts
 1 >
   >                
 2 >                    }
-1 >Emitted(104, 21) Source(71, 17) + SourceIndex(0)
-2 >Emitted(104, 22) Source(71, 18) + SourceIndex(0)
+1 >Emitted(84, 21) Source(71, 17) + SourceIndex(0)
+2 >Emitted(84, 22) Source(71, 18) + SourceIndex(0)
 ---
 >>>                }
 1 >^^^^^^^^^^^^^^^^
@@ -1916,8 +1771,8 @@ sourceFile:typeResolution.ts
 1 >
   >            
 2 >                }
-1 >Emitted(105, 17) Source(72, 13) + SourceIndex(0)
-2 >Emitted(105, 18) Source(72, 14) + SourceIndex(0)
+1 >Emitted(85, 17) Source(72, 13) + SourceIndex(0)
+2 >Emitted(85, 18) Source(72, 14) + SourceIndex(0)
 ---
 >>>                return ClassA;
 1->^^^^^^^^^^^^^^^^
@@ -1925,8 +1780,8 @@ sourceFile:typeResolution.ts
 1->
   >        
 2 >                }
-1->Emitted(106, 17) Source(73, 9) + SourceIndex(0)
-2 >Emitted(106, 30) Source(73, 10) + SourceIndex(0)
+1->Emitted(86, 17) Source(73, 9) + SourceIndex(0)
+2 >Emitted(86, 30) Source(73, 10) + SourceIndex(0)
 ---
 >>>            }());
 1 >^^^^^^^^^^^^
@@ -1949,10 +1804,10 @@ sourceFile:typeResolution.ts
   >                             }
   >                         }
   >                     }
-1 >Emitted(107, 13) Source(73, 9) + SourceIndex(0)
-2 >Emitted(107, 14) Source(73, 10) + SourceIndex(0)
-3 >Emitted(107, 14) Source(62, 9) + SourceIndex(0)
-4 >Emitted(107, 18) Source(73, 10) + SourceIndex(0)
+1 >Emitted(87, 13) Source(73, 9) + SourceIndex(0)
+2 >Emitted(87, 14) Source(73, 10) + SourceIndex(0)
+3 >Emitted(87, 14) Source(62, 9) + SourceIndex(0)
+4 >Emitted(87, 18) Source(73, 10) + SourceIndex(0)
 ---
 >>>        })(SubModule1 = TopLevelModule1.SubModule1 || (TopLevelModule1.SubModule1 = {}));
 1->^^^^^^^^
@@ -2046,15 +1901,15 @@ sourceFile:typeResolution.ts
   >                                                                                             }
   >                                                                                         }
   >                                                                                     }
-1->Emitted(108, 9) Source(74, 5) + SourceIndex(0)
-2 >Emitted(108, 10) Source(74, 6) + SourceIndex(0)
-3 >Emitted(108, 12) Source(2, 19) + SourceIndex(0)
-4 >Emitted(108, 22) Source(2, 29) + SourceIndex(0)
-5 >Emitted(108, 25) Source(2, 19) + SourceIndex(0)
-6 >Emitted(108, 51) Source(2, 29) + SourceIndex(0)
-7 >Emitted(108, 56) Source(2, 19) + SourceIndex(0)
-8 >Emitted(108, 82) Source(2, 29) + SourceIndex(0)
-9 >Emitted(108, 90) Source(74, 6) + SourceIndex(0)
+1->Emitted(88, 9) Source(74, 5) + SourceIndex(0)
+2 >Emitted(88, 10) Source(74, 6) + SourceIndex(0)
+3 >Emitted(88, 12) Source(2, 19) + SourceIndex(0)
+4 >Emitted(88, 22) Source(2, 29) + SourceIndex(0)
+5 >Emitted(88, 25) Source(2, 19) + SourceIndex(0)
+6 >Emitted(88, 51) Source(2, 29) + SourceIndex(0)
+7 >Emitted(88, 56) Source(2, 19) + SourceIndex(0)
+8 >Emitted(88, 82) Source(2, 29) + SourceIndex(0)
+9 >Emitted(88, 90) Source(74, 6) + SourceIndex(0)
 ---
 >>>        var SubModule2;
 1 >^^^^^^^^
@@ -2079,10 +1934,10 @@ sourceFile:typeResolution.ts
   >                              
   >                              export interface InterfaceY { YisIn1_2(); }
   >                          }
-1 >Emitted(109, 9) Source(76, 5) + SourceIndex(0)
-2 >Emitted(109, 13) Source(76, 19) + SourceIndex(0)
-3 >Emitted(109, 23) Source(76, 29) + SourceIndex(0)
-4 >Emitted(109, 24) Source(87, 6) + SourceIndex(0)
+1 >Emitted(89, 9) Source(76, 5) + SourceIndex(0)
+2 >Emitted(89, 13) Source(76, 19) + SourceIndex(0)
+3 >Emitted(89, 23) Source(76, 29) + SourceIndex(0)
+4 >Emitted(89, 24) Source(87, 6) + SourceIndex(0)
 ---
 >>>        (function (SubModule2) {
 1->^^^^^^^^
@@ -2092,9 +1947,9 @@ sourceFile:typeResolution.ts
 1->
 2 >        export module 
 3 >                   SubModule2
-1->Emitted(110, 9) Source(76, 5) + SourceIndex(0)
-2 >Emitted(110, 20) Source(76, 19) + SourceIndex(0)
-3 >Emitted(110, 30) Source(76, 29) + SourceIndex(0)
+1->Emitted(90, 9) Source(76, 5) + SourceIndex(0)
+2 >Emitted(90, 20) Source(76, 19) + SourceIndex(0)
+3 >Emitted(90, 30) Source(76, 29) + SourceIndex(0)
 ---
 >>>            var SubSubModule2;
 1->^^^^^^^^^^^^
@@ -2114,10 +1969,10 @@ sourceFile:typeResolution.ts
   >                                         export interface InterfaceY { YisIn1_2_2(); }
   >                                         interface NonExportedInterfaceQ { }
   >                                     }
-1->Emitted(111, 13) Source(77, 9) + SourceIndex(0)
-2 >Emitted(111, 17) Source(77, 23) + SourceIndex(0)
-3 >Emitted(111, 30) Source(77, 36) + SourceIndex(0)
-4 >Emitted(111, 31) Source(84, 10) + SourceIndex(0)
+1->Emitted(91, 13) Source(77, 9) + SourceIndex(0)
+2 >Emitted(91, 17) Source(77, 23) + SourceIndex(0)
+3 >Emitted(91, 30) Source(77, 36) + SourceIndex(0)
+4 >Emitted(91, 31) Source(84, 10) + SourceIndex(0)
 ---
 >>>            (function (SubSubModule2) {
 1->^^^^^^^^^^^^
@@ -2127,9 +1982,9 @@ sourceFile:typeResolution.ts
 1->
 2 >            export module 
 3 >                       SubSubModule2
-1->Emitted(112, 13) Source(77, 9) + SourceIndex(0)
-2 >Emitted(112, 24) Source(77, 23) + SourceIndex(0)
-3 >Emitted(112, 37) Source(77, 36) + SourceIndex(0)
+1->Emitted(92, 13) Source(77, 9) + SourceIndex(0)
+2 >Emitted(92, 24) Source(77, 23) + SourceIndex(0)
+3 >Emitted(92, 37) Source(77, 36) + SourceIndex(0)
 ---
 >>>                // No code here since these are the mirror of the above calls
 1->^^^^^^^^^^^^^^^^
@@ -2137,30 +1992,27 @@ sourceFile:typeResolution.ts
 1-> {
   >            
 2 >                // No code here since these are the mirror of the above calls
-1->Emitted(113, 17) Source(78, 13) + SourceIndex(0)
-2 >Emitted(113, 78) Source(78, 74) + SourceIndex(0)
+1->Emitted(93, 17) Source(78, 13) + SourceIndex(0)
+2 >Emitted(93, 78) Source(78, 74) + SourceIndex(0)
 ---
 >>>                var ClassA = /** @class */ (function () {
 1 >^^^^^^^^^^^^^^^^
-2 >                ^^^^^^^^^^^^^^^^^^^^^^^^->
+2 >                ^^^^^^^^^^^^^^^^^^^^^^^^^->
 1 >
   >            
-1 >Emitted(114, 17) Source(79, 13) + SourceIndex(0)
+1 >Emitted(94, 17) Source(79, 13) + SourceIndex(0)
 ---
->>>                    function ClassA() {
+>>>                    function ClassA() {}
 1->^^^^^^^^^^^^^^^^^^^^
-2 >                    ^^->
+2 >                    ^^^^^^^^^^^^^^^^^^^
+3 >                                       ^
+4 >                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^->
 1->
-1->Emitted(115, 21) Source(79, 13) + SourceIndex(0)
----
->>>                    }
-1->^^^^^^^^^^^^^^^^^^^^
-2 >                    ^
-3 >                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
-1->export class ClassA { public AisIn1_2_2() { } 
-2 >                    }
-1->Emitted(116, 21) Source(79, 59) + SourceIndex(0)
-2 >Emitted(116, 22) Source(79, 60) + SourceIndex(0)
+2 >                    export class ClassA { public AisIn1_2_2() { } 
+3 >                                       }
+1->Emitted(95, 21) Source(79, 13) + SourceIndex(0)
+2 >Emitted(95, 40) Source(79, 59) + SourceIndex(0)
+3 >Emitted(95, 41) Source(79, 60) + SourceIndex(0)
 ---
 >>>                    ClassA.prototype.AisIn1_2_2 = function () { };
 1->^^^^^^^^^^^^^^^^^^^^
@@ -2173,19 +2025,19 @@ sourceFile:typeResolution.ts
 3 >                                               
 4 >                                                  public AisIn1_2_2() { 
 5 >                                                                }
-1->Emitted(117, 21) Source(79, 42) + SourceIndex(0)
-2 >Emitted(117, 48) Source(79, 52) + SourceIndex(0)
-3 >Emitted(117, 51) Source(79, 35) + SourceIndex(0)
-4 >Emitted(117, 65) Source(79, 57) + SourceIndex(0)
-5 >Emitted(117, 66) Source(79, 58) + SourceIndex(0)
+1->Emitted(96, 21) Source(79, 42) + SourceIndex(0)
+2 >Emitted(96, 48) Source(79, 52) + SourceIndex(0)
+3 >Emitted(96, 51) Source(79, 35) + SourceIndex(0)
+4 >Emitted(96, 65) Source(79, 57) + SourceIndex(0)
+5 >Emitted(96, 66) Source(79, 58) + SourceIndex(0)
 ---
 >>>                    return ClassA;
 1 >^^^^^^^^^^^^^^^^^^^^
 2 >                    ^^^^^^^^^^^^^
 1 > 
 2 >                    }
-1 >Emitted(118, 21) Source(79, 59) + SourceIndex(0)
-2 >Emitted(118, 34) Source(79, 60) + SourceIndex(0)
+1 >Emitted(97, 21) Source(79, 59) + SourceIndex(0)
+2 >Emitted(97, 34) Source(79, 60) + SourceIndex(0)
 ---
 >>>                }());
 1 >^^^^^^^^^^^^^^^^
@@ -2197,10 +2049,10 @@ sourceFile:typeResolution.ts
 2 >                }
 3 >                 
 4 >                 export class ClassA { public AisIn1_2_2() { } }
-1 >Emitted(119, 17) Source(79, 59) + SourceIndex(0)
-2 >Emitted(119, 18) Source(79, 60) + SourceIndex(0)
-3 >Emitted(119, 18) Source(79, 13) + SourceIndex(0)
-4 >Emitted(119, 22) Source(79, 60) + SourceIndex(0)
+1 >Emitted(98, 17) Source(79, 59) + SourceIndex(0)
+2 >Emitted(98, 18) Source(79, 60) + SourceIndex(0)
+3 >Emitted(98, 18) Source(79, 13) + SourceIndex(0)
+4 >Emitted(98, 22) Source(79, 60) + SourceIndex(0)
 ---
 >>>                SubSubModule2.ClassA = ClassA;
 1->^^^^^^^^^^^^^^^^
@@ -2212,32 +2064,29 @@ sourceFile:typeResolution.ts
 2 >                ClassA
 3 >                                     { public AisIn1_2_2() { } }
 4 >                                             
-1->Emitted(120, 17) Source(79, 26) + SourceIndex(0)
-2 >Emitted(120, 37) Source(79, 32) + SourceIndex(0)
-3 >Emitted(120, 46) Source(79, 60) + SourceIndex(0)
-4 >Emitted(120, 47) Source(79, 60) + SourceIndex(0)
+1->Emitted(99, 17) Source(79, 26) + SourceIndex(0)
+2 >Emitted(99, 37) Source(79, 32) + SourceIndex(0)
+3 >Emitted(99, 46) Source(79, 60) + SourceIndex(0)
+4 >Emitted(99, 47) Source(79, 60) + SourceIndex(0)
 ---
 >>>                var ClassB = /** @class */ (function () {
 1->^^^^^^^^^^^^^^^^
-2 >                ^^^^^^^^^^^^^^^^^^^^^^^^->
+2 >                ^^^^^^^^^^^^^^^^^^^^^^^^^->
 1->
   >            
-1->Emitted(121, 17) Source(80, 13) + SourceIndex(0)
+1->Emitted(100, 17) Source(80, 13) + SourceIndex(0)
 ---
->>>                    function ClassB() {
+>>>                    function ClassB() {}
 1->^^^^^^^^^^^^^^^^^^^^
-2 >                    ^^->
+2 >                    ^^^^^^^^^^^^^^^^^^^
+3 >                                       ^
+4 >                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^->
 1->
-1->Emitted(122, 21) Source(80, 13) + SourceIndex(0)
----
->>>                    }
-1->^^^^^^^^^^^^^^^^^^^^
-2 >                    ^
-3 >                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
-1->export class ClassB { public BisIn1_2_2() { } 
-2 >                    }
-1->Emitted(123, 21) Source(80, 59) + SourceIndex(0)
-2 >Emitted(123, 22) Source(80, 60) + SourceIndex(0)
+2 >                    export class ClassB { public BisIn1_2_2() { } 
+3 >                                       }
+1->Emitted(101, 21) Source(80, 13) + SourceIndex(0)
+2 >Emitted(101, 40) Source(80, 59) + SourceIndex(0)
+3 >Emitted(101, 41) Source(80, 60) + SourceIndex(0)
 ---
 >>>                    ClassB.prototype.BisIn1_2_2 = function () { };
 1->^^^^^^^^^^^^^^^^^^^^
@@ -2250,19 +2099,19 @@ sourceFile:typeResolution.ts
 3 >                                               
 4 >                                                  public BisIn1_2_2() { 
 5 >                                                                }
-1->Emitted(124, 21) Source(80, 42) + SourceIndex(0)
-2 >Emitted(124, 48) Source(80, 52) + SourceIndex(0)
-3 >Emitted(124, 51) Source(80, 35) + SourceIndex(0)
-4 >Emitted(124, 65) Source(80, 57) + SourceIndex(0)
-5 >Emitted(124, 66) Source(80, 58) + SourceIndex(0)
+1->Emitted(102, 21) Source(80, 42) + SourceIndex(0)
+2 >Emitted(102, 48) Source(80, 52) + SourceIndex(0)
+3 >Emitted(102, 51) Source(80, 35) + SourceIndex(0)
+4 >Emitted(102, 65) Source(80, 57) + SourceIndex(0)
+5 >Emitted(102, 66) Source(80, 58) + SourceIndex(0)
 ---
 >>>                    return ClassB;
 1 >^^^^^^^^^^^^^^^^^^^^
 2 >                    ^^^^^^^^^^^^^
 1 > 
 2 >                    }
-1 >Emitted(125, 21) Source(80, 59) + SourceIndex(0)
-2 >Emitted(125, 34) Source(80, 60) + SourceIndex(0)
+1 >Emitted(103, 21) Source(80, 59) + SourceIndex(0)
+2 >Emitted(103, 34) Source(80, 60) + SourceIndex(0)
 ---
 >>>                }());
 1 >^^^^^^^^^^^^^^^^
@@ -2274,10 +2123,10 @@ sourceFile:typeResolution.ts
 2 >                }
 3 >                 
 4 >                 export class ClassB { public BisIn1_2_2() { } }
-1 >Emitted(126, 17) Source(80, 59) + SourceIndex(0)
-2 >Emitted(126, 18) Source(80, 60) + SourceIndex(0)
-3 >Emitted(126, 18) Source(80, 13) + SourceIndex(0)
-4 >Emitted(126, 22) Source(80, 60) + SourceIndex(0)
+1 >Emitted(104, 17) Source(80, 59) + SourceIndex(0)
+2 >Emitted(104, 18) Source(80, 60) + SourceIndex(0)
+3 >Emitted(104, 18) Source(80, 13) + SourceIndex(0)
+4 >Emitted(104, 22) Source(80, 60) + SourceIndex(0)
 ---
 >>>                SubSubModule2.ClassB = ClassB;
 1->^^^^^^^^^^^^^^^^
@@ -2289,32 +2138,29 @@ sourceFile:typeResolution.ts
 2 >                ClassB
 3 >                                     { public BisIn1_2_2() { } }
 4 >                                             
-1->Emitted(127, 17) Source(80, 26) + SourceIndex(0)
-2 >Emitted(127, 37) Source(80, 32) + SourceIndex(0)
-3 >Emitted(127, 46) Source(80, 60) + SourceIndex(0)
-4 >Emitted(127, 47) Source(80, 60) + SourceIndex(0)
+1->Emitted(105, 17) Source(80, 26) + SourceIndex(0)
+2 >Emitted(105, 37) Source(80, 32) + SourceIndex(0)
+3 >Emitted(105, 46) Source(80, 60) + SourceIndex(0)
+4 >Emitted(105, 47) Source(80, 60) + SourceIndex(0)
 ---
 >>>                var ClassC = /** @class */ (function () {
 1->^^^^^^^^^^^^^^^^
-2 >                ^^^^^^^^^^^^^^^^^^^^^^^^->
+2 >                ^^^^^^^^^^^^^^^^^^^^^^^^^->
 1->
   >            
-1->Emitted(128, 17) Source(81, 13) + SourceIndex(0)
+1->Emitted(106, 17) Source(81, 13) + SourceIndex(0)
 ---
->>>                    function ClassC() {
+>>>                    function ClassC() {}
 1->^^^^^^^^^^^^^^^^^^^^
-2 >                    ^^->
+2 >                    ^^^^^^^^^^^^^^^^^^^
+3 >                                       ^
+4 >                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^->
 1->
-1->Emitted(129, 21) Source(81, 13) + SourceIndex(0)
----
->>>                    }
-1->^^^^^^^^^^^^^^^^^^^^
-2 >                    ^
-3 >                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
-1->export class ClassC { public CisIn1_2_2() { } 
-2 >                    }
-1->Emitted(130, 21) Source(81, 59) + SourceIndex(0)
-2 >Emitted(130, 22) Source(81, 60) + SourceIndex(0)
+2 >                    export class ClassC { public CisIn1_2_2() { } 
+3 >                                       }
+1->Emitted(107, 21) Source(81, 13) + SourceIndex(0)
+2 >Emitted(107, 40) Source(81, 59) + SourceIndex(0)
+3 >Emitted(107, 41) Source(81, 60) + SourceIndex(0)
 ---
 >>>                    ClassC.prototype.CisIn1_2_2 = function () { };
 1->^^^^^^^^^^^^^^^^^^^^
@@ -2327,19 +2173,19 @@ sourceFile:typeResolution.ts
 3 >                                               
 4 >                                                  public CisIn1_2_2() { 
 5 >                                                                }
-1->Emitted(131, 21) Source(81, 42) + SourceIndex(0)
-2 >Emitted(131, 48) Source(81, 52) + SourceIndex(0)
-3 >Emitted(131, 51) Source(81, 35) + SourceIndex(0)
-4 >Emitted(131, 65) Source(81, 57) + SourceIndex(0)
-5 >Emitted(131, 66) Source(81, 58) + SourceIndex(0)
+1->Emitted(108, 21) Source(81, 42) + SourceIndex(0)
+2 >Emitted(108, 48) Source(81, 52) + SourceIndex(0)
+3 >Emitted(108, 51) Source(81, 35) + SourceIndex(0)
+4 >Emitted(108, 65) Source(81, 57) + SourceIndex(0)
+5 >Emitted(108, 66) Source(81, 58) + SourceIndex(0)
 ---
 >>>                    return ClassC;
 1 >^^^^^^^^^^^^^^^^^^^^
 2 >                    ^^^^^^^^^^^^^
 1 > 
 2 >                    }
-1 >Emitted(132, 21) Source(81, 59) + SourceIndex(0)
-2 >Emitted(132, 34) Source(81, 60) + SourceIndex(0)
+1 >Emitted(109, 21) Source(81, 59) + SourceIndex(0)
+2 >Emitted(109, 34) Source(81, 60) + SourceIndex(0)
 ---
 >>>                }());
 1 >^^^^^^^^^^^^^^^^
@@ -2351,10 +2197,10 @@ sourceFile:typeResolution.ts
 2 >                }
 3 >                 
 4 >                 export class ClassC { public CisIn1_2_2() { } }
-1 >Emitted(133, 17) Source(81, 59) + SourceIndex(0)
-2 >Emitted(133, 18) Source(81, 60) + SourceIndex(0)
-3 >Emitted(133, 18) Source(81, 13) + SourceIndex(0)
-4 >Emitted(133, 22) Source(81, 60) + SourceIndex(0)
+1 >Emitted(110, 17) Source(81, 59) + SourceIndex(0)
+2 >Emitted(110, 18) Source(81, 60) + SourceIndex(0)
+3 >Emitted(110, 18) Source(81, 13) + SourceIndex(0)
+4 >Emitted(110, 22) Source(81, 60) + SourceIndex(0)
 ---
 >>>                SubSubModule2.ClassC = ClassC;
 1->^^^^^^^^^^^^^^^^
@@ -2366,10 +2212,10 @@ sourceFile:typeResolution.ts
 2 >                ClassC
 3 >                                     { public CisIn1_2_2() { } }
 4 >                                             
-1->Emitted(134, 17) Source(81, 26) + SourceIndex(0)
-2 >Emitted(134, 37) Source(81, 32) + SourceIndex(0)
-3 >Emitted(134, 46) Source(81, 60) + SourceIndex(0)
-4 >Emitted(134, 47) Source(81, 60) + SourceIndex(0)
+1->Emitted(111, 17) Source(81, 26) + SourceIndex(0)
+2 >Emitted(111, 37) Source(81, 32) + SourceIndex(0)
+3 >Emitted(111, 46) Source(81, 60) + SourceIndex(0)
+4 >Emitted(111, 47) Source(81, 60) + SourceIndex(0)
 ---
 >>>            })(SubSubModule2 = SubModule2.SubSubModule2 || (SubModule2.SubSubModule2 = {}));
 1->^^^^^^^^^^^^
@@ -2400,15 +2246,15 @@ sourceFile:typeResolution.ts
   >                                                                                                export interface InterfaceY { YisIn1_2_2(); }
   >                                                                                                interface NonExportedInterfaceQ { }
   >                                                                                            }
-1->Emitted(135, 13) Source(84, 9) + SourceIndex(0)
-2 >Emitted(135, 14) Source(84, 10) + SourceIndex(0)
-3 >Emitted(135, 16) Source(77, 23) + SourceIndex(0)
-4 >Emitted(135, 29) Source(77, 36) + SourceIndex(0)
-5 >Emitted(135, 32) Source(77, 23) + SourceIndex(0)
-6 >Emitted(135, 56) Source(77, 36) + SourceIndex(0)
-7 >Emitted(135, 61) Source(77, 23) + SourceIndex(0)
-8 >Emitted(135, 85) Source(77, 36) + SourceIndex(0)
-9 >Emitted(135, 93) Source(84, 10) + SourceIndex(0)
+1->Emitted(112, 13) Source(84, 9) + SourceIndex(0)
+2 >Emitted(112, 14) Source(84, 10) + SourceIndex(0)
+3 >Emitted(112, 16) Source(77, 23) + SourceIndex(0)
+4 >Emitted(112, 29) Source(77, 36) + SourceIndex(0)
+5 >Emitted(112, 32) Source(77, 23) + SourceIndex(0)
+6 >Emitted(112, 56) Source(77, 36) + SourceIndex(0)
+7 >Emitted(112, 61) Source(77, 23) + SourceIndex(0)
+8 >Emitted(112, 85) Source(77, 36) + SourceIndex(0)
+9 >Emitted(112, 93) Source(84, 10) + SourceIndex(0)
 ---
 >>>        })(SubModule2 = TopLevelModule1.SubModule2 || (TopLevelModule1.SubModule2 = {}));
 1 >^^^^^^^^
@@ -2443,15 +2289,15 @@ sourceFile:typeResolution.ts
   >                                                                                         
   >                                                                                         export interface InterfaceY { YisIn1_2(); }
   >                                                                                     }
-1 >Emitted(136, 9) Source(87, 5) + SourceIndex(0)
-2 >Emitted(136, 10) Source(87, 6) + SourceIndex(0)
-3 >Emitted(136, 12) Source(76, 19) + SourceIndex(0)
-4 >Emitted(136, 22) Source(76, 29) + SourceIndex(0)
-5 >Emitted(136, 25) Source(76, 19) + SourceIndex(0)
-6 >Emitted(136, 51) Source(76, 29) + SourceIndex(0)
-7 >Emitted(136, 56) Source(76, 19) + SourceIndex(0)
-8 >Emitted(136, 82) Source(76, 29) + SourceIndex(0)
-9 >Emitted(136, 90) Source(87, 6) + SourceIndex(0)
+1 >Emitted(113, 9) Source(87, 5) + SourceIndex(0)
+2 >Emitted(113, 10) Source(87, 6) + SourceIndex(0)
+3 >Emitted(113, 12) Source(76, 19) + SourceIndex(0)
+4 >Emitted(113, 22) Source(76, 29) + SourceIndex(0)
+5 >Emitted(113, 25) Source(76, 19) + SourceIndex(0)
+6 >Emitted(113, 51) Source(76, 29) + SourceIndex(0)
+7 >Emitted(113, 56) Source(76, 19) + SourceIndex(0)
+8 >Emitted(113, 82) Source(76, 29) + SourceIndex(0)
+9 >Emitted(113, 90) Source(87, 6) + SourceIndex(0)
 ---
 >>>        var ClassA = /** @class */ (function () {
 1 >^^^^^^^^
@@ -2459,13 +2305,13 @@ sourceFile:typeResolution.ts
 1 >
   >    
   >    
-1 >Emitted(137, 9) Source(89, 5) + SourceIndex(0)
+1 >Emitted(114, 9) Source(89, 5) + SourceIndex(0)
 ---
 >>>            function ClassA() {
 1->^^^^^^^^^^^^
 2 >            ^^->
 1->
-1->Emitted(138, 13) Source(89, 5) + SourceIndex(0)
+1->Emitted(115, 13) Source(89, 5) + SourceIndex(0)
 ---
 >>>            }
 1->^^^^^^^^^^^^
@@ -2475,8 +2321,8 @@ sourceFile:typeResolution.ts
   >        public AisIn1() { }
   >    
 2 >            }
-1->Emitted(139, 13) Source(91, 5) + SourceIndex(0)
-2 >Emitted(139, 14) Source(91, 6) + SourceIndex(0)
+1->Emitted(116, 13) Source(91, 5) + SourceIndex(0)
+2 >Emitted(116, 14) Source(91, 6) + SourceIndex(0)
 ---
 >>>            ClassA.prototype.AisIn1 = function () { };
 1->^^^^^^^^^^^^
@@ -2489,11 +2335,11 @@ sourceFile:typeResolution.ts
 3 >                                   
 4 >                                      public AisIn1() { 
 5 >                                                    }
-1->Emitted(140, 13) Source(90, 16) + SourceIndex(0)
-2 >Emitted(140, 36) Source(90, 22) + SourceIndex(0)
-3 >Emitted(140, 39) Source(90, 9) + SourceIndex(0)
-4 >Emitted(140, 53) Source(90, 27) + SourceIndex(0)
-5 >Emitted(140, 54) Source(90, 28) + SourceIndex(0)
+1->Emitted(117, 13) Source(90, 16) + SourceIndex(0)
+2 >Emitted(117, 36) Source(90, 22) + SourceIndex(0)
+3 >Emitted(117, 39) Source(90, 9) + SourceIndex(0)
+4 >Emitted(117, 53) Source(90, 27) + SourceIndex(0)
+5 >Emitted(117, 54) Source(90, 28) + SourceIndex(0)
 ---
 >>>            return ClassA;
 1 >^^^^^^^^^^^^
@@ -2501,8 +2347,8 @@ sourceFile:typeResolution.ts
 1 >
   >    
 2 >            }
-1 >Emitted(141, 13) Source(91, 5) + SourceIndex(0)
-2 >Emitted(141, 26) Source(91, 6) + SourceIndex(0)
+1 >Emitted(118, 13) Source(91, 5) + SourceIndex(0)
+2 >Emitted(118, 26) Source(91, 6) + SourceIndex(0)
 ---
 >>>        }());
 1 >^^^^^^^^
@@ -2516,10 +2362,10 @@ sourceFile:typeResolution.ts
 4 >         class ClassA {
   >                 public AisIn1() { }
   >             }
-1 >Emitted(142, 9) Source(91, 5) + SourceIndex(0)
-2 >Emitted(142, 10) Source(91, 6) + SourceIndex(0)
-3 >Emitted(142, 10) Source(89, 5) + SourceIndex(0)
-4 >Emitted(142, 14) Source(91, 6) + SourceIndex(0)
+1 >Emitted(119, 9) Source(91, 5) + SourceIndex(0)
+2 >Emitted(119, 10) Source(91, 6) + SourceIndex(0)
+3 >Emitted(119, 10) Source(89, 5) + SourceIndex(0)
+4 >Emitted(119, 14) Source(91, 6) + SourceIndex(0)
 ---
 >>>        var NotExportedModule;
 1->^^^^^^^^
@@ -2539,10 +2385,10 @@ sourceFile:typeResolution.ts
 4 >                              {
   >                                     export class ClassA { }
   >                                 }
-1->Emitted(143, 9) Source(97, 5) + SourceIndex(0)
-2 >Emitted(143, 13) Source(97, 12) + SourceIndex(0)
-3 >Emitted(143, 30) Source(97, 29) + SourceIndex(0)
-4 >Emitted(143, 31) Source(99, 6) + SourceIndex(0)
+1->Emitted(120, 9) Source(97, 5) + SourceIndex(0)
+2 >Emitted(120, 13) Source(97, 12) + SourceIndex(0)
+3 >Emitted(120, 30) Source(97, 29) + SourceIndex(0)
+4 >Emitted(120, 31) Source(99, 6) + SourceIndex(0)
 ---
 >>>        (function (NotExportedModule) {
 1->^^^^^^^^
@@ -2552,39 +2398,35 @@ sourceFile:typeResolution.ts
 1->
 2 >        module 
 3 >                   NotExportedModule
-1->Emitted(144, 9) Source(97, 5) + SourceIndex(0)
-2 >Emitted(144, 20) Source(97, 12) + SourceIndex(0)
-3 >Emitted(144, 37) Source(97, 29) + SourceIndex(0)
+1->Emitted(121, 9) Source(97, 5) + SourceIndex(0)
+2 >Emitted(121, 20) Source(97, 12) + SourceIndex(0)
+3 >Emitted(121, 37) Source(97, 29) + SourceIndex(0)
 ---
 >>>            var ClassA = /** @class */ (function () {
 1->^^^^^^^^^^^^
-2 >            ^^^^^^^^^^^^^^^^^^^^^^^^->
+2 >            ^^^^^^^^^^^^^^^^^^^^^^^^^->
 1-> {
   >        
-1->Emitted(145, 13) Source(98, 9) + SourceIndex(0)
+1->Emitted(122, 13) Source(98, 9) + SourceIndex(0)
 ---
->>>                function ClassA() {
+>>>                function ClassA() {}
 1->^^^^^^^^^^^^^^^^
-2 >                ^^->
+2 >                ^^^^^^^^^^^^^^^^^^^
+3 >                                   ^
 1->
-1->Emitted(146, 17) Source(98, 9) + SourceIndex(0)
----
->>>                }
-1->^^^^^^^^^^^^^^^^
-2 >                ^
-3 >                 ^^^^^^^^^^^^^^->
-1->export class ClassA { 
-2 >                }
-1->Emitted(147, 17) Source(98, 31) + SourceIndex(0)
-2 >Emitted(147, 18) Source(98, 32) + SourceIndex(0)
+2 >                export class ClassA { 
+3 >                                   }
+1->Emitted(123, 17) Source(98, 9) + SourceIndex(0)
+2 >Emitted(123, 36) Source(98, 31) + SourceIndex(0)
+3 >Emitted(123, 37) Source(98, 32) + SourceIndex(0)
 ---
 >>>                return ClassA;
-1->^^^^^^^^^^^^^^^^
+1 >^^^^^^^^^^^^^^^^
 2 >                ^^^^^^^^^^^^^
-1->
+1 >
 2 >                }
-1->Emitted(148, 17) Source(98, 31) + SourceIndex(0)
-2 >Emitted(148, 30) Source(98, 32) + SourceIndex(0)
+1 >Emitted(124, 17) Source(98, 31) + SourceIndex(0)
+2 >Emitted(124, 30) Source(98, 32) + SourceIndex(0)
 ---
 >>>            }());
 1 >^^^^^^^^^^^^
@@ -2596,10 +2438,10 @@ sourceFile:typeResolution.ts
 2 >            }
 3 >             
 4 >             export class ClassA { }
-1 >Emitted(149, 13) Source(98, 31) + SourceIndex(0)
-2 >Emitted(149, 14) Source(98, 32) + SourceIndex(0)
-3 >Emitted(149, 14) Source(98, 9) + SourceIndex(0)
-4 >Emitted(149, 18) Source(98, 32) + SourceIndex(0)
+1 >Emitted(125, 13) Source(98, 31) + SourceIndex(0)
+2 >Emitted(125, 14) Source(98, 32) + SourceIndex(0)
+3 >Emitted(125, 14) Source(98, 9) + SourceIndex(0)
+4 >Emitted(125, 18) Source(98, 32) + SourceIndex(0)
 ---
 >>>            NotExportedModule.ClassA = ClassA;
 1->^^^^^^^^^^^^
@@ -2611,10 +2453,10 @@ sourceFile:typeResolution.ts
 2 >            ClassA
 3 >                                     { }
 4 >                                             
-1->Emitted(150, 13) Source(98, 22) + SourceIndex(0)
-2 >Emitted(150, 37) Source(98, 28) + SourceIndex(0)
-3 >Emitted(150, 46) Source(98, 32) + SourceIndex(0)
-4 >Emitted(150, 47) Source(98, 32) + SourceIndex(0)
+1->Emitted(126, 13) Source(98, 22) + SourceIndex(0)
+2 >Emitted(126, 37) Source(98, 28) + SourceIndex(0)
+3 >Emitted(126, 46) Source(98, 32) + SourceIndex(0)
+4 >Emitted(126, 47) Source(98, 32) + SourceIndex(0)
 ---
 >>>        })(NotExportedModule || (NotExportedModule = {}));
 1->^^^^^^^^
@@ -2635,13 +2477,13 @@ sourceFile:typeResolution.ts
 7 >                                                   {
   >                                                          export class ClassA { }
   >                                                      }
-1->Emitted(151, 9) Source(99, 5) + SourceIndex(0)
-2 >Emitted(151, 10) Source(99, 6) + SourceIndex(0)
-3 >Emitted(151, 12) Source(97, 12) + SourceIndex(0)
-4 >Emitted(151, 29) Source(97, 29) + SourceIndex(0)
-5 >Emitted(151, 34) Source(97, 12) + SourceIndex(0)
-6 >Emitted(151, 51) Source(97, 29) + SourceIndex(0)
-7 >Emitted(151, 59) Source(99, 6) + SourceIndex(0)
+1->Emitted(127, 9) Source(99, 5) + SourceIndex(0)
+2 >Emitted(127, 10) Source(99, 6) + SourceIndex(0)
+3 >Emitted(127, 12) Source(97, 12) + SourceIndex(0)
+4 >Emitted(127, 29) Source(97, 29) + SourceIndex(0)
+5 >Emitted(127, 34) Source(97, 12) + SourceIndex(0)
+6 >Emitted(127, 51) Source(97, 29) + SourceIndex(0)
+7 >Emitted(127, 59) Source(99, 6) + SourceIndex(0)
 ---
 >>>    })(TopLevelModule1 = exports.TopLevelModule1 || (exports.TopLevelModule1 = {}));
 1->^^^^
@@ -2762,15 +2604,15 @@ sourceFile:typeResolution.ts
   >                                                                                    export class ClassA { }
   >                                                                                }
   >                                                                            }
-1->Emitted(152, 5) Source(100, 1) + SourceIndex(0)
-2 >Emitted(152, 6) Source(100, 2) + SourceIndex(0)
-3 >Emitted(152, 8) Source(1, 15) + SourceIndex(0)
-4 >Emitted(152, 23) Source(1, 30) + SourceIndex(0)
-5 >Emitted(152, 26) Source(1, 15) + SourceIndex(0)
-6 >Emitted(152, 49) Source(1, 30) + SourceIndex(0)
-7 >Emitted(152, 54) Source(1, 15) + SourceIndex(0)
-8 >Emitted(152, 77) Source(1, 30) + SourceIndex(0)
-9 >Emitted(152, 85) Source(100, 2) + SourceIndex(0)
+1->Emitted(128, 5) Source(100, 1) + SourceIndex(0)
+2 >Emitted(128, 6) Source(100, 2) + SourceIndex(0)
+3 >Emitted(128, 8) Source(1, 15) + SourceIndex(0)
+4 >Emitted(128, 23) Source(1, 30) + SourceIndex(0)
+5 >Emitted(128, 26) Source(1, 15) + SourceIndex(0)
+6 >Emitted(128, 49) Source(1, 30) + SourceIndex(0)
+7 >Emitted(128, 54) Source(1, 15) + SourceIndex(0)
+8 >Emitted(128, 77) Source(1, 30) + SourceIndex(0)
+9 >Emitted(128, 85) Source(100, 2) + SourceIndex(0)
 ---
 >>>    var TopLevelModule2;
 1 >^^^^
@@ -2790,10 +2632,10 @@ sourceFile:typeResolution.ts
   >                               }
   >                           }
   >                       }
-1 >Emitted(153, 5) Source(102, 1) + SourceIndex(0)
-2 >Emitted(153, 9) Source(102, 8) + SourceIndex(0)
-3 >Emitted(153, 24) Source(102, 23) + SourceIndex(0)
-4 >Emitted(153, 25) Source(108, 2) + SourceIndex(0)
+1 >Emitted(129, 5) Source(102, 1) + SourceIndex(0)
+2 >Emitted(129, 9) Source(102, 8) + SourceIndex(0)
+3 >Emitted(129, 24) Source(102, 23) + SourceIndex(0)
+4 >Emitted(129, 25) Source(108, 2) + SourceIndex(0)
 ---
 >>>    (function (TopLevelModule2) {
 1->^^^^
@@ -2802,9 +2644,9 @@ sourceFile:typeResolution.ts
 1->
 2 >    module 
 3 >               TopLevelModule2
-1->Emitted(154, 5) Source(102, 1) + SourceIndex(0)
-2 >Emitted(154, 16) Source(102, 8) + SourceIndex(0)
-3 >Emitted(154, 31) Source(102, 23) + SourceIndex(0)
+1->Emitted(130, 5) Source(102, 1) + SourceIndex(0)
+2 >Emitted(130, 16) Source(102, 8) + SourceIndex(0)
+3 >Emitted(130, 31) Source(102, 23) + SourceIndex(0)
 ---
 >>>        var SubModule3;
 1 >^^^^^^^^
@@ -2821,10 +2663,10 @@ sourceFile:typeResolution.ts
   >                                  public AisIn2_3() { }
   >                              }
   >                          }
-1 >Emitted(155, 9) Source(103, 5) + SourceIndex(0)
-2 >Emitted(155, 13) Source(103, 19) + SourceIndex(0)
-3 >Emitted(155, 23) Source(103, 29) + SourceIndex(0)
-4 >Emitted(155, 24) Source(107, 6) + SourceIndex(0)
+1 >Emitted(131, 9) Source(103, 5) + SourceIndex(0)
+2 >Emitted(131, 13) Source(103, 19) + SourceIndex(0)
+3 >Emitted(131, 23) Source(103, 29) + SourceIndex(0)
+4 >Emitted(131, 24) Source(107, 6) + SourceIndex(0)
 ---
 >>>        (function (SubModule3) {
 1->^^^^^^^^
@@ -2834,22 +2676,22 @@ sourceFile:typeResolution.ts
 1->
 2 >        export module 
 3 >                   SubModule3
-1->Emitted(156, 9) Source(103, 5) + SourceIndex(0)
-2 >Emitted(156, 20) Source(103, 19) + SourceIndex(0)
-3 >Emitted(156, 30) Source(103, 29) + SourceIndex(0)
+1->Emitted(132, 9) Source(103, 5) + SourceIndex(0)
+2 >Emitted(132, 20) Source(103, 19) + SourceIndex(0)
+3 >Emitted(132, 30) Source(103, 29) + SourceIndex(0)
 ---
 >>>            var ClassA = /** @class */ (function () {
 1->^^^^^^^^^^^^
 2 >            ^^^^^^^^^^^^^^^^^^^^^^^^->
 1-> {
   >        
-1->Emitted(157, 13) Source(104, 9) + SourceIndex(0)
+1->Emitted(133, 13) Source(104, 9) + SourceIndex(0)
 ---
 >>>                function ClassA() {
 1->^^^^^^^^^^^^^^^^
 2 >                ^^->
 1->
-1->Emitted(158, 17) Source(104, 9) + SourceIndex(0)
+1->Emitted(134, 17) Source(104, 9) + SourceIndex(0)
 ---
 >>>                }
 1->^^^^^^^^^^^^^^^^
@@ -2859,8 +2701,8 @@ sourceFile:typeResolution.ts
   >            public AisIn2_3() { }
   >        
 2 >                }
-1->Emitted(159, 17) Source(106, 9) + SourceIndex(0)
-2 >Emitted(159, 18) Source(106, 10) + SourceIndex(0)
+1->Emitted(135, 17) Source(106, 9) + SourceIndex(0)
+2 >Emitted(135, 18) Source(106, 10) + SourceIndex(0)
 ---
 >>>                ClassA.prototype.AisIn2_3 = function () { };
 1->^^^^^^^^^^^^^^^^
@@ -2873,11 +2715,11 @@ sourceFile:typeResolution.ts
 3 >                                         
 4 >                                            public AisIn2_3() { 
 5 >                                                          }
-1->Emitted(160, 17) Source(105, 20) + SourceIndex(0)
-2 >Emitted(160, 42) Source(105, 28) + SourceIndex(0)
-3 >Emitted(160, 45) Source(105, 13) + SourceIndex(0)
-4 >Emitted(160, 59) Source(105, 33) + SourceIndex(0)
-5 >Emitted(160, 60) Source(105, 34) + SourceIndex(0)
+1->Emitted(136, 17) Source(105, 20) + SourceIndex(0)
+2 >Emitted(136, 42) Source(105, 28) + SourceIndex(0)
+3 >Emitted(136, 45) Source(105, 13) + SourceIndex(0)
+4 >Emitted(136, 59) Source(105, 33) + SourceIndex(0)
+5 >Emitted(136, 60) Source(105, 34) + SourceIndex(0)
 ---
 >>>                return ClassA;
 1 >^^^^^^^^^^^^^^^^
@@ -2885,8 +2727,8 @@ sourceFile:typeResolution.ts
 1 >
   >        
 2 >                }
-1 >Emitted(161, 17) Source(106, 9) + SourceIndex(0)
-2 >Emitted(161, 30) Source(106, 10) + SourceIndex(0)
+1 >Emitted(137, 17) Source(106, 9) + SourceIndex(0)
+2 >Emitted(137, 30) Source(106, 10) + SourceIndex(0)
 ---
 >>>            }());
 1 >^^^^^^^^^^^^
@@ -2900,10 +2742,10 @@ sourceFile:typeResolution.ts
 4 >             export class ClassA {
   >                         public AisIn2_3() { }
   >                     }
-1 >Emitted(162, 13) Source(106, 9) + SourceIndex(0)
-2 >Emitted(162, 14) Source(106, 10) + SourceIndex(0)
-3 >Emitted(162, 14) Source(104, 9) + SourceIndex(0)
-4 >Emitted(162, 18) Source(106, 10) + SourceIndex(0)
+1 >Emitted(138, 13) Source(106, 9) + SourceIndex(0)
+2 >Emitted(138, 14) Source(106, 10) + SourceIndex(0)
+3 >Emitted(138, 14) Source(104, 9) + SourceIndex(0)
+4 >Emitted(138, 18) Source(106, 10) + SourceIndex(0)
 ---
 >>>            SubModule3.ClassA = ClassA;
 1->^^^^^^^^^^^^
@@ -2917,10 +2759,10 @@ sourceFile:typeResolution.ts
   >                                         public AisIn2_3() { }
   >                                     }
 4 >                                      
-1->Emitted(163, 13) Source(104, 22) + SourceIndex(0)
-2 >Emitted(163, 30) Source(104, 28) + SourceIndex(0)
-3 >Emitted(163, 39) Source(106, 10) + SourceIndex(0)
-4 >Emitted(163, 40) Source(106, 10) + SourceIndex(0)
+1->Emitted(139, 13) Source(104, 22) + SourceIndex(0)
+2 >Emitted(139, 30) Source(104, 28) + SourceIndex(0)
+3 >Emitted(139, 39) Source(106, 10) + SourceIndex(0)
+4 >Emitted(139, 40) Source(106, 10) + SourceIndex(0)
 ---
 >>>        })(SubModule3 = TopLevelModule2.SubModule3 || (TopLevelModule2.SubModule3 = {}));
 1->^^^^^^^^
@@ -2946,15 +2788,15 @@ sourceFile:typeResolution.ts
   >                                                                                             public AisIn2_3() { }
   >                                                                                         }
   >                                                                                     }
-1->Emitted(164, 9) Source(107, 5) + SourceIndex(0)
-2 >Emitted(164, 10) Source(107, 6) + SourceIndex(0)
-3 >Emitted(164, 12) Source(103, 19) + SourceIndex(0)
-4 >Emitted(164, 22) Source(103, 29) + SourceIndex(0)
-5 >Emitted(164, 25) Source(103, 19) + SourceIndex(0)
-6 >Emitted(164, 51) Source(103, 29) + SourceIndex(0)
-7 >Emitted(164, 56) Source(103, 19) + SourceIndex(0)
-8 >Emitted(164, 82) Source(103, 29) + SourceIndex(0)
-9 >Emitted(164, 90) Source(107, 6) + SourceIndex(0)
+1->Emitted(140, 9) Source(107, 5) + SourceIndex(0)
+2 >Emitted(140, 10) Source(107, 6) + SourceIndex(0)
+3 >Emitted(140, 12) Source(103, 19) + SourceIndex(0)
+4 >Emitted(140, 22) Source(103, 29) + SourceIndex(0)
+5 >Emitted(140, 25) Source(103, 19) + SourceIndex(0)
+6 >Emitted(140, 51) Source(103, 29) + SourceIndex(0)
+7 >Emitted(140, 56) Source(103, 19) + SourceIndex(0)
+8 >Emitted(140, 82) Source(103, 29) + SourceIndex(0)
+9 >Emitted(140, 90) Source(107, 6) + SourceIndex(0)
 ---
 >>>    })(TopLevelModule2 || (TopLevelModule2 = {}));
 1 >^^^^
@@ -2978,13 +2820,13 @@ sourceFile:typeResolution.ts
   >                                                  }
   >                                              }
   >                                          }
-1 >Emitted(165, 5) Source(108, 1) + SourceIndex(0)
-2 >Emitted(165, 6) Source(108, 2) + SourceIndex(0)
-3 >Emitted(165, 8) Source(102, 8) + SourceIndex(0)
-4 >Emitted(165, 23) Source(102, 23) + SourceIndex(0)
-5 >Emitted(165, 28) Source(102, 8) + SourceIndex(0)
-6 >Emitted(165, 43) Source(102, 23) + SourceIndex(0)
-7 >Emitted(165, 51) Source(108, 2) + SourceIndex(0)
+1 >Emitted(141, 5) Source(108, 1) + SourceIndex(0)
+2 >Emitted(141, 6) Source(108, 2) + SourceIndex(0)
+3 >Emitted(141, 8) Source(102, 8) + SourceIndex(0)
+4 >Emitted(141, 23) Source(102, 23) + SourceIndex(0)
+5 >Emitted(141, 28) Source(102, 8) + SourceIndex(0)
+6 >Emitted(141, 43) Source(102, 23) + SourceIndex(0)
+7 >Emitted(141, 51) Source(108, 2) + SourceIndex(0)
 ---
 >>>});
 >>>//# sourceMappingURL=typeResolution.js.map

@@ -49,8 +49,12 @@ import { async } from 'asyncawait';
 export default async();
 //// [d.js]
 import { async } from 'asyncawait';
+
 export default async;
 //// [e.js]
 import { async } from 'asyncawait';
+
 export default async;
+
+
 export function foo() { }

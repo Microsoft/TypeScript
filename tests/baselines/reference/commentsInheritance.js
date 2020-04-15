@@ -170,11 +170,20 @@ var c1 = /** @class */ (function () {
     // i1_f1
     c1.prototype.i1_f1 = function () {
     };
+
+
     c1.prototype.i1_nc_f1 = function () {
     };
+
+
+
     /** c1_f1*/
     c1.prototype.f1 = function () {
     };
+
+
+
+
     /** c1_nc_f1*/
     c1.prototype.nc_f1 = function () {
     };
@@ -236,6 +245,8 @@ var c3 = /** @class */ (function (_super) {
     function c3() {
         return _super.call(this, 10) || this;
     }
+
+
     /** c3 f1*/
     c3.prototype.f1 = function () {
     };

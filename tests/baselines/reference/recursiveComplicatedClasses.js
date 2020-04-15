@@ -47,6 +47,7 @@ var Signature = /** @class */ (function () {
 function aEnclosesB(a) {
     return true;
 }
+
 var Symbol = /** @class */ (function () {
     function Symbol() {
     }

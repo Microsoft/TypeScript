@@ -54,6 +54,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 var Foo = /** @class */ (function () {
     function Foo() {
     }
@@ -79,6 +80,8 @@ bar.property;
 bar.optionalProperty;
 bar.additionalProperty;
 bar.additionalMethod(2);
+
 var obj;
+
 bar = obj;
 obj = bar;

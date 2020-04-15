@@ -34,8 +34,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var A = /** @class */ (function () {
-    function A() {
-    }
+    function A() {}
     return A;
 }());
 var B = /** @class */ (function (_super) {
@@ -56,6 +55,7 @@ rra = ara;
 rrb = arb; // OK, Array<B> is assignable to ReadonlyArray<A>
 rra = arb;
 rrb = ara; // error: 'A' is not assignable to 'B'
+
 rra = cra;
 rra = crb; // OK, C<B> is assignable to ReadonlyArray<A>
 rrb = crb;

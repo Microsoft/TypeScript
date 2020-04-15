@@ -201,12 +201,14 @@ var _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, 
 function x(o, k) { }
 let i = 0;
 function foo() { return ++i + ""; }
+
 const fieldNameA = "fieldName1";
 const fieldNameB = "fieldName2";
 const fieldNameC = "fieldName3";
 let A = /** @class */ (() => {
     var _a, _b, _c, _d;
     class A {
+
         constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
@@ -214,8 +216,7 @@ let A = /** @class */ (() => {
             this[Symbol.match] = null;
             this[_b] = null;
             this[_d] = null;
-        }
-    }
+        }}
     foo(), _a = foo(), _b = foo(), _c = fieldNameB, _d = fieldNameC;
     __decorate([
         x
@@ -243,16 +244,14 @@ let A = /** @class */ (() => {
     ], A.prototype, _d, void 0);
     return A;
 })();
-void (_a = class B {
-        constructor() {
+void (_a = class B {constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
             this["property4"] = 2;
             this[Symbol.match] = null;
             this[_f] = null;
             this[_h] = null;
-        }
-    },
+        }},
     foo(),
     _e = foo(),
     _f = foo(),
@@ -262,6 +261,7 @@ void (_a = class B {
 let C = /** @class */ (() => {
     var _a, _b, _c, _d;
     class C {
+
         constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
@@ -298,8 +298,7 @@ let C = /** @class */ (() => {
     ], C.prototype, _d, void 0);
     return C;
 })();
-void class D {
-    constructor() {
+void class D {constructor() {
         this["property2"] = 2;
         this[Symbol.iterator] = null;
         this["property4"] = 2;
@@ -312,6 +311,7 @@ void class D {
 let E = /** @class */ (() => {
     var _a, _b, _c, _d;
     class E {
+
         constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
@@ -349,8 +349,7 @@ let E = /** @class */ (() => {
     ], E.prototype, _d, void 0);
     return E;
 })();
-void (_b = class F {
-        constructor() {
+void (_b = class F {constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
             this["property4"] = 2;
@@ -366,6 +365,7 @@ void (_b = class F {
 let G = /** @class */ (() => {
     var _a, _b, _c, _d;
     class G {
+
         constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
@@ -375,6 +375,8 @@ let G = /** @class */ (() => {
             this[_d] = null;
         }
         [(foo(), _a = foo(), _b = foo(), "some" + "method")]() { }
+
+
         [(_c = fieldNameB, "some" + "method2")]() { }
     }
     _d = fieldNameC;
@@ -404,8 +406,7 @@ let G = /** @class */ (() => {
     ], G.prototype, _d, void 0);
     return G;
 })();
-void (_c = class H {
-        constructor() {
+void (_c = class H {constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
             this["property4"] = 2;
@@ -414,6 +415,8 @@ void (_c = class H {
             this[_v] = null;
         }
         [(foo(), _s = foo(), _t = foo(), "some" + "method")]() { }
+
+
         [(_u = fieldNameB, "some" + "method2")]() { }
     },
     _v = fieldNameC,
@@ -421,6 +424,7 @@ void (_c = class H {
 let I = /** @class */ (() => {
     var _a, _b, _c, _d, _e;
     class I {
+
         constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
@@ -430,6 +434,8 @@ let I = /** @class */ (() => {
             this[_e] = null;
         }
         [(foo(), _a = foo(), _b = foo(), _c = "some" + "method")]() { }
+
+
         [(_d = fieldNameB, "some" + "method2")]() { }
     }
     _e = fieldNameC;
@@ -462,8 +468,7 @@ let I = /** @class */ (() => {
     ], I.prototype, _e, void 0);
     return I;
 })();
-void (_d = class J {
-        constructor() {
+void (_d = class J {constructor() {
             this["property2"] = 2;
             this[Symbol.iterator] = null;
             this["property4"] = 2;
@@ -472,6 +477,8 @@ void (_d = class J {
             this[_0] = null;
         }
         [(foo(), _w = foo(), _x = foo(), _y = "some" + "method")]() { }
+
+
         [(_z = fieldNameB, "some" + "method2")]() { }
     },
     _0 = fieldNameC,

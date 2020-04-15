@@ -238,8 +238,10 @@ var TypeScript;
             }
             return extendsList;
         };
+
         Binder.prototype.resolveBases = function (scope, type) {
             type.extendsList = this.resolveBaseTypeLinks(type.extendsTypeLinks, scope);
+
             var i = 0, len = type.extendsList.length;
             var derivedIsClass = type.isClassInstance();
             for (; i < len; i++) {
@@ -247,28 +249,34 @@ var TypeScript;
                 if (type.extendsList[i] != this.checker.anyType) {
                     if (derivedIsClass) {
                         if (!baseIsClass) {
-                            this.checker.errorReporter.simpleErrorFromSym(type.symbol, "A export class may only extend other classes, " + type.extendsList[i].symbol.fullName() + " is an interface.");
+                            this.checker.errorReporter.simpleErrorFromSym(type.symbol,
+                                "A export class may only extend other classes, " + type.extendsList[i].symbol.fullName() + " is an interface.");
                         }
                     }
                     else {
                         if (baseIsClass) {
-                            this.checker.errorReporter.simpleErrorFromSym(type.symbol, "An interface may only extend other interfaces, " + type.extendsList[i].symbol.fullName() + " is a class.");
+                            this.checker.errorReporter.simpleErrorFromSym(type.symbol,
+                                "An interface may only extend other interfaces, " + type.extendsList[i].symbol.fullName() + " is a class.");
                         }
                     }
                 }
             }
+
             type.implementsList = this.resolveBaseTypeLinks(type.implementsTypeLinks, scope);
+
             if (type.implementsList) {
                 for (i = 0, len = type.implementsList.length; i < len; i++) {
                     var iface = type.implementsList[i];
                     if (iface.isClassInstance()) {
                         if (derivedIsClass) {
-                            this.checker.errorReporter.simpleErrorFromSym(type.symbol, "A class may only implement an interface; " + iface.symbol.fullName() + " is a class.");
+                            this.checker.errorReporter.simpleErrorFromSym(type.symbol,
+                                "A class may only implement an interface; " + iface.symbol.fullName() + " is a class.");
                         }
                     }
                 }
             }
         };
+
         Binder.prototype.resolveSignatureGroup = function (signatureGroup, scope, instanceType) {
             var supplyVar = !(signatureGroup.hasImplementation);
             for (var i = 0, len = signatureGroup.signatures.length; i < len; i++) {
@@ -288,12 +296,14 @@ var TypeScript;
                     var lastParam = signature.parameters[paramLen - 1];
                     lastParam.argsOffset = paramLen - 1;
                     if (!lastParam.getType().isArray()) {
-                        this.checker.errorReporter.simpleErrorFromSym(lastParam, "... parameter must have array type");
+                        this.checker.errorReporter.simpleErrorFromSym(lastParam,
+                            "... parameter must have array type");
                         lastParam.parameter.typeLink.type = this.checker.makeArrayType(lastParam.parameter.typeLink.type);
                     }
                 }
             }
         };
+
         Binder.prototype.bindType = function (scope, type, instanceType) {
             if (instanceType) {
                 this.bindType(scope, instanceType, null);
@@ -344,6 +354,7 @@ var TypeScript;
                 this.bindType(scope, type.elementType, null);
             }
         };
+
         Binder.prototype.bindSymbol = function (scope, symbol) {
             if (!symbol.bound) {
                 var prevLocationInfo = this.checker.locationInfo;
@@ -355,8 +366,10 @@ var TypeScript;
                         if (symbol.flags & SymbolFlags.Bound) {
                             break;
                         }
+
                         var typeSymbol = symbol;
                         typeSymbol.flags |= SymbolFlags.Bound;
+
                         // Since type collection happens out of order, a dynamic module referenced by an import statement
                         // may not yet be in scope when the import symbol is created.  In that case, we need to search
                         // out the module symbol now
@@ -369,8 +382,10 @@ var TypeScript;
                                 typeSymbol.type = modSym.getType();
                             }
                         }
+
                         if (typeSymbol.type && typeSymbol.type != this.checker.gloModType) {
                             this.bindType(scope, typeSymbol.type, typeSymbol.instanceType);
+
                             // bind expansions on the parent type symbol
                             if (typeSymbol.type.isModuleType()) {
                                 for (var i = 0; i < typeSymbol.expansions.length; i++) {
@@ -380,20 +395,26 @@ var TypeScript;
                         }
                         break;
                     case SymbolKind.Field:
-                        this.checker.resolveTypeLink(scope, symbol.field.typeLink, false);
+                        this.checker.resolveTypeLink(scope, symbol.field.typeLink,
+                            false);
                         break;
                     case SymbolKind.Parameter:
-                        this.checker.resolveTypeLink(scope, symbol.parameter.typeLink, true);
+                        this.checker.resolveTypeLink(scope,
+                            symbol.parameter.typeLink,
+                            true);
                         break;
                 }
                 this.checker.locationInfo = prevLocationInfo;
             }
             symbol.bound = true;
         };
+
         Binder.prototype.bind = function (scope, table) {
-            table.map(function (key, sym, binder) {
+            table.map(
+            function (key, sym, binder) {
                 binder.bindSymbol(scope, sym);
-            }, this);
+            },
+                this);
         };
         return Binder;
     }());

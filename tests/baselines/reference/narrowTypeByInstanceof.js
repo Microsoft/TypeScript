@@ -43,6 +43,7 @@ var FileMatch = /** @class */ (function () {
     return FileMatch;
 }());
 var elementA, elementB;
+
 if (elementA instanceof FileMatch && elementB instanceof FileMatch) {
     var a = elementA.resource().path;
     var b = elementB.resource().path;

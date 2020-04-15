@@ -62,8 +62,7 @@ var D = /** @class */ (function (_super) {
         _super.prototype.bar.call(_this);
         _super.prototype.x; // error
         return _this;
-    }
-    D.prototype.foo = function () {
+    }D.prototype.foo = function () {
         _super.prototype.bar.call(this);
         _super.prototype.x; // error
     };
