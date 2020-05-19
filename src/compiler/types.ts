@@ -345,6 +345,8 @@ namespace ts {
         ParenthesizedExpression,
         FunctionExpression,
         ArrowFunction,
+        PartialApplicationExpression,
+        PartialApplicationElement,
         DeleteExpression,
         TypeOfExpression,
         VoidExpression,
@@ -1702,6 +1704,19 @@ namespace ts {
         kind: SyntaxKind.FunctionExpression;
         name?: Identifier;
         body: FunctionBody;  // Required, whereas the member inherited from FunctionDeclaration is optional
+    }
+
+    export interface PartialApplicationExpression extends PrimaryExpression, FunctionLikeDeclarationBase, JSDocContainer {
+        kind: SyntaxKind.FunctionExpression;
+        questionToken: QuestionToken,
+        name?: Identifier;
+        body?: FunctionBody;  // Required?, whereas the member inherited from FunctionDeclaration is optional
+    }
+
+    export interface PartialApplicationElement extends Expression {
+        kind: SyntaxKind.PartialApplicationElement;
+        questionToken: QuestionToken,
+        argumentIndex: number;
     }
 
     export interface ArrowFunction extends Expression, FunctionLikeDeclarationBase, JSDocContainer {
@@ -5756,6 +5771,7 @@ namespace ts {
         ContainsHoistedDeclarationOrCompletion = 1 << 20,
         ContainsDynamicImport = 1 << 21,
         ContainsClassFields = 1 << 22,
+        ContainsPartialApplication = 1 << 23,
 
         // Please leave this as 1 << 29.
         // It is the maximum bit we can set before we outgrow the size of a v8 small integer (SMI) on an x86 system.

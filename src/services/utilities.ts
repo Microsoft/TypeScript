@@ -387,6 +387,7 @@ namespace ts {
             case SyntaxKind.ArrowFunction:
             case SyntaxKind.FunctionDeclaration:
             case SyntaxKind.FunctionExpression:
+            case SyntaxKind.PartialApplicationExpression:
                 return ScriptElementKind.functionElement;
             case SyntaxKind.GetAccessor: return ScriptElementKind.memberGetAccessorElement;
             case SyntaxKind.SetAccessor: return ScriptElementKind.memberSetAccessorElement;

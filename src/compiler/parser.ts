@@ -154,6 +154,7 @@ namespace ts {
             case SyntaxKind.FunctionExpression:
             case SyntaxKind.FunctionDeclaration:
             case SyntaxKind.ArrowFunction:
+            case SyntaxKind.PartialApplicationExpression:
                 return visitNodes(cbNode, cbNodes, node.decorators) ||
                     visitNodes(cbNode, cbNodes, node.modifiers) ||
                     visitNode(cbNode, (<FunctionLikeDeclaration>node).asteriskToken) ||
@@ -1710,7 +1711,7 @@ namespace ts {
                     }
                     // falls through
                 case ParsingContext.ArgumentExpressions:
-                    return token() === SyntaxKind.DotDotDotToken || isStartOfExpression();
+                    return token() === SyntaxKind.DotDotDotToken || token() === SyntaxKind.QuestionToken || isStartOfExpression();
                 case ParsingContext.Parameters:
                     return isStartOfParameter(/*isJSDocParameter*/ false);
                 case ParsingContext.JSDocParameters:
@@ -5061,9 +5062,17 @@ namespace ts {
             return finishNode(node);
         }
 
+        function parsePartialApplicationElement(): Expression {
+            const node = <PartialApplicationElement>createNode(SyntaxKind.PartialApplicationElement);
+            parseExpected(SyntaxKind.QuestionToken);
+            return finishNode(node);
+        }
+
         function parseArgumentOrArrayLiteralElement(): Expression {
             return token() === SyntaxKind.DotDotDotToken ? parseSpreadElement() :
+                token() === SyntaxKind.QuestionToken ? parsePartialApplicationElement() :
                 token() === SyntaxKind.CommaToken ? <Expression>createNode(SyntaxKind.OmittedExpression) :
+                token() === SyntaxKind.QuestionToken ? <PartialApplicationElement>createNode(SyntaxKind.PartialApplicationElement) :
                 parseAssignmentExpressionOrHigher();
         }
 
