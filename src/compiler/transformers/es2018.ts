@@ -673,7 +673,7 @@ namespace ts {
         function createDownlevelAwait(expression: Expression) {
             return enclosingFunctionFlags & FunctionFlags.Generator
                 ? factory.createYieldExpression(/*asteriskToken*/ undefined, emitHelpers().createAwaitHelper(expression))
-                : factory.createAwaitExpression(expression);
+                : factory.createAwaitExpression(expression, /*operation*/ undefined);
         }
 
         function transformForAwaitOfStatement(node: ForOfStatement, outermostLabeledStatement: LabeledStatement | undefined, ancestorFacts: HierarchyFacts) {

@@ -1780,6 +1780,7 @@ namespace ts {
     export interface AwaitExpression extends UnaryExpression {
         readonly kind: SyntaxKind.AwaitExpression;
         readonly expression: UnaryExpression;
+        readonly operation?: "all" | "race" | "allSettled" | "any";
     }
 
     export interface YieldExpression extends Expression {
@@ -6888,8 +6889,8 @@ namespace ts {
         updateTypeOfExpression(node: TypeOfExpression, expression: Expression): TypeOfExpression;
         createVoidExpression(expression: Expression): VoidExpression;
         updateVoidExpression(node: VoidExpression, expression: Expression): VoidExpression;
-        createAwaitExpression(expression: Expression): AwaitExpression;
-        updateAwaitExpression(node: AwaitExpression, expression: Expression): AwaitExpression;
+        createAwaitExpression(expression: Expression, operation: AwaitExpression["operation"]): AwaitExpression;
+        updateAwaitExpression(node: AwaitExpression, expression: Expression, operation: AwaitExpression["operation"]): AwaitExpression;
         createPrefixUnaryExpression(operator: PrefixUnaryOperator, operand: Expression): PrefixUnaryExpression;
         updatePrefixUnaryExpression(node: PrefixUnaryExpression, operand: Expression): PrefixUnaryExpression;
         createPostfixUnaryExpression(operand: Expression, operator: PostfixUnaryOperator): PostfixUnaryExpression;

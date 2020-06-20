@@ -336,7 +336,7 @@ namespace ts.codefix {
             return [factory.createReturnStatement(getSynthesizedDeepClone(node))];
         }
 
-        return createVariableOrAssignmentOrExpressionStatement(prevArgName, factory.createAwaitExpression(node), /*typeAnnotation*/ undefined);
+        return createVariableOrAssignmentOrExpressionStatement(prevArgName, factory.createAwaitExpression(node, /*operation*/ undefined), /*typeAnnotation*/ undefined);
     }
 
     function createVariableOrAssignmentOrExpressionStatement(variableName: SynthBindingName | undefined, rightHandSide: Expression, typeAnnotation: TypeNode | undefined): readonly Statement[] {
@@ -397,7 +397,7 @@ namespace ts.codefix {
                     return silentFail();
                 }
                 const returnType = callSignatures[0].getReturnType();
-                const varDeclOrAssignment = createVariableOrAssignmentOrExpressionStatement(prevArgName, factory.createAwaitExpression(synthCall), parent.typeArguments?.[0]);
+                const varDeclOrAssignment = createVariableOrAssignmentOrExpressionStatement(prevArgName, factory.createAwaitExpression(synthCall, /*operation*/ undefined), parent.typeArguments?.[0]);
                 if (prevArgName) {
                     prevArgName.types.push(returnType);
                 }
@@ -471,7 +471,7 @@ namespace ts.codefix {
 
     function getPossiblyAwaitedRightHandSide(checker: TypeChecker, type: Type, expr: Expression): AwaitExpression | Expression {
         const rightHandSide = getSynthesizedDeepClone(expr);
-        return !!checker.getPromisedTypeOfPromise(type) ? factory.createAwaitExpression(rightHandSide) : rightHandSide;
+        return !!checker.getPromisedTypeOfPromise(type) ? factory.createAwaitExpression(rightHandSide, /*operation*/ undefined) : rightHandSide;
     }
 
     function getLastCallSignature(type: Type, checker: TypeChecker): Signature | undefined {
@@ -484,7 +484,7 @@ namespace ts.codefix {
         for (const stmt of stmts) {
             if (isReturnStatement(stmt)) {
                 if (stmt.expression) {
-                    const possiblyAwaitedExpression = isPromiseTypedExpression(stmt.expression, transformer.checker) ? factory.createAwaitExpression(stmt.expression) : stmt.expression;
+                    const possiblyAwaitedExpression = isPromiseTypedExpression(stmt.expression, transformer.checker) ? factory.createAwaitExpression(stmt.expression, /*operation*/ undefined) : stmt.expression;
                     if (prevArgName === undefined) {
                         ret.push(factory.createExpressionStatement(possiblyAwaitedExpression));
                     }

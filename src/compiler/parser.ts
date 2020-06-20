@@ -4490,7 +4490,16 @@ namespace ts {
 
         function parseAwaitExpression() {
             const pos = getNodePos();
-            return finishNode(factory.createAwaitExpression(nextTokenAnd(parseSimpleUnaryExpression)), pos);
+            nextToken(); // advance past "await"
+            const op = tryParse(() => {
+                if (token() !== SyntaxKind.DotToken) return undefined;
+                nextToken(); // advance past the dot
+                if (!tokenIsIdentifierOrKeyword(token())) return undefined;
+                const id = parseIdentifierName().escapedText;
+                if (id === "all" || id === "race" || id === "allSettled" || id === "any") return <AwaitExpression["operation"]>id;
+                return undefined;
+            });
+            return finishNode(factory.createAwaitExpression(parseSimpleUnaryExpression(), op), pos);
         }
 
         /**
