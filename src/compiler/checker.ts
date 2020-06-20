@@ -897,6 +897,7 @@ namespace ts {
         let deferredGlobalESSymbolType: ObjectType;
         let deferredGlobalTypedPropertyDescriptorType: GenericType;
         let deferredGlobalPromiseType: GenericType;
+        let deferredGlobalPromiseSettledResultType: UnionType;
         let deferredGlobalPromiseLikeType: GenericType;
         let deferredGlobalPromiseConstructorSymbol: Symbol | undefined;
         let deferredGlobalPromiseConstructorLikeType: ObjectType;
@@ -12526,7 +12527,7 @@ namespace ts {
             return links.resolvedType;
         }
 
-        function getTypeOfGlobalSymbol(symbol: Symbol | undefined, arity: number): ObjectType {
+        function getTypeOfGlobalSymbol(symbol: Symbol | undefined, arity: number, expectUnion?: boolean): ObjectType | UnionType {
 
             function getTypeDeclaration(symbol: Symbol): Declaration | undefined {
                 const declarations = symbol.declarations;
@@ -12544,15 +12545,18 @@ namespace ts {
                 return arity ? emptyGenericType : emptyObjectType;
             }
             const type = getDeclaredTypeOfSymbol(symbol);
-            if (!(type.flags & TypeFlags.Object)) {
+            const isObjectLike = type.flags & TypeFlags.Object;
+            const isUnion = type.flags & TypeFlags.Union;
+            if (expectUnion ? !isUnion : !isObjectLike) {
+                // TODO: maybe add a new error for expecting a union type?
                 error(getTypeDeclaration(symbol), Diagnostics.Global_type_0_must_be_a_class_or_interface_type, symbolName(symbol));
                 return arity ? emptyGenericType : emptyObjectType;
             }
-            if (length((<InterfaceType>type).typeParameters) !== arity) {
+            if (length(isUnion ? (<UnionType>type).aliasTypeArguments : (<InterfaceType>type).typeParameters) !== arity) {
                 error(getTypeDeclaration(symbol), Diagnostics.Global_type_0_must_have_1_type_parameter_s, symbolName(symbol), arity);
                 return arity ? emptyGenericType : emptyObjectType;
             }
-            return <ObjectType>type;
+            return <ObjectType | UnionType>type;
         }
 
         function getGlobalValueSymbol(name: __String, reportErrors: boolean): Symbol | undefined {
@@ -12570,9 +12574,10 @@ namespace ts {
 
         function getGlobalType(name: __String, arity: 0, reportErrors: boolean): ObjectType;
         function getGlobalType(name: __String, arity: number, reportErrors: boolean): GenericType;
-        function getGlobalType(name: __String, arity: number, reportErrors: boolean): ObjectType | undefined {
+        function getGlobalType(name: __String, arity: number, reportErrors: boolean, expectUnion: true): UnionType;
+        function getGlobalType(name: __String, arity: number, reportErrors: boolean, expectUnion?: boolean): ObjectType | UnionType | undefined {
             const symbol = getGlobalTypeSymbol(name, reportErrors);
-            return symbol || reportErrors ? getTypeOfGlobalSymbol(symbol, arity) : undefined;
+            return symbol || reportErrors ? getTypeOfGlobalSymbol(symbol, arity, expectUnion) : undefined;
         }
 
         function getGlobalTypedPropertyDescriptorType() {
@@ -12633,6 +12638,10 @@ namespace ts {
 
         function getGlobalIteratorType(reportErrors: boolean) {
             return deferredGlobalIteratorType || (deferredGlobalIteratorType = getGlobalType("Iterator" as __String, /*arity*/ 3, reportErrors)) || emptyGenericType;
+        }
+
+        function getGlobalPromiseSettledResultType(reportErrors: boolean) {
+            return deferredGlobalPromiseSettledResultType || (deferredGlobalPromiseSettledResultType = getGlobalType("PromiseSettledResult" as __String, /*arity*/ 1, reportErrors, /*expectUnion*/ true)) || emptyGenericType;
         }
 
         function getGlobalIterableIteratorType(reportErrors: boolean) {
@@ -29706,11 +29715,35 @@ namespace ts {
             }
 
             const operandType = checkExpression(node.expression);
-            const awaitedType = checkAwaitedType(operandType, node, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member);
-            if (awaitedType === operandType && awaitedType !== errorType && !(operandType.flags & TypeFlags.AnyOrUnknown)) {
-                addErrorOrSuggestion(/*isError*/ false, createDiagnosticForNode(node, Diagnostics.await_has_no_effect_on_the_type_of_this_expression));
+            if (!node.operation) {
+                const awaitedType = checkAwaitedType(operandType, node, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member);
+                if (awaitedType === operandType && awaitedType !== errorType && !(operandType.flags & TypeFlags.AnyOrUnknown)) {
+                    addErrorOrSuggestion(/*isError*/ false, createDiagnosticForNode(node, Diagnostics.await_has_no_effect_on_the_type_of_this_expression));
+                }
+                return awaitedType;
             }
-            return awaitedType;
+            // About async iterable, see https://github.com/Jack-Works/proposal-await.ops/issues/6
+            const iterated = getIteratedTypeOrElementType(IterationUse.AllowsSyncIterablesFlag, operandType, undefinedType, node.expression, /*checkAssignability*/ false);
+            if (!iterated) {
+                // TODO: add a new diagnostics to emit error
+                // the operand of await operations must be an iterable
+                return neverType;
+            }
+            const awaitedType = checkAwaitedType(iterated, node, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member);
+            switch (node.operation) {
+                case "all":
+                    return createArrayType(awaitedType);
+                case "any":
+                case "race":
+                    return awaitedType;
+                case "allSettled":
+                    const PromiseSettledResult = getGlobalPromiseSettledResultType(true);
+                    const mapper = createTypeMapper(PromiseSettledResult.aliasTypeArguments!, /*targets*/[awaitedType]);
+                    const result = instantiateType(PromiseSettledResult, mapper)!;
+                    return createArrayType(result);
+                default:
+                    Debug.fail()
+            }
         }
 
         function checkPrefixUnaryExpression(node: PrefixUnaryExpression): Type {

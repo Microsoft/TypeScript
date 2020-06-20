@@ -142,6 +142,11 @@ namespace ts {
             node.forEachChild(child => { children.push(child); });
             return children;
         }
+        // await.operations should not have ".opName" as it's children
+        if (isAwaitExpression(node)) {
+            children.push(node.expression);
+            return children;
+        }
 
         scanner.setText((sourceFile || node.getSourceFile()).text);
         let pos = node.pos;
