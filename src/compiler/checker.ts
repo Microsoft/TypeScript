@@ -21339,6 +21339,12 @@ namespace ts {
             return mappedTypes && getUnionType(mappedTypes, noReductions ? UnionReduction.None : UnionReduction.Literal);
         }
 
+        function mapTupleType(tuple: TupleTypeReference, mapper: (t: Type) => Type): TupleTypeReference {
+            const target = tuple.target;
+            const newType = map(getTypeArguments(tuple), mapper);
+            return <TupleTypeReference>(createTupleType(newType, target.minLength, target.hasRestElement, target.readonly, target.labeledElementDeclarations));
+        }
+
         function extractTypesOfKind(type: Type, kind: TypeFlags) {
             return filterType(type, t => (t.flags & kind) !== 0);
         }
@@ -29722,28 +29728,33 @@ namespace ts {
                 }
                 return awaitedType;
             }
+            checkPromiseOperationExists(node.operation);
             const iterated = getIteratedTypeOrElementType(IterationUse.AllowsSyncIterablesFlag, operandType, undefinedType, /*errorNode*/undefined, /*checkAssignability*/ false);
             if (!iterated) {
                 error(node.expression, Diagnostics.The_expression_after_the_await_0_operator_must_be_iterable, node.operation);
                 return anyType;
             }
-            const awaitedType = checkAwaitedType(iterated, node, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member);
-            checkPromiseOperationExists(node.operation);
+            const awaited = (T: Type) => checkAwaitedType(T, node, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member);
             switch (node.operation) {
-                case "all":
-                    return createArrayType(awaitedType);
+                case "all": {
+                    if (isTupleLikeType(operandType)) return mapTupleType(<TupleTypeReference>operandType, awaited);
+                    return createArrayType(awaited(iterated));
+                }
                 case "any":
                 case "race":
-                    return awaitedType;
+                    return awaited(iterated);
                 case "allSettled":
                     const PromiseSettledResult = getGlobalPromiseSettledResultType(true);
+                    const promiseSettled = (T: Type) => instantiateType(
+                        PromiseSettledResult,
+                        createTypeMapper(PromiseSettledResult.aliasTypeArguments!, /*targets*/[T])
+                    )!;
                     if (PromiseSettledResult === (emptyGenericType as any)) {
                         error(node, Diagnostics.Cannot_find_name_0_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_1_or_later, "PromiseSettledResult", "es2020");
                         return anyType;
                     }
-                    const mapper = createTypeMapper(PromiseSettledResult.aliasTypeArguments!, /*targets*/[awaitedType]);
-                    const result = instantiateType(PromiseSettledResult, mapper)!;
-                    return createArrayType(result);
+                    if (isTupleLikeType(operandType)) return mapTupleType(<TupleTypeReference>operandType, T => promiseSettled(awaited(T)));
+                    return createArrayType(promiseSettled(awaited(iterated)));
                 default:
                     Debug.fail()
             }
