@@ -2602,6 +2602,7 @@ namespace ts {
                 TransformFlags.ContainsES2017 |
                 TransformFlags.ContainsES2018 |
                 TransformFlags.ContainsAwait;
+            if (operation) node.transformFlags |= TransformFlags.ContainsESNext;
             return node;
         }
 

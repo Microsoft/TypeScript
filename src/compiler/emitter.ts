@@ -2461,6 +2461,10 @@ namespace ts {
 
         function emitAwaitExpression(node: AwaitExpression) {
             emitTokenWithComment(SyntaxKind.AwaitKeyword, node.pos, writeKeyword, node);
+            if (node.operation) {
+                emitTokenWithComment(SyntaxKind.DotToken, node.pos, writeKeyword, node);
+                emitIdentifier(factory.createIdentifier(node.operation));
+            }
             writeSpace();
             emitExpression(node.expression);
         }
