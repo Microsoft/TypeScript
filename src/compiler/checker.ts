@@ -29722,14 +29722,13 @@ namespace ts {
                 }
                 return awaitedType;
             }
-            // About async iterable, see https://github.com/Jack-Works/proposal-await.ops/issues/6
-            const iterated = getIteratedTypeOrElementType(IterationUse.AllowsSyncIterablesFlag, operandType, undefinedType, node.expression, /*checkAssignability*/ false);
+            const iterated = getIteratedTypeOrElementType(IterationUse.AllowsSyncIterablesFlag, operandType, undefinedType, /*errorNode*/undefined, /*checkAssignability*/ false);
             if (!iterated) {
-                // TODO: add a new diagnostics to emit error
-                // the operand of await operations must be an iterable
-                return neverType;
+                error(node.expression, Diagnostics.The_expression_after_the_await_0_operator_must_be_iterable, node.operation);
+                return anyType;
             }
             const awaitedType = checkAwaitedType(iterated, node, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member);
+            checkPromiseOperationExists(node.operation);
             switch (node.operation) {
                 case "all":
                     return createArrayType(awaitedType);
@@ -29738,11 +29737,22 @@ namespace ts {
                     return awaitedType;
                 case "allSettled":
                     const PromiseSettledResult = getGlobalPromiseSettledResultType(true);
+                    if (PromiseSettledResult === (emptyGenericType as any)) {
+                        error(node, Diagnostics.Cannot_find_name_0_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_1_or_later, "PromiseSettledResult", "es2020");
+                        return anyType;
+                    }
                     const mapper = createTypeMapper(PromiseSettledResult.aliasTypeArguments!, /*targets*/[awaitedType]);
                     const result = instantiateType(PromiseSettledResult, mapper)!;
                     return createArrayType(result);
                 default:
                     Debug.fail()
+            }
+            function checkPromiseOperationExists(op: AwaitExpression["operation"]) {
+                const promiseConstructor = getGlobalPromiseConstructorSymbol(true);
+                if (!promiseConstructor) return error(node, Diagnostics.Cannot_find_name_0_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_1_or_later, "Promise", "ES2015");
+                if (!getPropertyOfType(getTypeOfSymbol(promiseConstructor), op as __String))
+                    return error(node, Diagnostics.To_use_await_0_operator_there_must_be_a_Promise_0_method_exists, op);
+                return undefined;
             }
         }
 

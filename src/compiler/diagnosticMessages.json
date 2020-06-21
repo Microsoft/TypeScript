@@ -3059,6 +3059,14 @@
         "category": "Error",
         "code": 2796
     },
+    "To use await.{0} operator, there must be a Promise.{0} method exists.": {
+        "category": "Error",
+        "code": 2797
+    },
+    "The expression after the await.{0} operator must be iterable.": {
+        "category": "Error",
+        "code": 2978
+    },
 
     "Import declaration '{0}' is using private name '{1}'.": {
         "category": "Error",
