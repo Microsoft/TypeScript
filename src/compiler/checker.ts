@@ -21342,7 +21342,7 @@ namespace ts {
         function mapTupleType(tuple: TupleTypeReference, mapper: (t: Type) => Type): TupleTypeReference {
             const target = tuple.target;
             const newType = map(getTypeArguments(tuple), mapper);
-            return <TupleTypeReference>(createTupleType(newType, target.minLength, target.hasRestElement, target.readonly, target.labeledElementDeclarations));
+            return <TupleTypeReference>(createTupleType(newType, target.elementFlags, target.readonly, target.labeledElementDeclarations));
         }
 
         function extractTypesOfKind(type: Type, kind: TypeFlags) {
@@ -29729,12 +29729,12 @@ namespace ts {
                 return awaitedType;
             }
             checkPromiseOperationExists(node.operation);
-            const iterated = getIteratedTypeOrElementType(IterationUse.AllowsSyncIterablesFlag, operandType, undefinedType, /*errorNode*/undefined, /*checkAssignability*/ false);
+            const iterated = getIteratedTypeOrElementType(IterationUse.AllowsSyncIterablesFlag, operandType, undefinedType, /*errorNode*/ undefined, /*checkAssignability*/ false);
             if (!iterated) {
                 error(node.expression, Diagnostics.The_expression_after_the_await_0_operator_must_be_iterable, node.operation);
                 return anyType;
             }
-            const awaited = (T: Type) => checkAwaitedType(T, node, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member);
+            const awaited = (type: Type) => checkAwaitedType(type, node, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member);
             switch (node.operation) {
                 case "all": {
                     if (isTupleLikeType(operandType)) return mapTupleType(<TupleTypeReference>operandType, awaited);
@@ -29744,25 +29744,26 @@ namespace ts {
                 case "race":
                     return awaited(iterated);
                 case "allSettled":
-                    const PromiseSettledResult = getGlobalPromiseSettledResultType(true);
-                    const promiseSettled = (T: Type) => instantiateType(
+                    const PromiseSettledResult = getGlobalPromiseSettledResultType(/*reportErrors*/ true);
+                    const promiseSettled = (type: Type) => instantiateType(
                         PromiseSettledResult,
-                        createTypeMapper(PromiseSettledResult.aliasTypeArguments!, /*targets*/[T])
+                        createTypeMapper(PromiseSettledResult.aliasTypeArguments!, /*targets*/[type])
                     )!;
                     if (PromiseSettledResult === (emptyGenericType as any)) {
                         error(node, Diagnostics.Cannot_find_name_0_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_1_or_later, "PromiseSettledResult", "es2020");
                         return anyType;
                     }
-                    if (isTupleLikeType(operandType)) return mapTupleType(<TupleTypeReference>operandType, T => promiseSettled(awaited(T)));
+                    if (isTupleLikeType(operandType)) return mapTupleType(<TupleTypeReference>operandType, type => promiseSettled(awaited(type)));
                     return createArrayType(promiseSettled(awaited(iterated)));
                 default:
-                    Debug.fail()
+                    Debug.fail();
             }
             function checkPromiseOperationExists(op: AwaitExpression["operation"]) {
-                const promiseConstructor = getGlobalPromiseConstructorSymbol(true);
+                const promiseConstructor = getGlobalPromiseConstructorSymbol(/*reportErrors*/ true);
                 if (!promiseConstructor) return error(node, Diagnostics.Cannot_find_name_0_Do_you_need_to_change_your_target_library_Try_changing_the_lib_compiler_option_to_1_or_later, "Promise", "ES2015");
-                if (!getPropertyOfType(getTypeOfSymbol(promiseConstructor), op as __String))
+                if (!getPropertyOfType(getTypeOfSymbol(promiseConstructor), op as __String)) {
                     return error(node, Diagnostics.To_use_await_0_operator_there_must_be_a_Promise_0_method_exists, op);
+                }
                 return undefined;
             }
         }

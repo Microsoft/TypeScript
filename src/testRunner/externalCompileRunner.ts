@@ -1,6 +1,7 @@
 namespace Harness {
     const fs: typeof import("fs") = require("fs");
     const path: typeof import("path") = require("path");
+    // @ts-ignore
     const del: typeof import("del") = require("del");
 
     interface ExecResult {
