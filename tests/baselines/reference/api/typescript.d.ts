@@ -3723,7 +3723,6 @@ declare namespace ts {
         noEmitHelpers?: boolean;
     }
     export interface GetEffectiveTypeRootsHost {
-        directoryExists?(directoryName: string): boolean;
         getCurrentDirectory?(): string;
     }
     export interface TextSpan {
@@ -5335,6 +5334,7 @@ declare namespace ts {
         readFile?(path: string, encoding?: string): string | undefined;
         realpath?(path: string): string;
         fileExists?(path: string): boolean;
+        directoryExists?(directoryName: string): boolean;
         getTypeRootsVersion?(): number;
         resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedModule | undefined)[];
         getResolvedModuleWithFailedLookupLocationsFromCache?(modulename: string, containingFile: string): ResolvedModuleWithFailedLookupLocations | undefined;

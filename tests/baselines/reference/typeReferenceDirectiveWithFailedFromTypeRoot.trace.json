@@ -1,0 +1,9 @@
+[
+    "======== Resolving type reference directive 'phaser', containing file '/__inferred type names__.ts', root directory '/typings'. ========",
+    "Resolving with primary search path '/typings'.",
+    "Loading module as file / folder, candidate module location '/typings/phaser', target file type 'DtsOnly'.",
+    "File '/typings/phaser.d.ts' does not exist.",
+    "Directory '/typings/phaser' does not exist, skipping all lookups in it.",
+    "Resolving type reference directive for program with typeRoots, skipping lookup in 'node_modules' folder.",
+    "======== Type reference directive 'phaser' was not resolved. ========"
+]

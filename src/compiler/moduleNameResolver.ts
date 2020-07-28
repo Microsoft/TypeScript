@@ -250,7 +250,7 @@ namespace ts {
         }
 
         if (currentDirectory !== undefined) {
-            return getDefaultTypeRoots(currentDirectory, host);
+            return getDefaultTypeRoots(currentDirectory);
         }
     }
 
@@ -258,19 +258,11 @@ namespace ts {
      * Returns the path to every node_modules/@types directory from some ancestor directory.
      * Returns undefined if there are none.
      */
-    function getDefaultTypeRoots(currentDirectory: string, host: { directoryExists?: (directoryName: string) => boolean }): string[] | undefined {
-        if (!host.directoryExists) {
-            return [combinePaths(currentDirectory, nodeModulesAtTypes)];
-            // And if it doesn't exist, tough.
-        }
-
+    function getDefaultTypeRoots(currentDirectory: string): string[] | undefined {
         let typeRoots: string[] | undefined;
         forEachAncestorDirectory(normalizePath(currentDirectory), directory => {
             const atTypes = combinePaths(directory, nodeModulesAtTypes);
-            if (host.directoryExists!(atTypes)) {
-                (typeRoots || (typeRoots = [])).push(atTypes);
-            }
-            return undefined;
+            (typeRoots || (typeRoots = [])).push(atTypes);
         });
         return typeRoots;
     }
@@ -343,15 +335,15 @@ namespace ts {
                     trace(host, Diagnostics.Resolving_with_primary_search_path_0, typeRoots.join(", "));
                 }
                 return firstDefined(typeRoots, typeRoot => {
-                    const candidate = combinePaths(typeRoot, typeReferenceDirectiveName);
-                    const candidateDirectory = getDirectoryPath(candidate);
-                    const directoryExists = directoryProbablyExists(candidateDirectory, host);
-                    if (!directoryExists && traceEnabled) {
-                        trace(host, Diagnostics.Directory_0_does_not_exist_skipping_all_lookups_in_it, candidateDirectory);
-                    }
                     return resolvedTypeScriptOnly(
-                        loadNodeModuleFromDirectory(Extensions.DtsOnly, candidate,
-                            !directoryExists, moduleResolutionState));
+                        nodeLoadModuleByRelativeName(
+                            Extensions.DtsOnly,
+                            combinePaths(typeRoot, typeReferenceDirectiveName),
+                            /*onlyRecordFailures*/ false,
+                            moduleResolutionState,
+                             /*considerPackageJson*/ true
+                        )
+                    );
                 });
             }
             else {
@@ -363,20 +355,25 @@ namespace ts {
 
         function secondaryLookup(): PathAndPackageId | undefined {
             const initialLocationForSecondaryLookup = containingFile && getDirectoryPath(containingFile);
-
             if (initialLocationForSecondaryLookup !== undefined) {
-                // check secondary locations
-                if (traceEnabled) {
-                    trace(host, Diagnostics.Looking_up_in_node_modules_folder_initial_location_0, initialLocationForSecondaryLookup);
-                }
+                // Do not resolve auto types from secondary location
                 let result: Resolved | undefined;
-                if (!isExternalModuleNameRelative(typeReferenceDirectiveName)) {
-                    const searchResult = loadModuleFromNearestNodeModulesDirectory(Extensions.DtsOnly, typeReferenceDirectiveName, initialLocationForSecondaryLookup, moduleResolutionState, /*cache*/ undefined, /*redirectedReference*/ undefined);
-                    result = searchResult && searchResult.value;
+                if (!options.typeRoots || !endsWith(containingFile!, inferredTypesContainingFile)) {
+                    // check secondary locations
+                    if (traceEnabled) {
+                        trace(host, Diagnostics.Looking_up_in_node_modules_folder_initial_location_0, initialLocationForSecondaryLookup);
+                    }
+                    if (!isExternalModuleNameRelative(typeReferenceDirectiveName)) {
+                        const searchResult = loadModuleFromNearestNodeModulesDirectory(Extensions.DtsOnly, typeReferenceDirectiveName, initialLocationForSecondaryLookup, moduleResolutionState, /*cache*/ undefined, /*redirectedReference*/ undefined);
+                        result = searchResult && searchResult.value;
+                    }
+                    else {
+                        const { path: candidate } = normalizePathAndParts(combinePaths(initialLocationForSecondaryLookup, typeReferenceDirectiveName));
+                        result = nodeLoadModuleByRelativeName(Extensions.DtsOnly, candidate, /*onlyRecordFailures*/ false, moduleResolutionState, /*considerPackageJson*/ true);
+                    }
                 }
-                else {
-                    const { path: candidate } = normalizePathAndParts(combinePaths(initialLocationForSecondaryLookup, typeReferenceDirectiveName));
-                    result = nodeLoadModuleByRelativeName(Extensions.DtsOnly, candidate, /*onlyRecordFailures*/ false, moduleResolutionState, /*considerPackageJson*/ true);
+                else if (traceEnabled) {
+                    trace(host, Diagnostics.Resolving_type_reference_directive_for_program_with_typeRoots_skipping_lookup_in_node_modules_folder);
                 }
                 const resolvedFile = resolvedTypeScriptOnly(result);
                 if (!resolvedFile && traceEnabled) {
@@ -944,6 +941,7 @@ namespace ts {
                 if (traceEnabled) {
                     trace(host, Diagnostics.Loading_module_0_from_node_modules_folder_target_file_type_1, moduleName, Extensions[extensions]);
                 }
+                // TODO:: resolve type ference directive
                 const resolved = loadModuleFromNearestNodeModulesDirectory(extensions, moduleName, containingDirectory, state, cache, redirectedReference);
                 if (!resolved) return undefined;
 
@@ -1473,7 +1471,8 @@ namespace ts {
                 }
                 if (extensions === Extensions.TypeScript) {
                     // If we didn't find the file normally, look it up in @types.
-                    return loadModuleFromNearestNodeModulesDirectoryTypesScope(moduleName, containingDirectory, state);
+                    // TODO type referecnce like resolution
+                    return resolveTypeReferenceDirective(moduleName, containingFile,  containingDirectory, state);
                 }
             }
             else {
