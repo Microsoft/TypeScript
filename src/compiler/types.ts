@@ -3624,6 +3624,7 @@ namespace ts {
         fileExists(path: string): boolean;
 
         readFile(path: string): string | undefined;
+        readFileBuffer(path: string): Uint8Array | undefined;
         trace?(s: string): void;
     }
 
@@ -5676,6 +5677,7 @@ namespace ts {
         emitBOM?: boolean;
         emitDecoratorMetadata?: boolean;
         experimentalDecorators?: boolean;
+        experimentalWasmModules?: boolean;
         forceConsistentCasingInFileNames?: boolean;
         /*@internal*/generateCpuProfile?: string;
         /*@internal*/help?: boolean;
@@ -5835,7 +5837,8 @@ namespace ts {
          * Used on extensions that doesn't define the ScriptKind but the content defines it.
          * Deferred extensions are going to be included in all project contexts.
          */
-        Deferred = 7
+        Deferred = 7,
+        Wasm = 8,
     }
 
     export const enum ScriptTarget {
@@ -6110,6 +6113,7 @@ namespace ts {
         // readFile function is used to read arbitrary text files on disk, i.e. when resolution procedure needs the content of 'package.json'
         // to determine location of bundled typings for node module
         readFile(fileName: string): string | undefined;
+        readFileBuffer(fileName: string): Uint8Array | undefined;
         trace?(s: string): void;
         directoryExists?(directoryName: string): boolean;
         /**
@@ -6178,7 +6182,8 @@ namespace ts {
         Js = ".js",
         Jsx = ".jsx",
         Json = ".json",
-        TsBuildInfo = ".tsbuildinfo"
+        TsBuildInfo = ".tsbuildinfo",
+        Wasm = ".wasm",
     }
 
     export interface ResolvedModuleWithFailedLookupLocations {
@@ -7602,7 +7607,7 @@ namespace ts {
          * });
          * ```
          */
-        onEmitNode?(hint: EmitHint, node: Node | undefined, emitCallback: (hint: EmitHint, node: Node | undefined) => void): void;
+        onEmitNode?(hint: EmitHint, node: Node | undefined, emitCallback: (hint: EmitHint, node: Node | undefined) => void, getTextPos: () => number): void;
 
         /**
          * A hook used to check if an emit notification is required for a node.

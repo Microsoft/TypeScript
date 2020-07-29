@@ -121,6 +121,11 @@ namespace ts {
         /** Gets a portion of the script snapshot specified by [start, end). */
         getText(start: number, end: number): string;
 
+        /**
+         * Gets the udnerlying buffer for the snapshot
+         */
+        getBuffer(): Uint8Array;
+
         /** Gets the length of this script snapshot. */
         getLength(): number;
 
@@ -140,13 +145,17 @@ namespace ts {
     export namespace ScriptSnapshot {
         class StringScriptSnapshot implements IScriptSnapshot {
 
-            constructor(private text: string) {
+            constructor(private text: string, private buffer: Uint8Array | undefined) {
             }
 
             public getText(start: number, end: number): string {
                 return start === 0 && end === this.text.length
                     ? this.text
                     : this.text.substring(start, end);
+            }
+
+            public getBuffer() {
+                return this.buffer || (sys.bufferFrom?.(this.text, "utf8") as Uint8Array); // TODO: very unsafe, disreregards `undefined` result
             }
 
             public getLength(): number {
@@ -160,8 +169,8 @@ namespace ts {
             }
         }
 
-        export function fromString(text: string): IScriptSnapshot {
-            return new StringScriptSnapshot(text);
+        export function fromString(text: string, buffer?: Uint8Array): IScriptSnapshot {
+            return new StringScriptSnapshot(text, buffer);
         }
     }
 
@@ -248,6 +257,7 @@ namespace ts {
          */
         readDirectory?(path: string, extensions?: readonly string[], exclude?: readonly string[], include?: readonly string[], depth?: number): string[];
         readFile?(path: string, encoding?: string): string | undefined;
+        readFileBuffer?(path: string): Uint8Array | undefined;
         realpath?(path: string): string;
         fileExists?(path: string): boolean;
 
@@ -1340,6 +1350,7 @@ namespace ts {
         jsModifier = ".js",
         jsxModifier = ".jsx",
         jsonModifier = ".json",
+        wasmModifier = ".wasm",
     }
 
     export const enum ClassificationTypeNames {

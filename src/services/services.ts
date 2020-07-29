@@ -1038,7 +1038,7 @@ namespace ts {
             const version = this.host.getScriptVersion(fileName);
             let sourceFile: SourceFile | undefined;
 
-            if (this.currentFileName !== fileName) {
+            if (this.currentFileName !== fileName || scriptKind === ScriptKind.Wasm) {
                 // This is a new file, just parse it
                 sourceFile = createLanguageServiceSourceFile(fileName, scriptSnapshot, ScriptTarget.Latest, version, /*setNodeParents*/ true, scriptKind);
             }
@@ -1066,7 +1066,7 @@ namespace ts {
     }
 
     export function createLanguageServiceSourceFile(fileName: string, scriptSnapshot: IScriptSnapshot, scriptTarget: ScriptTarget, version: string, setNodeParents: boolean, scriptKind?: ScriptKind): SourceFile {
-        const sourceFile = createSourceFile(fileName, getSnapshotText(scriptSnapshot), scriptTarget, setNodeParents, scriptKind);
+        const sourceFile = createSourceFile(fileName, endsWith(fileName, ".wasm") ? getSnapshotBuffer(scriptSnapshot) : getSnapshotText(scriptSnapshot), scriptTarget, setNodeParents, scriptKind);
         setSourceFileFields(sourceFile, scriptSnapshot, version);
         return sourceFile;
     }
@@ -1074,7 +1074,7 @@ namespace ts {
     export function updateLanguageServiceSourceFile(sourceFile: SourceFile, scriptSnapshot: IScriptSnapshot, version: string, textChangeRange: TextChangeRange | undefined, aggressiveChecks?: boolean): SourceFile {
         // If we were given a text change range, and our version or open-ness changed, then
         // incrementally parse this file.
-        if (textChangeRange) {
+        if (textChangeRange && !endsWith(sourceFile.fileName, ".wasm")) {
             if (version !== sourceFile.version) {
                 let newText: string;
 
@@ -1123,7 +1123,7 @@ namespace ts {
         }
 
         // Otherwise, just create a new source file.
-        return createLanguageServiceSourceFile(sourceFile.fileName, scriptSnapshot, sourceFile.languageVersion, version, /*setNodeParents*/ true, sourceFile.scriptKind);
+        return createLanguageServiceSourceFile(sourceFile.fileName, scriptSnapshot, sourceFile.languageVersion, version, /*setNodeParents*/ true, endsWith(sourceFile.fileName, ".wasm") ? ScriptKind.Wasm : sourceFile.scriptKind);
     }
 
     class CancellationTokenObject implements CancellationToken {
@@ -1296,6 +1296,7 @@ namespace ts {
                 getCurrentDirectory: () => currentDirectory,
                 fileExists,
                 readFile,
+                readFileBuffer,
                 getSymlinkCache: maybeBind(host, host.getSymlinkCache),
                 realpath: maybeBind(host, host.realpath),
                 directoryExists: directoryName => {
@@ -1361,6 +1362,10 @@ namespace ts {
                 return host.readFile && host.readFile(fileName);
             }
 
+            function readFileBuffer(fileName: string): Uint8Array | undefined {
+                return host.readFileBuffer && host.readFileBuffer(fileName);
+            }
+
             // Release any files we have acquired in the old program but are
             // not part of the new program.
             function onReleaseOldSourceFile(oldSourceFile: SourceFile, oldOptions: CompilerOptions) {
@@ -1385,7 +1390,7 @@ namespace ts {
                 // Check if the language version has changed since we last created a program; if they are the same,
                 // it is safe to reuse the sourceFiles; if not, then the shape of the AST can change, and the oldSourceFile
                 // can not be reused. we have to dump all syntax trees and create new ones.
-                if (!shouldCreateNewSourceFile) {
+                if (!shouldCreateNewSourceFile && !endsWith(fileName, ".wasm")) {
                     // Check if the old program had this file already
                     const oldSourceFile = program && program.getSourceFileByPath(path);
                     if (oldSourceFile) {

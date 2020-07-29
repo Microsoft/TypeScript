@@ -44,7 +44,23 @@ namespace fakes {
         public readFile(path: string) {
             try {
                 const content = this.vfs.readFileSync(path, "utf8");
-                return content === undefined ? undefined : Utils.removeByteOrderMark(content);
+                if (content === undefined) {
+                    return undefined;
+                }
+                return Utils.removeByteOrderMark(content);
+            }
+            catch {
+                return undefined;
+            }
+        }
+
+        public readFileBuffer(path: string) {
+            try {
+                const content = this.vfs.readFileSync(path);
+                if (content === undefined) {
+                    return undefined;
+                }
+                return content;
             }
             catch {
                 return undefined;
@@ -206,6 +222,10 @@ namespace fakes {
             return this.sys.readFile(path);
         }
 
+        public readFileBuffer(path: string): Uint8Array | undefined {
+            return this.sys.readFileBuffer(path);
+        }
+
         public readDirectory(path: string, extensions: string[], excludes: string[], includes: string[], depth: number): string[] {
             return this.sys.readDirectory(path, extensions, excludes, includes, depth);
         }
@@ -293,6 +313,10 @@ namespace fakes {
             return this.sys.readFile(path);
         }
 
+        public readFileBuffer(path: string): Uint8Array | undefined {
+            return this.sys.readFileBuffer(path);
+        }
+
         public writeFile(fileName: string, content: string, writeByteOrderMark: boolean) {
             if (writeByteOrderMark) content = Utils.addUTF8ByteOrderMark(content);
             this.sys.writeFile(fileName, content);
@@ -328,7 +352,7 @@ namespace fakes {
             const existing = this._sourceFiles.get(canonicalFileName);
             if (existing) return existing;
 
-            const content = this.readFile(canonicalFileName);
+            const content = ts.endsWith(fileName, ".wasm") ? this.readFileBuffer(canonicalFileName) : this.readFile(canonicalFileName);
             if (content === undefined) return undefined;
 
             // A virtual file system may shadow another existing virtual file system. This

@@ -68,6 +68,8 @@ namespace ts {
             return this.getFullText().substring(start, end);
         }
 
+        getBuffer = notImplemented;
+
         getLength(): number {
             return this.getFullText().length;
         }
@@ -136,6 +138,7 @@ namespace ts {
                 const file = files.get(fileName);
                 return file && file.text;
             },
+            readFileBuffer: notImplemented,
         };
         if (useGetSourceFileByPath) {
             const filesByPath = mapEntries(files, (fileName, file) => [toPath(fileName, "", getCanonicalFileName), file]);
