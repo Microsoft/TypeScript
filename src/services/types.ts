@@ -1342,6 +1342,8 @@ namespace ts {
         dtsModifier = ".d.ts",
         tsModifier = ".ts",
         tsxModifier = ".tsx",
+        cjsModifier = ".cjs",
+        mjsModifier = ".mjs",
         jsModifier = ".js",
         jsxModifier = ".jsx",
         jsonModifier = ".json",

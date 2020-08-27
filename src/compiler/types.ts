@@ -6174,6 +6174,8 @@ namespace ts {
         Tsx = ".tsx",
         Dts = ".d.ts",
         Js = ".js",
+        Cjs = ".cjs",
+        Mjs = ".mjs",
         Jsx = ".jsx",
         Json = ".json",
         TsBuildInfo = ".tsbuildinfo"

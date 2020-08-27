@@ -3004,6 +3004,8 @@ declare namespace ts {
         Tsx = ".tsx",
         Dts = ".d.ts",
         Js = ".js",
+        Cjs = ".cjs",
+        Mjs = ".mjs",
         Jsx = ".jsx",
         Json = ".json",
         TsBuildInfo = ".tsbuildinfo"
@@ -4480,6 +4482,7 @@ declare namespace ts {
      */
     export function parseJsonText(fileName: string, sourceText: string): JsonSourceFile;
     export function isExternalModule(file: SourceFile): boolean;
+    export function isCommonJsModule(file: SourceFile): boolean;
     export function updateSourceFile(sourceFile: SourceFile, newText: string, textChangeRange: TextChangeRange, aggressiveChecks?: boolean): SourceFile;
     export {};
 }
@@ -6166,6 +6169,8 @@ declare namespace ts {
         dtsModifier = ".d.ts",
         tsModifier = ".ts",
         tsxModifier = ".tsx",
+        cjsModifier = ".cjs",
+        mjsModifier = ".mjs",
         jsModifier = ".js",
         jsxModifier = ".jsx",
         jsonModifier = ".json"
