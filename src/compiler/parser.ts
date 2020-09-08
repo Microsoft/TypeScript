@@ -236,6 +236,9 @@ namespace ts {
                     visitNode(cbNode, (<CallExpression>node).questionDotToken) ||
                     visitNodes(cbNode, cbNodes, (<CallExpression>node).typeArguments) ||
                     visitNodes(cbNode, cbNodes, (<CallExpression>node).arguments);
+            case SyntaxKind.BindExpression:
+                return visitNode(cbNode, (<BindExpression>node).left) ||
+                    visitNode(cbNode, (<BindExpression>node).right);
             case SyntaxKind.TaggedTemplateExpression:
                 return visitNode(cbNode, (<TaggedTemplateExpression>node).tag) ||
                     visitNode(cbNode, (<TaggedTemplateExpression>node).questionDotToken) ||
@@ -3762,6 +3765,8 @@ namespace ts {
                 case SyntaxKind.SlashEqualsToken:
                 case SyntaxKind.Identifier:
                     return true;
+                case SyntaxKind.ColonColonToken:
+                    return true;
                 case SyntaxKind.ImportKeyword:
                     return lookAhead(nextTokenIsOpenParenOrLessThanOrDot);
                 default:
@@ -4607,12 +4612,14 @@ namespace ts {
             // LeftHandSideExpression: See 11.2
             //      NewExpression
             //      CallExpression
+            //      BindExpression
             //
             // Our simplification:
             //
             // LeftHandSideExpression: See 11.2
             //      MemberExpression
             //      CallExpression
+            //      BindExpression
             //
             // See comment in parseMemberExpressionOrHigher on how we replaced NewExpression with
             // MemberExpression to make our lives easier.
@@ -4623,6 +4630,7 @@ namespace ts {
             // CallExpression:
             //      MemberExpression Arguments
             //      CallExpression Arguments
+            //      BindExpression Arguments
             //      CallExpression[Expression]
             //      CallExpression.IdentifierName
             //      import (AssignmentExpression)
@@ -4635,7 +4643,7 @@ namespace ts {
             // 3)we have a MemberExpression which either completes the LeftHandSideExpression,
             // or starts the beginning of the first four CallExpression productions.
             const pos = getNodePos();
-            let expression: MemberExpression;
+            let expression: MemberExpression | BindExpression;
             if (token() === SyntaxKind.ImportKeyword) {
                 if (lookAhead(nextTokenIsOpenParenOrLessThan)) {
                     // We don't want to eagerly consume all import keyword as import call expression so we look ahead to find "("
@@ -4657,14 +4665,36 @@ namespace ts {
                     expression = parseMemberExpressionOrHigher();
                 }
             }
+            else if (token() === SyntaxKind.ColonColonToken) {
+                // BindExpression: `::` MemberExpression
+                nextToken();
+                const right = parseMemberExpressionOrHigher();
+                if (!isMaybeParenthesizedAccessOrSuperPropertyExpression(right)) {
+                    parseErrorAtRange(right, Diagnostics.Only_property_access_expressions_are_allowed_here);
+                }
+                expression = finishNode(
+                    factory.createBindExpression(
+                        /* left */ undefined,
+                        right
+                    ),
+                    pos
+                );
+            }
             else {
                 expression = token() === SyntaxKind.SuperKeyword ? parseSuperExpression() : parseMemberExpressionOrHigher();
             }
 
             // Now, we *may* be complete.  However, we might have consumed the start of a
-            // CallExpression or OptionalExpression.  As such, we need to consume the rest
+            // CallExpression, BindExpression or OptionalExpression.  As such, we need to consume the rest
             // of it here to be complete.
-            return parseCallExpressionRest(pos, expression);
+            return parseCallExpressionOrBindExpressionRest(pos, expression);
+        }
+
+        function isMaybeParenthesizedAccessOrSuperPropertyExpression(node: Node): boolean {
+            while (isParenthesizedExpression(node)) {
+                node = node.expression;
+            }
+            return isAccessExpression(node) || isSuperProperty(node);
         }
 
         function parseMemberExpressionOrHigher(): MemberExpression {
@@ -5117,9 +5147,15 @@ namespace ts {
             return finishNode(tagExpression, pos);
         }
 
-        function parseCallExpressionRest(pos: number, expression: LeftHandSideExpression): LeftHandSideExpression {
+        function parseCallExpressionOrBindExpressionRest(pos: number, expression: LeftHandSideExpression): LeftHandSideExpression {
             while (true) {
                 expression = parseMemberExpressionRest(pos, expression, /*allowOptionalChain*/ true);
+                // handle bynary BindExpression
+                if (token() === SyntaxKind.ColonColonToken) {
+                    expression = parseBinaryBindExpressionRest(pos, expression);
+                    continue;
+                }
+
                 const questionDotToken = parseOptionalToken(SyntaxKind.QuestionDotToken);
                 // handle 'foo<<T>()'
                 if (token() === SyntaxKind.LessThanToken || token() === SyntaxKind.LessThanLessThanToken) {
@@ -5227,6 +5263,13 @@ namespace ts {
                     // Anything else treat as an expression.
                     return false;
             }
+        }
+
+        function parseBinaryBindExpressionRest(pos: number, expression: LeftHandSideExpression): BindExpression {
+            parseExpected(SyntaxKind.ColonColonToken);
+            // TODO: lookahead != new
+            const right = parseMemberExpressionOrHigher();
+            return finishNode(factory.createBindExpression(expression, right), pos);
         }
 
         function parsePrimaryExpression(): PrimaryExpression {
@@ -6458,7 +6501,7 @@ namespace ts {
                 const awaitExpression = parseIdentifier(Diagnostics.Expression_expected);
                 nextToken();
                 const memberExpression = parseMemberExpressionRest(pos, awaitExpression, /*allowOptionalChain*/ true);
-                return parseCallExpressionRest(pos, memberExpression);
+                return parseCallExpressionOrBindExpressionRest(pos, memberExpression);
             }
             return parseLeftHandSideExpressionOrHigher();
         }

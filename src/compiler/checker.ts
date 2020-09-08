@@ -27826,6 +27826,122 @@ namespace ts {
             return false;
         }
 
+        function checkBindExpression(node: BindExpression, checkMode?: CheckMode): Type {
+            const funcType = checkExpression(node.right, checkMode);
+            const apparentType = getApparentType(funcType);
+
+            if (isTypeAny(apparentType)) {
+                return anyType;
+            }
+
+            const callSignatures = getSignaturesOfType(apparentType, SignatureKind.Call);
+
+            if (!callSignatures.length) {
+                error(node.right, Diagnostics.This_expression_is_not_callable);
+                return errorType;
+            }
+
+            let targetType: Type;
+            if (node.left) {
+                // left::right
+                targetType = node.left && checkExpression(node.left, checkMode);
+            }
+            else {
+                const right = skipParentheses(node.right);
+                if (!isAccessExpression(right)) {
+                    // this should be syntax error
+                    return errorType;
+                }
+                targetType = getTypeOfExpression(right.expression);
+            }
+
+            // Filter out signatures that do not accept target type as instantiated 'this' type.
+            const remainingCallSignatures = flatMap(callSignatures, sig => {
+                const thisParameter = sig.thisParameter;
+                if (!thisParameter) return sig;
+                const thisType = getTypeOfSymbol(thisParameter);
+
+                const typeParameters = sig.typeParameters;
+                if (!typeParameters) {
+                    if (!isTypeAssignableTo(targetType, thisType)) return undefined;
+
+                    const newSig = cloneSignature(sig);
+                    newSig.thisParameter = undefined;
+                    return newSig;
+                }
+
+                // const isJavaScript = isInJSFile(node);
+                const inferenceContext = createInferenceContext(
+                    typeParameters,
+                    sig,
+                    /*flags*/ InferenceFlags.NoDefault
+                );
+                inferTypes(inferenceContext.inferences, targetType, thisType);
+                const inferredTypes = getInferredTypes(inferenceContext);
+
+                const freshTypeParameters: TypeParameter[] = [];
+                const newTypeArguments = map(inferredTypes, (ty, i) => {
+                    if (ty === silentNeverType) {
+                        const tp = cloneTypeParameter(typeParameters[i]);
+                        freshTypeParameters.push(tp);
+                        return tp;
+                    }
+                    return ty;
+                });
+
+                const mapper = createTypeMapper(typeParameters, newTypeArguments);
+                for (const tp of freshTypeParameters) {
+                    tp.mapper = mapper;
+                }
+
+                const instantiatedThis = instantiateSymbol(thisParameter, mapper);
+                const instantiatedThisType = getTypeOfSymbol(instantiatedThis);
+                if (!isTypeAssignableTo(targetType, instantiatedThisType)) return undefined;
+
+
+                const newSig = createSignature(
+                    sig.declaration,
+                    freshTypeParameters,
+                    /* thisParameter */ undefined,
+                    instantiateList(sig.parameters, mapper, instantiateSymbol),
+                    /* resolvedReturnType */ undefined,
+                    /* resolvedTypePredicate */ undefined,
+                    sig.minArgumentCount,
+                    sig.flags & SignatureFlags.PropagatingFlags
+                );
+                newSig.target = sig;
+                newSig.mapper = mapper;
+
+                return newSig;
+            });
+
+            if (!remainingCallSignatures.length) {
+                const headMessage = Diagnostics.The_this_context_of_type_0_is_not_assignable_to_method_s_this_of_type_1;
+                const errorOutputContainer: { errors?: Diagnostic[], skipLogging?: boolean } = { errors: undefined, skipLogging: true };
+                Debug.assert(!checkTypeAssignableTo(
+                    targetType,
+                    getThisTypeOfSignature(callSignatures[0])!,
+                    node,
+                    headMessage,
+                    /* containingMessageChain */ undefined,
+                    errorOutputContainer
+                ), "this check should fail");
+                if (errorOutputContainer.errors) {
+                    for (const diag of errorOutputContainer.errors) {
+                        diagnostics.add(diag);
+                    }
+                }
+                return errorType;
+            }
+
+            const result = createObjectType(ObjectFlags.Anonymous);
+            result.members = emptySymbols;
+            result.properties = emptyArray;
+            result.callSignatures = remainingCallSignatures;
+            result.constructSignatures = emptyArray;
+            return result;
+        }
+
         function checkTaggedTemplateExpression(node: TaggedTemplateExpression): Type {
             if (!checkGrammarTaggedTemplateChain(node)) checkGrammarTypeArguments(node, node.typeArguments);
             if (languageVersion < ScriptTarget.ES2015) {
@@ -30418,6 +30534,8 @@ namespace ts {
                     // falls through
                 case SyntaxKind.NewExpression:
                     return checkCallExpression(<CallExpression>node, checkMode);
+                case SyntaxKind.BindExpression:
+                    return checkBindExpression(<BindExpression>node, checkMode);
                 case SyntaxKind.TaggedTemplateExpression:
                     return checkTaggedTemplateExpression(<TaggedTemplateExpression>node);
                 case SyntaxKind.ParenthesizedExpression:

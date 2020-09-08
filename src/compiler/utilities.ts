@@ -1752,6 +1752,7 @@ namespace ts {
             case SyntaxKind.ElementAccessExpression:
             case SyntaxKind.CallExpression:
             case SyntaxKind.NewExpression:
+            case SyntaxKind.BindExpression:
             case SyntaxKind.TaggedTemplateExpression:
             case SyntaxKind.AsExpression:
             case SyntaxKind.TypeAssertionExpression:
@@ -3411,9 +3412,13 @@ namespace ts {
         // LeftHandSideExpression:
         //     NewExpression
         //     CallExpression
+        //     BindExpression
         // NewExpression:
         //     MemberExpression
         //     `new` NewExpression
+        // BindExpression:
+        //     LeftHandSideExpression `::` MemberExpression
+        //     `::` MemberExpression
         LeftHandSide,
 
         // CallExpression:

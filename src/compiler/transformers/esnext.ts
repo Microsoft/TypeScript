@@ -25,7 +25,10 @@ namespace ts {
                     if (isLogicalOrCoalescingAssignmentExpression(binaryExpression)) {
                         return transformLogicalAssignment(binaryExpression);
                     }
-                // falls through
+                    return visitEachChild(node, visitor, context);
+                case SyntaxKind.BindExpression:
+                    const bindExpression = <BindExpression>node;
+                    return transformBindExpression(bindExpression);
                 default:
                     return visitEachChild(node, visitor, context);
             }
@@ -86,6 +89,94 @@ namespace ts {
                     )
                 )
             );
+        }
+
+        function transformBindExpression(bindExpression: BindExpression): VisitResult<Node> {
+            const left = bindExpression.left && skipParentheses(visitNode(bindExpression.left, visitor, isLeftHandSideExpression));
+            const right = skipParentheses(visitNode(bindExpression.right, visitor));
+            if (left) {
+                // left::right
+                // => right.bind(left)
+                // but left should be evaluated earlier than right
+                const base = factory.createTempVariable(hoistVariableDeclaration);
+                const bound = factory.createCallExpression(
+                    factory.createPropertyAccessExpression(right, "bind"),
+                    /* typeArguments */ undefined,
+                    [base]
+                );
+                const res = factory.createCommaListExpression([
+                    factory.createAssignment(base, left),
+                    bound
+                ]);
+                return res;
+            }
+            else {
+                if (isAccessExpression(right) && right.expression.kind === SyntaxKind.SuperKeyword) {
+                    // ::super.bar
+                    // => super.bar.bind(this)
+                    // ::super["bar"]
+                    // => super["bar"].bind(this)
+                    return factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            right,
+                            "bind"
+                        ),
+                        /* typeArguments */ undefined,
+                        [factory.createThis()]
+                    );
+                }
+                if (isPropertyAccessExpression(right)) {
+                    // ::foo.bar
+                    // => foo.bar.bind(foo)
+                    // but foo should be evaluated only once
+
+                    const base = factory.createTempVariable(hoistVariableDeclaration);
+                    const bound = factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createPropertyAccessExpression(
+                                factory.createAssignment(base, right.expression),
+                                right.name
+                            ),
+                            "bind"
+                        ),
+                        /* typeArguments */ undefined,
+                        [base]
+                    );
+                    return bound;
+                }
+                else if (isElementAccessExpression(right)) {
+                    // ::foo["bar"]
+                    // => foo["bar"].bind(foo)
+                    // but foo should be evaluated only once
+
+                    const base = factory.createTempVariable(hoistVariableDeclaration);
+                    const bound = factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createElementAccessExpression(
+                                factory.createAssignment(base, right.expression),
+                                right.argumentExpression
+                            ),
+                            "bind"
+                        ),
+                        /* typeArguments */ undefined,
+                        [base]
+                    );
+                    return bound;
+                }
+                else {
+                    // this should not happen, fallback emission
+                    // ::expr
+                    // => expr.bind(void 0)
+                    return factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            right,
+                            "bind"
+                        ),
+                        /* typeArguments */ undefined,
+                        [factory.createVoidZero()]
+                    );
+                }
+            }
         }
     }
 }
