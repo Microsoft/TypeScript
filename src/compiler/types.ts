@@ -4819,6 +4819,7 @@ namespace ts {
         ClassWithConstructorReference       = 0x01000000,  // Class that contains a binding to its constructor inside of the class body.
         ConstructorReferenceInClass         = 0x02000000,  // Binding to a class constructor inside of the class's body.
         ContainsClassWithPrivateIdentifiers = 0x04000000,  // Marked on all block-scoped containers containing a class with private identifiers.
+        AllTypeAliasesAcessibleAreMaterialized          = 0x08000000,  // Indicates that, if the file hasn't been typechecked, it's at least had its imports traversed and checked
     }
 
     /* @internal */
@@ -4936,6 +4937,8 @@ namespace ts {
         IncludesWildcard = IndexedAccess,
         /* @internal */
         IncludesEmptyObject = Conditional,
+        /* @internal */
+        SupportsAliases = Union | Intersection | Object | IndexedAccess | Conditional, // This list is likely open to expansion
     }
 
     export type DestructuringPattern = BindingPattern | ObjectLiteralExpression | ArrayLiteralExpression;
@@ -4950,9 +4953,6 @@ namespace ts {
         /* @internal */ checker: TypeChecker;
         symbol: Symbol;                  // Symbol associated with type (if any)
         pattern?: DestructuringPattern;  // Destructuring pattern represented by type (if any)
-        aliasSymbol?: Symbol;            // Alias associated with type
-        aliasTypeArguments?: readonly Type[]; // Alias type arguments (if any)
-        /* @internal */ aliasTypeArgumentsContainsMarker?: boolean; // Alias type arguments (if any)
         /* @internal */
         permissiveInstantiation?: Type;  // Instantiation with type parameters mapped to wildcard type
         /* @internal */
@@ -5067,6 +5067,8 @@ namespace ts {
         RequiresWidening = ContainsWideningType | ContainsObjectOrArrayLiteral,
         /* @internal */
         PropagatingFlags = ContainsWideningType | ContainsObjectOrArrayLiteral | NonInferrableType,
+        /* @internal */
+        SupportsAliases = Anonymous | Mapped | ReverseMapped | Reference,
 
         // Object flags that uniquely identify the kind of ObjectType
         /* @internal */
@@ -5345,8 +5347,6 @@ namespace ts {
         inferTypeParameters?: TypeParameter[];
         outerTypeParameters?: TypeParameter[];
         instantiations?: Map<Type>;
-        aliasSymbol?: Symbol;
-        aliasTypeArguments?: Type[];
     }
 
     // T extends U ? X : Y (TypeFlags.Conditional)
@@ -5476,10 +5476,10 @@ namespace ts {
 
     /* @internal */
     export type TypeMapper =
-        | { kind: TypeMapKind.Simple, source: Type, target: Type }
-        | { kind: TypeMapKind.Array, sources: readonly Type[], targets: readonly Type[] | undefined }
-        | { kind: TypeMapKind.Function, func: (t: Type) => Type }
-        | { kind: TypeMapKind.Composite | TypeMapKind.Merged, mapper1: TypeMapper, mapper2: TypeMapper };
+        | { kind: TypeMapKind.Simple, source: Type, target: Type, aliasCache?: Set<Type> }
+        | { kind: TypeMapKind.Array, sources: readonly Type[], targets: readonly Type[] | undefined, aliasCache?: Set<Type> }
+        | { kind: TypeMapKind.Function, func: (t: Type) => Type, aliasCache?: Set<Type> }
+        | { kind: TypeMapKind.Composite | TypeMapKind.Merged, mapper1: TypeMapper, mapper2: TypeMapper, aliasCache?: Set<Type> };
 
     export const enum InferencePriority {
         NakedTypeVariable            = 1 << 0,  // Naked type variable in union or intersection type
@@ -8153,5 +8153,25 @@ namespace ts {
     export interface PseudoBigInt {
         negative: boolean;
         base10Value: string;
+    }
+
+    export type TypeAlias = AliasReference | AliasKeyof;
+
+    export enum AliasKind {
+        Reference,
+        Keyof, // Unimplemented
+    }
+
+    export interface AliasReference {
+        kind: AliasKind.Reference;
+        symbol: Symbol;
+        typeArguments?: readonly Type[];
+        /* @internal */
+        typeArgumentsContainMarker?: boolean;
+    }
+
+    export interface AliasKeyof {
+        kind: AliasKind.Keyof;
+        type: Type;
     }
 }

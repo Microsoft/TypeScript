@@ -24,7 +24,7 @@ function f2<T extends string | number | undefined, U extends string | null | und
 >x : T & U
 
     let y3: string | undefined = x;
->y3 : string | undefined
+>y3 : T1
 >x : T & U
 
     let y4: number | null = x;       // Error
@@ -43,7 +43,7 @@ function f2<T extends string | number | undefined, U extends string | null | und
 }
 
 type T1 = (string | number | undefined) & (string | null | undefined);  // string | undefined
->T1 : string | undefined
+>T1 : T1
 >null : null
 
 function f3<T extends string | number | undefined>(x: T & (number | object | undefined)) {
@@ -69,7 +69,7 @@ function f5<T, U extends keyof T>(x: keyof T & U) {
 >x : keyof T & U
 
     let y: keyof any = x;
->y : string | number | symbol
+>y : PropertyKey
 >x : keyof T & U
 }
 

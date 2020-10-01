@@ -1,6 +1,6 @@
 === tests/cases/compiler/isArray.ts ===
 var maybeArray: number | number[];
->maybeArray : number | number[]
+>maybeArray : VibratePattern
 
 
 if (Array.isArray(maybeArray)) {
@@ -8,7 +8,7 @@ if (Array.isArray(maybeArray)) {
 >Array.isArray : <T>(arg: {} | T) => arg is T extends readonly any[] ? unknown extends T ? never : readonly any[] : any[]
 >Array : ArrayConstructor
 >isArray : <T>(arg: {} | T) => arg is T extends readonly any[] ? unknown extends T ? never : readonly any[] : any[]
->maybeArray : number | number[]
+>maybeArray : VibratePattern
 
     maybeArray.length; // OK
 >maybeArray.length : number

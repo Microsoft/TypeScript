@@ -980,9 +980,64 @@ namespace ts {
         const builtinGlobals = createSymbolTable();
         builtinGlobals.set(undefinedSymbol.escapedName, undefinedSymbol);
 
+        const typeAliases = createMultiMap<Type, TypeAlias>();
+
         initializeTypeChecker();
 
         return checker;
+
+        function compareAliases(a: TypeAlias, b: TypeAlias) {
+            if (a.kind !== b.kind) return false;
+            switch (a.kind) {
+                case AliasKind.Reference: return compareAliasReferences(a, b as AliasReference);
+                case AliasKind.Keyof: return compareAliasKeyofs(a, b as AliasKeyof);
+                default: return Debug.assertNever(a);
+            }
+        }
+
+        function compareAliasReferences(a: AliasReference, b: AliasReference) {
+            return a.symbol === b.symbol && getTypeListId(a.typeArguments) === getTypeListId(b.typeArguments);
+        }
+
+        function compareAliasKeyofs(a: AliasKeyof, b: AliasKeyof) {
+            return a.type === b.type;
+        }
+
+        function registerAliasReferenceForType(type: Type, aliasSymbol: Symbol | undefined, aliasTypeArguments?: readonly Type[]): void {
+            if (!aliasSymbol) return;
+            const newAlias: AliasReference = { kind: AliasKind.Reference, symbol: aliasSymbol, typeArguments: aliasTypeArguments };
+            const existing = find(typeAliases.get(type) || emptyArray, t => compareAliases(newAlias, t));
+            if (existing) return;
+            registerNewAlias(type, newAlias);
+        }
+
+        function registerNewAlias(type: Type, alias: TypeAlias) {
+            if (type.flags & TypeFlags.SupportsAliases) {
+                if (type.flags & TypeFlags.Object && !(getObjectFlags(type) & ObjectFlags.SupportsAliases)) return;
+                // Don't add aliases which trivially contain the type in question directly in their type arguments
+                if (alias.kind === AliasKind.Reference && some(alias.typeArguments, typeIsOrTriviallyContainsType)) return;
+                typeAliases.add(type, alias);
+            }
+
+            function typeIsOrTriviallyContainsType(t2: Type, visited: Set<Type> = new Set()): boolean {
+                if (type === t2) return true;
+                if (visited.has(t2)) return false;
+                visited.add(t2);
+                if (t2.flags & TypeFlags.UnionOrIntersection) return some((t2 as UnionOrIntersectionType).types, recur);
+                if (t2.flags & TypeFlags.Index) return recur((t2 as IndexType).type);
+                if (t2.flags & TypeFlags.IndexedAccess) return recur((t2 as IndexedAccessType).objectType) || recur((t2 as IndexedAccessType).indexType);
+                if (getObjectFlags(t2) & ObjectFlags.Reference) return some(getTypeArguments(t2 as TypeReference), recur);
+                return false;
+
+                function recur(t: Type) {
+                    return typeIsOrTriviallyContainsType(t, visited);
+                }
+            }
+        }
+
+        function getMatchingAliasPair(source: Type, target: Type) {
+            return forEach(typeAliases.get(source), s => s.kind !== AliasKind.Reference ? undefined : forEach(typeAliases.get(target), t => t.kind === AliasKind.Reference && s.symbol === t.symbol ? [s, t] as const : undefined));
+        }
 
         function getJsxNamespace(location: Node | undefined): __String {
             if (location) {
@@ -4481,10 +4536,16 @@ namespace ts {
                     return factory.createThisTypeNode();
                 }
 
-                if (!inTypeAlias && type.aliasSymbol && (context.flags & NodeBuilderFlags.UseAliasDefinedOutsideCurrentScope || isTypeSymbolAccessible(type.aliasSymbol, context.enclosingDeclaration))) {
-                    const typeArgumentNodes = mapToTypeNodes(type.aliasTypeArguments, context);
-                    if (isReservedMemberName(type.aliasSymbol.escapedName) && !(type.aliasSymbol.flags & SymbolFlags.Class)) return factory.createTypeReferenceNode(factory.createIdentifier(""), typeArgumentNodes);
-                    return symbolToTypeNode(type.aliasSymbol, context, SymbolFlags.Type, typeArgumentNodes);
+                if (!inTypeAlias) {
+                    ensureAliasesDiscovered(context.enclosingDeclaration);
+                    const accessibleAlias = find(typeAliases.get(type) || emptyArray, t => t.kind === AliasKind.Reference && !!(context.flags & NodeBuilderFlags.UseAliasDefinedOutsideCurrentScope || isTypeSymbolAccessible(t.symbol, context.enclosingDeclaration))) as AliasReference | undefined;
+                    if (accessibleAlias && (!context.aliasStack || context.aliasStack.indexOf(accessibleAlias) === -1)) {
+                        (context.aliasStack ||= []).push(accessibleAlias);
+                        const typeArgumentNodes = mapToTypeNodes(accessibleAlias.typeArguments, context);
+                        context.aliasStack.pop();
+                        if (isReservedMemberName(accessibleAlias.symbol.escapedName) && !(accessibleAlias.symbol.flags & SymbolFlags.Class)) return factory.createTypeReferenceNode(factory.createIdentifier(""), typeArgumentNodes);
+                        return symbolToTypeNode(accessibleAlias.symbol, context, SymbolFlags.Type, typeArgumentNodes);
+                    }
                 }
 
                 const objectFlags = getObjectFlags(type);
@@ -5089,7 +5150,7 @@ namespace ts {
             function typesAreSameReference(a: Type, b: Type): boolean {
                 return a === b
                     || !!a.symbol && a.symbol === b.symbol
-                    || !!a.aliasSymbol && a.aliasSymbol === b.aliasSymbol;
+                    || some(typeAliases.get(a), t1 => t1.kind === AliasKind.Reference && some(typeAliases.get(b), t2 => t2.kind === AliasKind.Reference && t1.symbol === t2.symbol));
             }
 
             function indexInfoToIndexSignatureDeclarationHelper(indexInfo: IndexInfo, kind: IndexKind, context: NodeBuilderContext, typeNode: TypeNode | undefined): IndexSignatureDeclaration {
@@ -7395,6 +7456,7 @@ namespace ts {
             typeParameterNamesByText?: Set<string>;
             usedSymbolNames?: Set<string>;
             remappedSymbolNames?: ESMap<SymbolId, string>;
+            aliasStack?: TypeAlias[];
         }
 
         function isDefaultBindingContext(location: Node) {
@@ -7621,6 +7683,30 @@ namespace ts {
                             }
                         }
                     }
+                });
+            }
+        }
+
+        function ensureAliasesDiscovered(node: Node | undefined) {
+            if (!node) return;
+            const links = getNodeLinks(node);
+            if (!(links.flags & NodeCheckFlags.AllTypeAliasesAcessibleAreMaterialized)) {
+                links.flags |= NodeCheckFlags.AllTypeAliasesAcessibleAreMaterialized;
+                forEachSymbolTableInScope(node, table => {
+                    forEachEntry(table, s => {
+                        // So... this is kinda an approximation - technically we'd wanna guarantee
+                        // that the whole program is typechecked (and thus all aliases are available)
+                        // however that's a bit much to do - so we do a kind of first order approximation
+                        // and guarantee that at least all type aliases with local references (and therefore are trivially visible to print) have been materialized.
+                        // This notably means that type aliases who are members of namespaces which have local references
+                        // may not have been materialized. We _could_ traverse all local references looking for those, too... but
+                        // then we get into essentially performing the traversal recursively on every symbol table in scope,
+                        // which, if symbol visibility checking has taught us anything, could be a costly endeavor.
+                        const resolved = resolveSymbol(s);
+                        if (resolved.flags & SymbolFlags.TypeAlias) {
+                            getDeclaredTypeOfTypeAlias(resolved);
+                        }
+                    });
                 });
             }
         }
@@ -12092,8 +12178,7 @@ namespace ts {
             type.target = target;
             type.node = node;
             type.mapper = mapper;
-            type.aliasSymbol = aliasSymbol;
-            type.aliasTypeArguments = mapper ? instantiateTypes(aliasTypeArguments, mapper) : aliasTypeArguments;
+            registerAliasReferenceForType(type, aliasSymbol, mapper ? instantiateTypes(aliasTypeArguments, mapper) : aliasTypeArguments);
             return type;
         }
 
@@ -13073,7 +13158,9 @@ namespace ts {
             }
             const objectFlags = (includes & TypeFlags.NotPrimitiveUnion ? 0 : ObjectFlags.PrimitiveUnion) |
                 (includes & TypeFlags.Intersection ? ObjectFlags.ContainsIntersections : 0);
-            return getUnionTypeFromSortedList(typeSet, objectFlags, aliasSymbol, aliasTypeArguments);
+            const result = getUnionTypeFromSortedList(typeSet, objectFlags);
+            registerAliasReferenceForType(result, aliasSymbol, aliasTypeArguments);
+            return result;
         }
 
         function getUnionTypePredicate(signatures: readonly Signature[]): TypePredicate | undefined {
@@ -13109,7 +13196,7 @@ namespace ts {
         }
 
         // This function assumes the constituent type list is sorted and deduplicated.
-        function getUnionTypeFromSortedList(types: Type[], objectFlags: ObjectFlags, aliasSymbol?: Symbol, aliasTypeArguments?: readonly Type[]): Type {
+        function getUnionTypeFromSortedList(types: Type[], objectFlags: ObjectFlags): Type {
             if (types.length === 0) {
                 return neverType;
             }
@@ -13123,14 +13210,6 @@ namespace ts {
                 unionTypes.set(id, type);
                 type.objectFlags = objectFlags | getPropagatingFlagsOfTypes(types, /*excludeKinds*/ TypeFlags.Nullable);
                 type.types = types;
-                /*
-                Note: This is the alias symbol (or lack thereof) that we see when we first encounter this union type.
-                For aliases of identical unions, eg `type T = A | B; type U = A | B`, the symbol of the first alias encountered is the aliasSymbol.
-                (In the language service, the order may depend on the order in which a user takes actions, such as hovering over symbols.)
-                It's important that we create equivalent union types only once, so that's an unfortunate side effect.
-                */
-                type.aliasSymbol = aliasSymbol;
-                type.aliasTypeArguments = aliasTypeArguments;
             }
             return type;
         }
@@ -13296,12 +13375,10 @@ namespace ts {
             return true;
         }
 
-        function createIntersectionType(types: Type[], aliasSymbol?: Symbol, aliasTypeArguments?: readonly Type[]) {
+        function createIntersectionType(types: Type[]) {
             const result = <IntersectionType>createType(TypeFlags.Intersection);
             result.objectFlags = getPropagatingFlagsOfTypes(types, /*excludeKinds*/ TypeFlags.Nullable);
             result.types = types;
-            result.aliasSymbol = aliasSymbol; // See comment in `getUnionTypeFromSortedList`.
-            result.aliasTypeArguments = aliasTypeArguments;
             return result;
         }
 
@@ -13393,11 +13470,12 @@ namespace ts {
                         result = neverType;
                     }
                     else {
-                        result = createIntersectionType(typeSet, aliasSymbol, aliasTypeArguments);
+                        result = createIntersectionType(typeSet);
                     }
                 }
                 intersectionTypes.set(id, result);
             }
+            registerAliasReferenceForType(result, aliasSymbol, aliasTypeArguments);
             return result;
         }
 
@@ -13643,12 +13721,10 @@ namespace ts {
             return result;
         }
 
-        function createIndexedAccessType(objectType: Type, indexType: Type, aliasSymbol: Symbol | undefined, aliasTypeArguments: readonly Type[] | undefined) {
+        function createIndexedAccessType(objectType: Type, indexType: Type) {
             const type = <IndexedAccessType>createType(TypeFlags.IndexedAccess);
             type.objectType = objectType;
             type.indexType = indexType;
-            type.aliasSymbol = aliasSymbol;
-            type.aliasTypeArguments = aliasTypeArguments;
             return type;
         }
 
@@ -14060,9 +14136,9 @@ namespace ts {
                 const id = objectType.id + "," + indexType.id;
                 let type = indexedAccessTypes.get(id);
                 if (!type) {
-                    indexedAccessTypes.set(id, type = createIndexedAccessType(objectType, indexType, aliasSymbol, aliasTypeArguments));
+                    indexedAccessTypes.set(id, type = createIndexedAccessType(objectType, indexType));
                 }
-
+                registerAliasReferenceForType(type, aliasSymbol, aliasTypeArguments);
                 return shouldIncludeUndefined ? getUnionType([type, undefinedType]) : type;
             }
             // In the following we resolve T[K] to the type of the property in T selected by K.
@@ -14116,8 +14192,9 @@ namespace ts {
             if (!links.resolvedType) {
                 const type = <MappedType>createObjectType(ObjectFlags.Mapped, node.symbol);
                 type.declaration = node;
-                type.aliasSymbol = getAliasSymbolForTypeNode(node);
-                type.aliasTypeArguments = getTypeArgumentsForAliasSymbol(type.aliasSymbol);
+                const aliasSymbol = getAliasSymbolForTypeNode(node);
+                const aliasTypeArguments = getTypeArgumentsForAliasSymbol(aliasSymbol);
+                registerAliasReferenceForType(type, aliasSymbol, aliasTypeArguments);
                 links.resolvedType = type;
                 // Eagerly resolve the constraint type which forces an error if the constraint type circularly
                 // references itself through one or more type aliases.
@@ -14210,8 +14287,8 @@ namespace ts {
                 result.extendsType = extendsType;
                 result.mapper = mapper;
                 result.combinedMapper = combinedMapper;
-                result.aliasSymbol = root.aliasSymbol;
-                result.aliasTypeArguments = instantiateTypes(root.aliasTypeArguments, mapper!); // TODO: GH#18217
+                const referenceSymbol = getAliasSymbolForTypeNode(root.node);
+                registerAliasReferenceForType(result, referenceSymbol, instantiateTypes(getTypeArgumentsForAliasSymbol(referenceSymbol), mapper!));
                 break;
             }
             return extraTypes ? getUnionType(append(extraTypes, result)) : result;
@@ -14257,8 +14334,6 @@ namespace ts {
                     inferTypeParameters: getInferTypeParameters(node),
                     outerTypeParameters,
                     instantiations: undefined,
-                    aliasSymbol,
-                    aliasTypeArguments
                 };
                 links.resolvedType = getConditionalType(root, /*mapper*/ undefined);
                 if (outerTypeParameters) {
@@ -14364,8 +14439,7 @@ namespace ts {
                 }
                 else {
                     let type = createObjectType(ObjectFlags.Anonymous, node.symbol);
-                    type.aliasSymbol = aliasSymbol;
-                    type.aliasTypeArguments = getTypeArgumentsForAliasSymbol(aliasSymbol);
+                    registerAliasReferenceForType(type, aliasSymbol, getTypeArgumentsForAliasSymbol(aliasSymbol));
                     if (isJSDocTypeLiteral(node) && node.isArrayType) {
                         type = createArrayType(type);
                     }
@@ -15026,7 +15100,7 @@ namespace ts {
                     outerTypeParameters = addRange(outerTypeParameters, templateTagParameters);
                 }
                 typeParameters = outerTypeParameters || emptyArray;
-                typeParameters = (target.objectFlags & ObjectFlags.Reference || target.symbol.flags & SymbolFlags.TypeLiteral) && !target.aliasTypeArguments ?
+                typeParameters = (target.objectFlags & ObjectFlags.Reference || target.symbol.flags & SymbolFlags.TypeLiteral) && !some(typeAliases.get(target), t => t.kind === AliasKind.Reference && !!t.typeArguments) ?
                     filter(typeParameters, tp => isTypeParameterPossiblyReferenced(tp, declaration)) :
                     typeParameters;
                 links.outerTypeParameters = typeParameters;
@@ -15152,7 +15226,10 @@ namespace ts {
                     elementFlags[i] & ElementFlags.Rest ? createArrayType(t) :
                     createTupleType([t], [elementFlags[i]]);
                 // The singleton is never a generic tuple type, so it is safe to recurse here.
-                return instantiateMappedType(mappedType, prependTypeMapping(typeVariable, singleton, mapper));
+                const elemMapper = prependTypeMapping(typeVariable, singleton, mapper);
+                const result = instantiateMappedType(mappedType, elemMapper);
+                instantiateAliasesForResult(mappedType, elemMapper, result);
+                return result;
             });
             const newReadonly = getModifiedReadonlyState(tupleType.target.readonly, getMappedTypeModifiers(mappedType));
             return createTupleType(elementTypes, map(elementTypes, _ => ElementFlags.Variadic), newReadonly);
@@ -15186,6 +15263,36 @@ namespace ts {
                 propType;
         }
 
+        function instantiateAliasesForResult(type: Type, mapper: TypeMapper, result: Type) {
+            // Quick bail if type was unaffected by instantiation
+            if (type === result) return;
+            // Quick bail if result doesn't support aliasing
+            if (!(result.flags & TypeFlags.SupportsAliases)) return;
+            // Bail if a conditional resolves to a non-conditional (this is usually "simplifying", so recording the alias only complicates output)
+            if (type.flags & TypeFlags.Conditional && !(result.flags & TypeFlags.Conditional)) return;
+            // If a mapped type somehow maps into a simple reference type (ie, via a homomorphic mapped type), don't bother keeping around aliases on it (they'll probably just confuse the printback)
+            if (getObjectFlags(type) & ObjectFlags.Mapped && getObjectFlags(result) & ObjectFlags.Reference) return;
+            // Lastly, bail if we've already recorded starting instantiation for the aliases associated with this type and mapper
+            if (mapper.aliasCache?.has(type)) return;
+            const aliases = typeAliases.get(type) || emptyArray;
+            (mapper.aliasCache ||= new Set()).add(type);
+            for (const a of aliases) {
+                registerNewAlias(result, instantiateAlias(a, mapper));
+            }
+        }
+
+        function instantiateAlias(a: TypeAlias, mapper: TypeMapper) {
+            // TODO: we could defer this so easily
+            switch (a.kind) {
+                case AliasKind.Reference:
+                    return { ...a, typeArguments: instantiateTypes(a.typeArguments, mapper) };
+                case AliasKind.Keyof:
+                    return { ...a, type: instantiateType(a.type, mapper) };
+                default:
+                    return Debug.assertNever(a);
+            }
+        }
+
         function instantiateAnonymousType(type: AnonymousType, mapper: TypeMapper): AnonymousType {
             const result = <AnonymousType>createObjectType(type.objectFlags | ObjectFlags.Instantiated, type.symbol);
             if (type.objectFlags & ObjectFlags.Mapped) {
@@ -15199,8 +15306,6 @@ namespace ts {
             }
             result.target = type;
             result.mapper = mapper;
-            result.aliasSymbol = type.aliasSymbol;
-            result.aliasTypeArguments = instantiateTypes(type.aliasTypeArguments, mapper);
             return result;
         }
 
@@ -15255,6 +15360,7 @@ namespace ts {
             instantiationCount++;
             instantiationDepth++;
             const result = instantiateTypeWorker(type, mapper);
+            instantiateAliasesForResult(type, mapper, result);
             instantiationDepth--;
             return result;
         }
@@ -15281,8 +15387,8 @@ namespace ts {
                 const newTypes = instantiateTypes(types, mapper);
                 return newTypes === types ? type :
                     flags & TypeFlags.Intersection ?
-                        getIntersectionType(newTypes, type.aliasSymbol, instantiateTypes(type.aliasTypeArguments, mapper)) :
-                        getUnionType(newTypes, UnionReduction.Literal, type.aliasSymbol, instantiateTypes(type.aliasTypeArguments, mapper));
+                        getIntersectionType(newTypes) :
+                        getUnionType(newTypes, UnionReduction.Literal);
             }
             if (flags & TypeFlags.Index) {
                 return getIndexType(instantiateType((<IndexType>type).type, mapper));
@@ -15294,7 +15400,7 @@ namespace ts {
                 return getStringMappingType((<StringMappingType>type).symbol, instantiateType((<StringMappingType>type).type, mapper));
             }
             if (flags & TypeFlags.IndexedAccess) {
-                return getIndexedAccessType(instantiateType((<IndexedAccessType>type).objectType, mapper), instantiateType((<IndexedAccessType>type).indexType, mapper), /*accessNode*/ undefined, type.aliasSymbol, instantiateTypes(type.aliasTypeArguments, mapper));
+                return getIndexedAccessType(instantiateType((<IndexedAccessType>type).objectType, mapper), instantiateType((<IndexedAccessType>type).indexType, mapper), /*accessNode*/ undefined);
             }
             if (flags & TypeFlags.Conditional) {
                 return getConditionalTypeInstantiation(<ConditionalType>type, combineTypeMappers((<ConditionalType>type).mapper, mapper));
@@ -16837,8 +16943,8 @@ namespace ts {
 
                 function reportErrorResults(source: Type, target: Type, result: Ternary, isComparingJsxAttributes: boolean) {
                     if (!result && reportErrors) {
-                        source = originalSource.aliasSymbol ? originalSource : source;
-                        target = originalTarget.aliasSymbol ? originalTarget : target;
+                        source = typeAliases.get(originalSource) ? originalSource : source;
+                        target = typeAliases.get(originalTarget) ? originalTarget : target;
                         let maybeSuppress = overrideNextErrorInfo > 0;
                         if (maybeSuppress) {
                             overrideNextErrorInfo--;
@@ -17279,16 +17385,18 @@ namespace ts {
                 // We limit alias variance probing to only object and conditional types since their alias behavior
                 // is more predictable than other, interned types, which may or may not have an alias depending on
                 // the order in which things were checked.
-                if (source.flags & (TypeFlags.Object | TypeFlags.Conditional) && source.aliasSymbol &&
-                    source.aliasTypeArguments && source.aliasSymbol === target.aliasSymbol &&
-                    !(source.aliasTypeArgumentsContainsMarker || target.aliasTypeArgumentsContainsMarker)) {
-                    const variances = getAliasVariances(source.aliasSymbol);
-                    if (variances === emptyArray) {
-                        return Ternary.Maybe;
-                    }
-                    const varianceResult = relateVariances(source.aliasTypeArguments, target.aliasTypeArguments, variances, intersectionState);
-                    if (varianceResult !== undefined) {
-                        return varianceResult;
+                if (source.flags & (TypeFlags.Object | TypeFlags.Conditional)) {
+                    const matchingAliasPair = getMatchingAliasPair(source, target);
+                    if (matchingAliasPair &&
+                        !(matchingAliasPair[0].typeArgumentsContainMarker || matchingAliasPair[1].typeArgumentsContainMarker)) {
+                        const variances = getAliasVariances(matchingAliasPair[0].symbol);
+                        if (variances === emptyArray) {
+                            return Ternary.Maybe;
+                        }
+                        const varianceResult = relateVariances(matchingAliasPair[0].typeArguments, matchingAliasPair[1].typeArguments, variances, intersectionState);
+                        if (varianceResult !== undefined) {
+                            return varianceResult;
+                        }
                     }
                 }
 
@@ -18473,7 +18581,7 @@ namespace ts {
             const links = getSymbolLinks(symbol);
             return getVariancesWorker(links.typeParameters, links, (_links, param, marker) => {
                 const type = getTypeAliasInstantiation(symbol, instantiateTypes(links.typeParameters!, makeUnaryTypeMapper(param, marker)));
-                type.aliasTypeArgumentsContainsMarker = true;
+                typeAliases.get(type)!.forEach(a => a.kind === AliasKind.Reference && !!a.typeArguments && void (a.typeArgumentsContainMarker = true));
                 return type;
             });
         }
@@ -19606,11 +19714,11 @@ namespace ts {
         }
 
         function isNonGenericTopLevelType(type: Type) {
-            if (type.aliasSymbol && !type.aliasTypeArguments) {
-                const declaration = getDeclarationOfKind(type.aliasSymbol, SyntaxKind.TypeAliasDeclaration);
-                return !!(declaration && findAncestor(declaration.parent, n => n.kind === SyntaxKind.SourceFile ? true : n.kind === SyntaxKind.ModuleDeclaration ? false : "quit"));
-            }
-            return false;
+            return some(typeAliases.get(type), a =>
+                a.kind === AliasKind.Reference &&
+                !a.typeArguments &&
+                !!findAncestor(getDeclarationOfKind(a.symbol, SyntaxKind.TypeAliasDeclaration), n => n.kind === SyntaxKind.SourceFile ? true : n.kind === SyntaxKind.ModuleDeclaration ? false : "quit")
+            );
         }
 
         function isTypeParameterAtTopLevel(type: Type, typeParameter: TypeParameter): boolean {
@@ -19848,10 +19956,12 @@ namespace ts {
                     propagationType = savePropagationType;
                     return;
                 }
-                if (source.aliasSymbol && source.aliasTypeArguments && source.aliasSymbol === target.aliasSymbol) {
+
+                const aliases = getMatchingAliasPair(source, target);
+                if (aliases && !!aliases[0].typeArguments) {
                     // Source and target are types originating in the same generic type alias declaration.
                     // Simply infer from source type arguments to target type arguments.
-                    inferFromTypeArguments(source.aliasTypeArguments, target.aliasTypeArguments!, getAliasVariances(source.aliasSymbol));
+                    inferFromTypeArguments(aliases[0].typeArguments, aliases[1].typeArguments!, getAliasVariances(aliases[0].symbol));
                     return;
                 }
                 if (source === target && source.flags & TypeFlags.UnionOrIntersection) {
@@ -20459,7 +20569,7 @@ namespace ts {
 
         function isTypeCloselyMatchedBy(s: Type, t: Type) {
             return !!(s.flags & TypeFlags.Object && t.flags & TypeFlags.Object && s.symbol && s.symbol === t.symbol ||
-                s.aliasSymbol && s.aliasTypeArguments && s.aliasSymbol === t.aliasSymbol);
+                !!getMatchingAliasPair(s, t)?.[0]?.typeArguments);
         }
 
         function hasPrimitiveConstraint(type: TypeParameter): boolean {
@@ -24201,9 +24311,10 @@ namespace ts {
                     const args = fillMissingTypeArguments([ctorType, attributesType], (declaredManagedType as GenericType).typeParameters, 2, isInJSFile(context));
                     return createTypeReference((declaredManagedType as GenericType), args);
                 }
-                else if (length(declaredManagedType.aliasTypeArguments) >= 2) {
-                    const args = fillMissingTypeArguments([ctorType, attributesType], declaredManagedType.aliasTypeArguments, 2, isInJSFile(context));
-                    return getTypeAliasInstantiation(declaredManagedType.aliasSymbol!, args);
+                const alias = find(typeAliases.get(declaredManagedType) || emptyArray, a => a.kind === AliasKind.Reference) as AliasReference | undefined;
+                if (alias && length(alias.typeArguments) >= 2) {
+                    const args = fillMissingTypeArguments([ctorType, attributesType], alias.typeArguments, 2, isInJSFile(context));
+                    return getTypeAliasInstantiation(alias.symbol, args);
                 }
             }
             return attributesType;
@@ -40056,7 +40167,7 @@ namespace ts {
                             return (source as TypeReference).target === (target as TypeReference).target;
                         }
                         if (overlapObjFlags & ObjectFlags.Anonymous) {
-                            return !!(source as AnonymousType).aliasSymbol && (source as AnonymousType).aliasSymbol === (target as AnonymousType).aliasSymbol;
+                            return !!getMatchingAliasPair(source, target);
                         }
                     }
                     return false;

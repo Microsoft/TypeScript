@@ -148,7 +148,7 @@ namespace ts.tracing {
         for (let i = 0; i < numTypes; i++) {
             const type = types[i];
             const objectFlags = (type as any).objectFlags;
-            const symbol = type.aliasSymbol ?? type.symbol;
+            const symbol = type.symbol;
             const firstDeclaration = symbol?.declarations?.[0];
             const firstFile = firstDeclaration && getSourceFileOfNode(firstDeclaration);
 
@@ -211,7 +211,6 @@ namespace ts.tracing {
                 recursionId: recursionToken,
                 unionTypes: (type.flags & TypeFlags.Union) ? (type as UnionType).types?.map(t => t.id) : undefined,
                 intersectionTypes: (type.flags & TypeFlags.Intersection) ? (type as IntersectionType).types.map(t => t.id) : undefined,
-                aliasTypeArguments: type.aliasTypeArguments?.map(t => t.id),
                 keyofType: (type.flags & TypeFlags.Index) ? (type as IndexType).type?.id : undefined,
                 ...indexedAccessProperties,
                 ...referenceProperties,

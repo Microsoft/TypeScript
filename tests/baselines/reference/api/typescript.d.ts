@@ -2505,8 +2505,6 @@ declare namespace ts {
         flags: TypeFlags;
         symbol: Symbol;
         pattern?: DestructuringPattern;
-        aliasSymbol?: Symbol;
-        aliasTypeArguments?: readonly Type[];
     }
     export interface LiteralType extends Type {
         value: string | number | PseudoBigInt;
@@ -2639,8 +2637,6 @@ declare namespace ts {
         inferTypeParameters?: TypeParameter[];
         outerTypeParameters?: TypeParameter[];
         instantiations?: Map<Type>;
-        aliasSymbol?: Symbol;
-        aliasTypeArguments?: Type[];
     }
     export interface ConditionalType extends InstantiableType {
         root: ConditionalRoot;
@@ -3874,6 +3870,20 @@ declare namespace ts {
     export interface PseudoBigInt {
         negative: boolean;
         base10Value: string;
+    }
+    export type TypeAlias = AliasReference | AliasKeyof;
+    export enum AliasKind {
+        Reference = 0,
+        Keyof = 1
+    }
+    export interface AliasReference {
+        kind: AliasKind.Reference;
+        symbol: Symbol;
+        typeArguments?: readonly Type[];
+    }
+    export interface AliasKeyof {
+        kind: AliasKind.Keyof;
+        type: Type;
     }
     export {};
 }
