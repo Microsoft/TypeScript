@@ -2464,7 +2464,15 @@ namespace ts {
                     break;
                 }
             }
-
+            const res = createNodeArray(list, listPos, /*end*/ undefined, commaStart >= 0);
+            // Or we could add a nodeFlag, or we could add this code in each *parseTypeArguments* functions.
+            if (parsingContext | (1 << ParsingContext.TypeArguments)){
+                forEach(res, (t) => {
+                    if (isTypeReferenceNode(t)) {
+                        t.isTypeArguments = true;
+                    }
+                });
+            }
             parsingContext = saveParsingContext;
             // Recording the trailing comma is deliberately done after the previous
             // loop, and not just if we see a list terminator. This is because the list
@@ -2472,7 +2480,7 @@ namespace ts {
             // was a trailing comma.
             // Check if the last token was a comma.
             // Always preserve a trailing comma by marking it on the NodeArray
-            return createNodeArray(list, listPos, /*end*/ undefined, commaStart >= 0);
+            return res;
         }
 
         function getExpectedCommaDiagnostic(kind: ParsingContext) {
@@ -2870,6 +2878,11 @@ namespace ts {
             const name = parseIdentifier();
             let constraint: TypeNode | undefined;
             let expression: Expression | undefined;
+            let tParams: NodeArray<TypeParameterDeclaration> | undefined;
+            if (token() === SyntaxKind.LessThanToken) {
+                tParams = parseBracketedList(ParsingContext.TypeParameters, parseTypeParameter, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken);
+            }
+
             if (parseOptional(SyntaxKind.ExtendsKeyword)) {
                 // It's not uncommon for people to write improper constraints to a generic.  If the
                 // user writes a constraint that is an expression and not an actual type, then parse
@@ -2891,7 +2904,7 @@ namespace ts {
             }
 
             const defaultType = parseOptional(SyntaxKind.EqualsToken) ? parseType() : undefined;
-            const node = factory.createTypeParameterDeclaration(name, constraint, defaultType);
+            const node = factory.createTypeParameterDeclaration(name, constraint, defaultType, tParams);
             node.expression = expression;
             return finishNode(node, pos);
         }

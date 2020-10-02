@@ -9481,7 +9481,21 @@ namespace ts {
 
         function getDeclaredTypeOfTypeParameter(symbol: Symbol): TypeParameter {
             const links = getSymbolLinks(symbol);
-            return links.declaredType || (links.declaredType = createTypeParameter(symbol));
+            if (!links.declaredType) {
+                const tmp = createTypeParameter(symbol);
+
+                const index = 0;// or it should be symbol.declarations.length-1 ?
+                const declration = symbol.declarations[index];
+                // this means it is typeConstructor.
+                if (isTypeParameterDeclaration(declration) && declration.tParamDeclarations && declration.tParamDeclarations.length > 0) {
+                    tmp.flags |= TypeFlags.TypeConstructorDeclaration;
+                    // This line is important, which combines Node and Type.
+                    // for now Node.paras is not used but its length. So constrait is not used for now.
+                    (<TypeConstructorPolymorphismDeclaration>tmp).tParams = declration.tParamDeclarations.length;
+                }
+                links.declaredType = tmp;
+            }
+            return links.declaredType;
         }
 
         function getDeclaredTypeOfAlias(symbol: Symbol): Type {
@@ -12141,6 +12155,91 @@ namespace ts {
             return length(type.target.typeParameters);
         }
 
+        /**
+         * we assueme that typeArgument must be a TypeReference TypeArgument, which means it get the typeConstructor parent which take it as a typeArgument.
+         */
+        function isTypeConstructorArgumentValidInTypeConstructorPolymorisic(typeArgument: TypeReferenceNode) {
+            // Question! should we assume typeArgument always does not have any type argument?
+
+            const parentNode = typeArgument.parent;
+            // I am not sure whether the parent could have the typeArgument, maybe the grandparent?
+            if (!isTypeReferenceNode(parentNode)) {
+                debugger;
+                return false;
+            }
+            const argumentIndex = parentNode.typeArguments?.findIndex(ta => ta === typeArgument);
+            if (argumentIndex === undefined || argumentIndex < 0) {
+                // never happens. If code runs here, it means we find the parent wrongly or we do not find the proper argument node(it might have typecasting or sth else?)
+                return false;
+            }
+
+            const typeParametersOfArgument = getTypeParameterOfTypeConstructorNode(typeArgument);
+
+            const typeParameterIndex = argumentIndex;
+            const typeParameters = getTypeParameterOfTypeConstructorNode(parentNode);
+            if (!typeParameters) {
+                return false;
+            }
+            const correspondTypeParameter = typeParameters[typeParameterIndex];
+            if (!isTypeParameterTypeConstructorDeclaration(correspondTypeParameter)) {
+                /**
+                 * interface G<T>{}
+                 * interface HKT<Container<X>>{}
+                 * v: G<G>   <-- the inner G is a typeConstructor, but the first type parameter of outter G is not type constructor polymorphism.
+                 */
+                const diag = Diagnostics.Proper_Polymorphism_type_parameter_0_could_not_accept_Generic_type_1;
+                const typeConstructorPolymorphismStr = typeToString(correspondTypeParameter, /*enclosingDeclaration*/ undefined, TypeFormatFlags.WriteArrayAsGenericType);
+                const genericString = entityNameToString(typeArgument.typeName);
+                error(typeArgument, diag, typeConstructorPolymorphismStr, genericString);
+                return false;
+            }
+
+            if (correspondTypeParameter.tParams !== length(typeParametersOfArgument)) {
+                /**
+                 * interface G<T,U>{}
+                 * interface HKT<Container<X>>{}
+                 * v: HKT<G>   <-- G has two type parameters but the type constructor polymorphism Container only accept one type parameter.
+                 */
+                const diag = Diagnostics.When_Generic_type_0_is_used_as_type_argument_its_type_parameter_must_match_type_constructor_polymorphism_1;
+                const typeConstructorPolymorphismStr = typeToString(correspondTypeParameter, /*enclosingDeclaration*/ undefined, TypeFormatFlags.WriteArrayAsGenericType);
+                const genericString = entityNameToString(typeArgument.typeName);
+                error(typeArgument, diag, genericString, typeConstructorPolymorphismStr);
+                return false;
+            }
+
+            return true;
+
+            function getTypeParameterOfTypeConstructorNode(typeConstructor: TypeReferenceNode) {
+                const symbol = getSymbolOfTypeConstructorTypeReference(typeConstructor);
+                if (!symbol) {
+                    return undefined;
+                }
+                const typeParameters = getTypeParametersFromTypeConstructorSymbol(symbol);
+                return typeParameters;
+            }
+
+            // or this one? getLocalTypeParametersOfClassOrInterfaceOrTypeAlias
+            function getTypeParametersFromTypeConstructorSymbol(symbol: Symbol) {
+                const type = getDeclaredTypeOfSymbol(getMergedSymbol(symbol));  // this has work even in TypeAlias condition -- it give typeParameters value if there is not.
+                if (symbol.flags & (SymbolFlags.Class | SymbolFlags.Interface)) {
+                    const typeParameters = (<InterfaceType>type).localTypeParameters;
+                    return typeParameters;
+                }
+                if (symbol.flags & SymbolFlags.TypeAlias) {
+                    const links = getSymbolLinks(symbol);
+                    const typeParameters = links.typeParameters;
+                    return typeParameters;
+                }
+            }
+
+            // I wish the symbol should be a interface/class/alias
+            // the typeconstructor parameter is not included.
+            function getSymbolOfTypeConstructorTypeReference(typeConstructor: TypeReferenceNode): Symbol | undefined {
+                const meaning = SymbolFlags.Type;
+                return resolveTypeReferenceName(getTypeReferenceName(typeConstructor), meaning);
+            }
+        }
+
 
         /**
          * Get type from type-reference that reference to class or interface
@@ -12153,25 +12252,33 @@ namespace ts {
                 const minTypeArgumentCount = getMinTypeArgumentCount(typeParameters);
                 const isJs = isInJSFile(node);
                 const isJsImplicitAny = !noImplicitAny && isJs;
-                if (!isJsImplicitAny && (numTypeArguments < minTypeArgumentCount || numTypeArguments > typeParameters.length)) {
-                    const missingAugmentsTag = isJs && isExpressionWithTypeArguments(node) && !isJSDocAugmentsTag(node.parent);
-                    const diag = minTypeArgumentCount === typeParameters.length ?
-                        missingAugmentsTag ?
-                            Diagnostics.Expected_0_type_arguments_provide_these_with_an_extends_tag :
-                            Diagnostics.Generic_type_0_requires_1_type_argument_s :
-                        missingAugmentsTag ?
-                            Diagnostics.Expected_0_1_type_arguments_provide_these_with_an_extends_tag :
-                            Diagnostics.Generic_type_0_requires_between_1_and_2_type_arguments;
+                // type reference without typeArguments. Like Set, rather than Set<XXX>
+                if (isTypeReferenceNode(node) && node.isTypeArguments && numTypeArguments === 0 && isTypeConstructorArgumentValidInTypeConstructorPolymorisic(node)) {
+                    (<any>type).isConcentrateTypeConstructor = true;
+                    // These are not well considered, just for passing test cases.
+                    // Maybe all those code should be removed and written in other places.
+                }
+                else {
+                    if (!isJsImplicitAny && (numTypeArguments < minTypeArgumentCount || numTypeArguments > typeParameters.length)) {
+                        const missingAugmentsTag = isJs && isExpressionWithTypeArguments(node) && !isJSDocAugmentsTag(node.parent);
+                        const diag = minTypeArgumentCount === typeParameters.length ?
+                            missingAugmentsTag ?
+                                Diagnostics.Expected_0_type_arguments_provide_these_with_an_extends_tag :
+                                Diagnostics.Generic_type_0_requires_1_type_argument_s :
+                            missingAugmentsTag ?
+                                Diagnostics.Expected_0_1_type_arguments_provide_these_with_an_extends_tag :
+                                Diagnostics.Generic_type_0_requires_between_1_and_2_type_arguments;
 
-                    const typeStr = typeToString(type, /*enclosingDeclaration*/ undefined, TypeFormatFlags.WriteArrayAsGenericType);
-                    error(node, diag, typeStr, minTypeArgumentCount, typeParameters.length);
-                    if (!isJs) {
-                        // TODO: Adopt same permissive behavior in TS as in JS to reduce follow-on editing experience failures (requires editing fillMissingTypeArguments)
-                        return errorType;
+                        const typeStr = typeToString(type, /*enclosingDeclaration*/ undefined, TypeFormatFlags.WriteArrayAsGenericType);
+                        error(node, diag, typeStr, minTypeArgumentCount, typeParameters.length);
+                        if (!isJs) {
+                            // TODO: Adopt same permissive behavior in TS as in JS to reduce follow-on editing experience failures (requires editing fillMissingTypeArguments)
+                            return errorType;
+                        }
                     }
                 }
-                if (node.kind === SyntaxKind.TypeReference && isDeferredTypeReferenceNode(<TypeReferenceNode>node, length(node.typeArguments) !== typeParameters.length)) {
-                    return createDeferredTypeReference(<GenericType>type, <TypeReferenceNode>node, /*mapper*/ undefined);
+                if (isTypeReferenceNode(node) && isDeferredTypeReferenceNode(node, length(node.typeArguments) !== typeParameters.length)) {
+                    return createDeferredTypeReference(<GenericType>type, node, /*mapper*/ undefined);
                 }
                 // In a type reference, the outer type parameters of the referenced class or interface are automatically
                 // supplied as type arguments and the type reference only specifies arguments for the local type parameters
@@ -12208,6 +12315,11 @@ namespace ts {
             if (typeParameters) {
                 const numTypeArguments = length(node.typeArguments);
                 const minTypeArgumentCount = getMinTypeArgumentCount(typeParameters);
+                if (isTypeReferenceNode(node) && node.isTypeArguments && numTypeArguments === 0 && isTypeConstructorArgumentValidInTypeConstructorPolymorisic(node)) {
+                        (<any>type).isConcentrateTypeConstructor = true;
+                        (<any>type).origionalTypeAliasSymbol = symbol;
+                        return type;
+                }
                 if (numTypeArguments < minTypeArgumentCount || numTypeArguments > typeParameters.length) {
                     error(node,
                         minTypeArgumentCount === typeParameters.length ?
@@ -12249,6 +12361,7 @@ namespace ts {
         }
 
         function getTypeReferenceType(node: NodeWithTypeArguments, symbol: Symbol): Type {
+            // Debug.assert(isTypeReferenceNode(node));
             if (symbol === unknownSymbol) {
                 return errorType;
             }
@@ -12262,7 +12375,26 @@ namespace ts {
             // Get type from reference to named type that cannot be generic (enum or type parameter)
             const res = tryGetDeclaredTypeOfSymbol(symbol);
             if (res) {
-                return checkNoTypeArguments(node, symbol) ? getRegularTypeOfLiteralType(res) : errorType;
+                /*
+                    interface Itertable<T, Container<X>> {
+                        filter(p: (x: T) => boolean): Container<T>;
+                                                      ^     this should not report as error.
+                    }
+                */
+                if (isTypeParameterTypeConstructorDeclaration(res)) {
+                    if(node.typeArguments?.length !== res.tParams){
+                        //check whether type arguments match type parameters.
+                    }
+                    const typeConstructorInstance = createTypeParameter(symbol);
+                    typeConstructorInstance.flags |= TypeFlags.TypeConstructorInstance;
+                    (<TypeConstructorPolymorphismInstance>typeConstructorInstance).resolvedTypeConstructorParam = node.typeArguments?.map(getTypeFromTypeNode);
+                    (<TypeConstructorPolymorphismInstance>typeConstructorInstance).origionalTypeConstructorDeclaration = res;
+                    return typeConstructorInstance;
+                }
+                if (checkNoTypeArguments(node, symbol)) {
+                    return getRegularTypeOfLiteralType(res);
+                }
+                return errorType;
             }
             if (symbol.flags & SymbolFlags.Value && isJSDocTypeReference(node)) {
                 const jsdocType = getTypeFromJSDocValueReference(node, symbol);
@@ -13914,6 +14046,14 @@ namespace ts {
             return !!(type.flags & TypeFlags.TypeParameter && (<TypeParameter>type).isThisType);
         }
 
+        function isTypeParameterTypeConstructorDeclaration(type: Type): type is TypeConstructorPolymorphismDeclaration {
+            return !!(type.flags & TypeFlags.TypeParameter && type.flags & TypeFlags.TypeConstructorDeclaration);
+        }
+
+        function isTypeParameterTypeConstructorInstance(type: Type): type is TypeConstructorPolymorphismInstance {
+            return !!(type.flags & TypeFlags.TypeParameter && type.flags & TypeFlags.TypeConstructorInstance);
+        }
+
         function getSimplifiedType(type: Type, writing: boolean): Type {
             return type.flags & TypeFlags.IndexedAccess ? getSimplifiedIndexedAccessType(<IndexedAccessType>type, writing) :
                 type.flags & TypeFlags.Conditional ? getSimplifiedConditionalType(<ConditionalType>type, writing) :
@@ -14897,7 +15037,7 @@ namespace ts {
                 case TypeMapKind.Array:
                     const sources = mapper.sources;
                     const targets = mapper.targets;
-                    for (let i = 0; i < sources.length; i++) {
+                    for (let i = 0; i < sources.length; i++) { // we should check whether the generic and typeconstructor has the same parameters. Or here is too late, we should check when mapper is created.
                         if (type === sources[i]) {
                             return targets ? targets[i] : anyType;
                         }
@@ -15061,7 +15201,7 @@ namespace ts {
                 // mapper to the type parameters to produce the effective list of type arguments, and compute the
                 // instantiation cache key from the type IDs of the type arguments.
                 const combinedMapper = combineTypeMappers(type.mapper, mapper);
-                const typeArguments = map(typeParameters, t => getMappedType(t, combinedMapper));
+                const typeArguments = map(typeParameters, t => instantiateTypeOfTypeParameter(t, combinedMapper));   //maybe this is instantiateType?Or instantiateTypeWorker? I just want to handle typeConstructor situation.
                 const id = getTypeListId(typeArguments);
                 let result = links.instantiations!.get(id);
                 if (!result) {
@@ -15078,7 +15218,7 @@ namespace ts {
 
         function maybeTypeParameterReference(node: Node) {
             return !(node.kind === SyntaxKind.QualifiedName ||
-                node.parent.kind === SyntaxKind.TypeReference && (<TypeReferenceNode>node.parent).typeArguments && node === (<TypeReferenceNode>node.parent).typeName ||
+                // node.parent.kind === SyntaxKind.TypeReference && (<TypeReferenceNode>node.parent).typeArguments && node === (<TypeReferenceNode>node.parent).typeName || // delete this line or add more constract.
                 node.parent.kind === SyntaxKind.ImportType && (node.parent as ImportTypeNode).typeArguments && node === (node.parent as ImportTypeNode).qualifier);
         }
 
@@ -15280,10 +15420,43 @@ namespace ts {
             return result;
         }
 
+        // this function is mainly for the change in function `getObjectTypeInstantiation`, another choice is written in the comment of that changed line.
+        function instantiateTypeOfTypeParameter(type: TypeParameter, mapper: TypeMapper): Type {
+            const flags = type.flags;
+            if (isTypeParameterTypeConstructorInstance(type)) {
+                debugger;
+                const origionalTypeConstructorParameter = type.origionalTypeConstructorDeclaration!;
+                const resolvedTypeConstructorParam = type.resolvedTypeConstructorParam;
+                const concentrateGenericType = getMappedType(origionalTypeConstructorParameter, mapper);
+                if (concentrateGenericType === origionalTypeConstructorParameter) {
+                    debugger;//on which condition this would happen?
+                    return origionalTypeConstructorParameter;
+                }
+                const newTypeArguments = instantiateTypes(resolvedTypeConstructorParam, mapper);
+                // concentrate type constructor is TypeAlias
+                if (!!concentrateGenericType.aliasSymbol) {
+                    const tmpSymbol: Symbol = (<any>concentrateGenericType).origionalTypeAliasSymbol;
+                    return getTypeAliasInstantiation(tmpSymbol, newTypeArguments);
+                }
+                // concentrate type constructor is Object of Interface/Class
+                else {
+                    return createNormalizedTypeReference((<TypeReference>concentrateGenericType).target, newTypeArguments);
+                }
+            }
+            else if (flags & TypeFlags.TypeConstructorDeclaration) {
+                // this is a demo implement, and not well considered.
+                // ATTENTION: this might cause error.(just guess, in which condition the declaration would be mapped?)
+                return getMappedType(type, mapper);
+            }
+            else {
+                return getMappedType(type, mapper);
+            }
+        }
+
         function instantiateTypeWorker(type: Type, mapper: TypeMapper): Type {
             const flags = type.flags;
             if (flags & TypeFlags.TypeParameter) {
-                return getMappedType(type, mapper);
+                return instantiateTypeOfTypeParameter(type, mapper);
             }
             if (flags & TypeFlags.Object) {
                 const objectFlags = (<ObjectType>type).objectFlags;

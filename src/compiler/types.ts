@@ -1202,6 +1202,9 @@ namespace ts {
 
         // For error recovery purposes.
         expression?: Expression;
+
+        // If this is not empty, it is a type constructor.
+        tParamDeclarations?: NodeArray<TypeParameterDeclaration>;
     }
 
     export interface SignatureDeclarationBase extends NamedDeclaration, JSDocContainer {
@@ -1531,6 +1534,8 @@ namespace ts {
     export interface TypeReferenceNode extends NodeWithTypeArguments {
         readonly kind: SyntaxKind.TypeReference;
         readonly typeName: EntityName;
+        //@internal
+        isTypeArguments: boolean;
     }
 
     export interface TypePredicateNode extends TypeNode {
@@ -4870,6 +4875,10 @@ namespace ts {
         Null            = 1 << 16,
         Never           = 1 << 17,  // Never type
         TypeParameter   = 1 << 18,  // Type parameter
+        // @internal
+        TypeConstructorDeclaration = 1<< 27,   // Type Constructor Declaration, this is an additional flag of TypeParameter. This should include the constraint and parameter constrait.
+        // @internal
+        TypeConstructorInstance = 1<< 28,   // Type Constructor, this is an additional flag of TypeParameter. This should include the concentrate arguments(not mapped yet).
         Object          = 1 << 19,  // Object type
         Union           = 1 << 20,  // Union (T | U)
         Intersection    = 1 << 21,  // Intersection (T & U)
@@ -5316,6 +5325,20 @@ namespace ts {
         isThisType?: boolean;
         /* @internal */
         resolvedDefaultType?: Type;
+    }
+
+    // Type parameters (TypeFlags.TypeParameter | TypeFlags.TypeConstructorDeclaration)
+    export interface TypeConstructorPolymorphismDeclaration extends TypeParameter{
+        /* @internal */
+        tParams?: number; // Not allowed constraint for now, this might be a very complex feature.
+    }
+
+    // Type parameters (TypeFlags.TypeParameter | TypeFlags.TypeConstructorInstance)
+    export interface TypeConstructorPolymorphismInstance extends TypeParameter{
+        /* @internal */
+        resolvedTypeConstructorParam?: Type[];
+        /* @internal */
+        origionalTypeConstructorDeclaration?: TypeConstructorPolymorphismDeclaration;
     }
 
     // Indexed access types (TypeFlags.IndexedAccess)
@@ -6740,7 +6763,7 @@ namespace ts {
         // Signature elements
         //
 
-        createTypeParameterDeclaration(name: string | Identifier, constraint?: TypeNode, defaultType?: TypeNode): TypeParameterDeclaration;
+        createTypeParameterDeclaration(name: string | Identifier, constraint?: TypeNode, defaultType?: TypeNode, tParams?: NodeArray<TypeParameterDeclaration>): TypeParameterDeclaration;
         updateTypeParameterDeclaration(node: TypeParameterDeclaration, name: Identifier, constraint: TypeNode | undefined, defaultType: TypeNode | undefined): TypeParameterDeclaration;
         createParameterDeclaration(decorators: readonly Decorator[] | undefined, modifiers: readonly Modifier[] | undefined, dotDotDotToken: DotDotDotToken | undefined, name: string | BindingName, questionToken?: QuestionToken, type?: TypeNode, initializer?: Expression): ParameterDeclaration;
         updateParameterDeclaration(node: ParameterDeclaration, decorators: readonly Decorator[] | undefined, modifiers: readonly Modifier[] | undefined, dotDotDotToken: DotDotDotToken | undefined, name: string | BindingName, questionToken: QuestionToken | undefined, type: TypeNode | undefined, initializer: Expression | undefined): ParameterDeclaration;
