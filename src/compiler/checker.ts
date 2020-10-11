@@ -33608,6 +33608,14 @@ namespace ts {
             }
 
             if (node.kind === SyntaxKind.BindingElement) {
+                if (node.propertyName && isIdentifier(node.name) && isParameterDeclaration(node) && nodeIsMissing((getContainingFunction(node) as FunctionLikeDeclaration).body)) {
+                    // type F = ({a: string}) => void;
+                    //               ^^^^^^
+                    // variable renaming in function type notation is confusing, so forbid it
+                    error(node.name, Diagnostics.Renaming_a_property_in_destructuring_assignment_is_only_allowed_in_a_function_or_constructor_implementation);
+                    return;
+                }
+
                 if (node.parent.kind === SyntaxKind.ObjectBindingPattern && languageVersion < ScriptTarget.ESNext) {
                     checkExternalEmitHelpers(node, ExternalEmitHelpers.Rest);
                 }
