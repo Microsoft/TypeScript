@@ -2498,6 +2498,7 @@ declare namespace ts {
         InstantiablePrimitive = 406847488,
         Instantiable = 465829888,
         StructuredOrInstantiable = 469499904,
+        PedanticPossiblyFalsy = 263203,
         Narrowable = 536624127,
     }
     export type DestructuringPattern = BindingPattern | ObjectLiteralExpression | ArrayLiteralExpression;
@@ -2840,6 +2841,7 @@ declare namespace ts {
         outDir?: string;
         outFile?: string;
         paths?: MapLike<string[]>;
+        pedanticBooleanCoercions?: boolean;
         preserveConstEnums?: boolean;
         preserveSymlinks?: boolean;
         project?: string;

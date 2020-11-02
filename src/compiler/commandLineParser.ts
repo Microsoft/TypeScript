@@ -635,6 +635,14 @@ namespace ts {
             category: Diagnostics.Additional_Checks,
             description: Diagnostics.Include_undefined_in_index_signature_results
         },
+        {
+            name: "pedanticBooleanCoercions",
+            type: "boolean",
+            affectsSemanticDiagnostics: true,
+            showInSimplifiedHelpView: false,
+            category: Diagnostics.Additional_Checks,
+            description: Diagnostics.Disallow_truthiness_coercions_on_known_true_Slashknown_false_values
+        },
 
         // Module Resolution
         {

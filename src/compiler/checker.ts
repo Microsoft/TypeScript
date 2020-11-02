@@ -30153,7 +30153,8 @@ namespace ts {
                         workStacks.leftType[stackIndex] = leftType;
                         const operator = node.operatorToken.kind;
                         if (operator === SyntaxKind.AmpersandAmpersandToken || operator === SyntaxKind.BarBarToken || operator === SyntaxKind.QuestionQuestionToken) {
-                            checkTruthinessOfType(leftType, node.left);
+                            const checkPossibilyFalsy = operator !== SyntaxKind.QuestionQuestionToken;
+                            checkTruthinessOfType(leftType, node.left, checkPossibilyFalsy);
                         }
                         advanceState(CheckBinaryExpressionState.FinishCheck);
                         maybeCheckExpression(node.right);
@@ -34013,26 +34014,54 @@ namespace ts {
             checkGrammarStatementInAmbientContext(node);
 
             checkSourceElement(node.statement);
-            checkTruthinessExpression(node.expression);
+            checkTruthinessExpression(node.expression, /*checkMode*/ undefined, /*isLoopStetement*/ true);
         }
 
         function checkWhileStatement(node: WhileStatement) {
             // Grammar checking
             checkGrammarStatementInAmbientContext(node);
 
-            checkTruthinessExpression(node.expression);
+            checkTruthinessExpression(node.expression, /*checkMode*/ undefined, /*isLoopStetement*/ true);
             checkSourceElement(node.statement);
         }
 
-        function checkTruthinessOfType(type: Type, node: Node) {
+        function checkTruthinessOfType(type: Type, node: Node, checkPossibilyFalsy: boolean, isLoopStetement?: boolean) {
             if (type.flags & TypeFlags.Void) {
                 error(node, Diagnostics.An_expression_of_type_void_cannot_be_tested_for_truthiness);
+            }
+            if (checkPossibilyFalsy && compilerOptions.pedanticBooleanCoercions) {
+                checkPedanticBooleanCoercions(type, node, isLoopStetement);
             }
             return type;
         }
 
-        function checkTruthinessExpression(node: Expression, checkMode?: CheckMode) {
-            return checkTruthinessOfType(checkExpression(node, checkMode), node);
+        function checkPedanticBooleanCoercions(type: Type, node: Node, isLoopStetement?: boolean) {
+            if (isPossibilyFalsyType(type)) {
+                return;
+            }
+
+            const isInfiniteLoop = isLoopStetement && isTypeIdenticalTo(type, trueType);
+            if (isInfiniteLoop) {
+                return;
+            }
+
+            error(node, Diagnostics.The_type_0_is_disallowed_in_truthiness_position, typeToString(type));
+        }
+
+        function isPossibilyFalsyType(type: Type): boolean {
+            if (type.flags & TypeFlags.UnionOrIntersection) {
+                return some((<UnionOrIntersectionType>type).types, isPossibilyFalsyType);
+            }
+
+            const possiblyFalsy = !!getFalsyFlags(type);
+            if (!(type.flags & ~TypeFlags.PossiblyFalsy)) {
+                return possiblyFalsy;
+            }
+            return !!(type.flags & TypeFlags.PedanticPossiblyFalsy);
+        }
+
+        function checkTruthinessExpression(node: Expression, checkMode?: CheckMode, isLoopStetement?: boolean) {
+            return checkTruthinessOfType(checkExpression(node, checkMode), node, /*checkPossibilyFalsy*/ true, isLoopStetement);
         }
 
         function checkForStatement(node: ForStatement) {
@@ -34052,7 +34081,7 @@ namespace ts {
                 }
             }
 
-            if (node.condition) checkTruthinessExpression(node.condition);
+            if (node.condition) checkTruthinessExpression(node.condition, /*checkMode*/ undefined, /*isLoopStetement*/ true);
             if (node.incrementor) checkExpression(node.incrementor);
             checkSourceElement(node.statement);
             if (node.locals) {

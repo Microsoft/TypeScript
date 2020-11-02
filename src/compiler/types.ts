@@ -4922,6 +4922,7 @@ namespace ts {
         Simplifiable = IndexedAccess | Conditional,
         /* @internal */
         Substructure = Object | Union | Intersection | Index | IndexedAccess | Conditional | Substitution | TemplateLiteral | StringMapping,
+        PedanticPossiblyFalsy = AnyOrUnknown | EnumLike | TypeParameter,
         // 'Narrowable' types are types where narrowing actually narrows.
         // This *should* be every type other than null, undefined, void, and never
         Narrowable = Any | Unknown | StructuredOrInstantiable | StringLike | NumberLike | BigIntLike | BooleanLike | ESSymbol | UniqueESSymbol | NonPrimitive,
@@ -5792,6 +5793,7 @@ namespace ts {
         outDir?: string;
         outFile?: string;
         paths?: MapLike<string[]>;
+        pedanticBooleanCoercions?: boolean
         /** The directory of the config file that specified 'paths'. Used to resolve relative paths when 'baseUrl' is absent. */
         /*@internal*/ pathsBasePath?: string;
         /*@internal*/ plugins?: PluginImport[];
