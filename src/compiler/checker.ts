@@ -578,6 +578,7 @@ namespace ts {
             getAliasedSymbol: resolveAlias,
             getEmitResolver,
             getExportsOfModule: getExportsOfModuleAsArray,
+            getExportsOfSymbol: getExportsOfSymbolAsArray,
             getExportsAndPropertiesOfModule,
             getSymbolWalker: createGetSymbolWalker(
                 getRestTypeOfSignature,
@@ -1275,6 +1276,8 @@ namespace ts {
             }
         }
 
+        function combineSymbolTables(first: SymbolTable, second: SymbolTable): SymbolTable;
+        function combineSymbolTables(first: SymbolTable | undefined, second: SymbolTable | undefined): SymbolTable | undefined;
         function combineSymbolTables(first: SymbolTable | undefined, second: SymbolTable | undefined): SymbolTable | undefined {
             if (!first?.size) return second;
             if (!second?.size) return first;
@@ -1351,20 +1354,25 @@ namespace ts {
         }
 
         function addToSymbolTable(target: SymbolTable, source: SymbolTable, message: DiagnosticMessage) {
-            source.forEach((sourceSymbol, id) => {
-                const targetSymbol = target.get(id);
-                if (targetSymbol) {
-                    // Error on redeclarations
-                    forEach(targetSymbol.declarations, addDeclarationDiagnostic(unescapeLeadingUnderscores(id), message));
-                }
-                else {
-                    target.set(id, sourceSymbol);
-                }
+            addToSymbolTableWithDiagnostic(target, source, ({ targetSymbol, id }) => {
+                forEach(targetSymbol.declarations, addDeclarationDiagnostic(unescapeLeadingUnderscores(id), message));
             });
 
             function addDeclarationDiagnostic(id: string, message: DiagnosticMessage) {
                 return (declaration: Declaration) => diagnostics.add(createDiagnosticForNode(declaration, message, id));
             }
+        }
+
+        function addToSymbolTableWithDiagnostic(target: SymbolTable, source: SymbolTable, onConflict: (args: { targetSymbol: Symbol, sourceSymbol: Symbol, id: __String }) => void) {
+            source.forEach((sourceSymbol, id) => {
+                const targetSymbol = target.get(id);
+                if (targetSymbol) {
+                    onConflict({ targetSymbol, sourceSymbol, id });
+                }
+                else {
+                    target.set(id, sourceSymbol);
+                }
+            });
         }
 
         function getSymbolLinks(symbol: Symbol): SymbolLinks {
@@ -3435,6 +3443,10 @@ namespace ts {
             return symbolsToArray(getExportsOfModule(moduleSymbol));
         }
 
+        function getExportsOfSymbolAsArray(symbol: Symbol): Symbol[] {
+            return symbolsToArray(getExportsOfSymbol(symbol));
+        }
+
         function getExportsAndPropertiesOfModule(moduleSymbol: Symbol): Symbol[] {
             const exports = getExportsOfModuleAsArray(moduleSymbol);
             const exportEquals = resolveExternalModuleSymbol(moduleSymbol);
@@ -3470,8 +3482,28 @@ namespace ts {
                 : getPropertyOfType(type, memberName);
         }
 
+        function isLateBindingContainer(symbol: Symbol): boolean {
+            if (!(symbol.flags & (SymbolFlags.LateBindingContainer | SymbolFlags.Enum))) {
+                return false;
+            }
+
+            if (symbol.flags & SymbolFlags.Enum) {
+                const links = getSymbolLinks(symbol);
+                if (links.enumHasLateBoundMember === undefined) {
+                    for (const declaration of symbol.declarations) {
+                        if (isEnumDeclaration(declaration) && some(declaration.members, isSpreadEnumMember)) {
+                            return links.enumHasLateBoundMember = true;
+                        }
+                    }
+                    return links.enumHasLateBoundMember = false;
+                }
+                return links.enumHasLateBoundMember;
+            }
+            return true;
+        }
+
         function getExportsOfSymbol(symbol: Symbol): SymbolTable {
-            return symbol.flags & SymbolFlags.LateBindingContainer ? getResolvedMembersOrExportsOfSymbol(symbol, MembersOrExportsResolutionKind.resolvedExports) :
+            return isLateBindingContainer(symbol) ? getResolvedMembersOrExportsOfSymbol(symbol, MembersOrExportsResolutionKind.resolvedExports) :
                 symbol.flags & SymbolFlags.Module ? getExportsOfModule(symbol) :
                 symbol.exports || emptySymbols;
         }
@@ -9479,7 +9511,7 @@ namespace ts {
             for (const declaration of symbol.declarations) {
                 if (declaration.kind === SyntaxKind.EnumDeclaration) {
                     for (const member of (<EnumDeclaration>declaration).members) {
-                        if (member.initializer && isStringLiteralLike(member.initializer)) {
+                        if (isSpreadEnumMember(member) || member.initializer && isStringLiteralLike(member.initializer)) {
                             return links.enumKind = EnumKind.Literal;
                         }
                         if (!isLiteralEnumMember(member)) {
@@ -9505,14 +9537,16 @@ namespace ts {
                 const memberTypeList: Type[] = [];
                 for (const declaration of symbol.declarations) {
                     if (declaration.kind === SyntaxKind.EnumDeclaration) {
-                        for (const member of (<EnumDeclaration>declaration).members) {
+                        const members = getEnumMembers(<EnumDeclaration>declaration);
+                        members.forEach(member => {
                             const value = getEnumMemberValue(member);
                             const memberType = getFreshTypeOfLiteralType(getLiteralType(value !== undefined ? value : 0, enumCount, getSymbolOfNode(member)));
                             getSymbolLinks(getSymbolOfNode(member)).declaredType = memberType;
                             memberTypeList.push(getRegularTypeOfLiteralType(memberType));
-                        }
+                        });
                     }
                 }
+
                 if (memberTypeList.length) {
                     const enumType = getUnionType(memberTypeList, UnionReduction.Literal, symbol, /*aliasTypeArguments*/ undefined);
                     if (enumType.flags & TypeFlags.Union) {
@@ -9855,6 +9889,28 @@ namespace ts {
             return links.resolvedSymbol;
         }
 
+        function lateBindSpreadEnumMember(earlySymbols: SymbolTable | undefined, lateSymbols: SymbolTable, member: SpreadEnumMember) {
+            const spreadEnumMemberExports = createSymbolTable();
+            const enumMembers = getExportsFromSpreadEnumMember(member);
+            enumMembers.forEach(enumMember => {
+                const symbol = getSymbolOfNode(enumMember);
+                const earlySymbol = earlySymbols?.get(symbol.escapedName);
+                if (earlySymbol) {
+                    const earlySymbolText = symbolToString(earlySymbol);
+                    const diag = error(member, Diagnostics.Spread_enum_member_has_overlapped_on_0, earlySymbolText);
+                    addRelatedInfo(diag, createDiagnosticForNode(earlySymbol.valueDeclaration, Diagnostics._0_is_declared_here, earlySymbolText));
+                }
+
+                const enumSymbol = cloneSymbol(symbol);
+                spreadEnumMemberExports.set(enumSymbol.escapedName, enumSymbol);
+            });
+            addToSymbolTableWithDiagnostic(lateSymbols, spreadEnumMemberExports, ({ targetSymbol }) => {
+                const targetSymbolText = symbolToString(targetSymbol);
+                const diag = error(member, Diagnostics.Spread_enum_member_has_overlapped_on_0, targetSymbolText);
+                addRelatedInfo(diag, createDiagnosticForNode(targetSymbol.valueDeclaration, Diagnostics._0_is_declared_here, targetSymbolText));
+            });
+        }
+
         function getResolvedMembersOrExportsOfSymbol(symbol: Symbol, resolutionKind: MembersOrExportsResolutionKind): UnderscoreEscapedMap<Symbol> {
             const links = getSymbolLinks(symbol);
             if (!links[resolutionKind]) {
@@ -9874,7 +9930,10 @@ namespace ts {
                     const members = getMembersOfDeclaration(decl);
                     if (members) {
                         for (const member of members) {
-                            if (isStatic === hasStaticModifier(member) && hasLateBindableName(member)) {
+                            if (isSpreadEnumMember(member)) {
+                                lateBindSpreadEnumMember(earlySymbols, lateSymbols, member);
+                            }
+                            else if (isStatic === hasStaticModifier(member) && hasLateBindableName(member)) {
                                 lateBindMember(symbol, earlySymbols, lateSymbols, member);
                             }
                         }
@@ -31155,10 +31214,11 @@ namespace ts {
                 (node.parent.kind === SyntaxKind.ElementAccessExpression && (<ElementAccessExpression>node.parent).expression === node) ||
                 ((node.kind === SyntaxKind.Identifier || node.kind === SyntaxKind.QualifiedName) && isInRightSideOfImportOrExportAssignment(<Identifier>node) ||
                     (node.parent.kind === SyntaxKind.TypeQuery && (<TypeQueryNode>node.parent).exprName === node)) ||
+                (node.parent.kind === SyntaxKind.SpreadEnumMember) ||
                 (node.parent.kind === SyntaxKind.ExportSpecifier); // We allow reexporting const enums
 
             if (!ok) {
-                error(node, Diagnostics.const_enums_can_only_be_used_in_property_or_index_access_expressions_or_the_right_hand_side_of_an_import_declaration_or_export_assignment_or_type_query);
+                error(node, Diagnostics.const_enums_can_only_be_used_in_property_or_index_access_expressions_or_the_right_hand_side_of_an_import_declaration_or_export_assignment_or_type_query_or_spread_enum_member);
             }
 
             if (compilerOptions.isolatedModules) {
@@ -32483,6 +32543,7 @@ namespace ts {
                     case SyntaxKind.ClassDeclaration:
                     case SyntaxKind.EnumDeclaration:
                     case SyntaxKind.EnumMember:
+                    case SyntaxKind.SpreadEnumMember:
                         return DeclarationSpaces.ExportType | DeclarationSpaces.ExportValue;
                     case SyntaxKind.SourceFile:
                         return DeclarationSpaces.ExportType | DeclarationSpaces.ExportValue | DeclarationSpaces.ExportNamespace;
@@ -35888,9 +35949,11 @@ namespace ts {
                 nodeLinks.flags |= NodeCheckFlags.EnumValuesComputed;
                 let autoValue: number | undefined = 0;
                 for (const member of node.members) {
-                    const value = computeMemberValue(member, autoValue);
-                    getNodeLinks(member).enumMemberValue = value;
-                    autoValue = typeof value === "number" ? value + 1 : undefined;
+                    if (isEnumMember(member)) {
+                        const value = computeMemberValue(member, autoValue);
+                        getNodeLinks(member).enumMemberValue = value;
+                        autoValue = typeof value === "number" ? value + 1 : undefined;
+                    }
                 }
             }
         }
@@ -36066,7 +36129,7 @@ namespace ts {
             checkCollisionWithRequireExportsInGeneratedCode(node, node.name);
             checkCollisionWithGlobalPromiseInGeneratedCode(node, node.name);
             checkExportsOnMergedDeclarations(node);
-            node.members.forEach(checkEnumMember);
+            node.members.forEach(checkEnumMemberLike);
 
             computeEnumMemberValues(node);
 
@@ -36102,7 +36165,7 @@ namespace ts {
                     }
 
                     const firstEnumMember = enumDeclaration.members[0];
-                    if (!firstEnumMember.initializer) {
+                    if (!isSpreadEnumMember(firstEnumMember) && !firstEnumMember.initializer) {
                         if (seenEnumMissingInitialInitializer) {
                             error(firstEnumMember.name, Diagnostics.In_an_enum_with_multiple_declarations_only_one_declaration_can_omit_an_initializer_for_its_first_enum_element);
                         }
@@ -36114,10 +36177,51 @@ namespace ts {
             }
         }
 
+        function checkEnumMemberLike(node: EnumMemberLike) {
+            if (isEnumMember(node)) {
+                checkEnumMember(node);
+            }
+            else {
+                checkSpreadEnumMember(node);
+            }
+        }
+
         function checkEnumMember(node: EnumMember) {
             if (isPrivateIdentifier(node.name)) {
                 error(node, Diagnostics.An_enum_member_cannot_be_named_with_a_private_identifier);
             }
+        }
+
+        function checkGrammarSpreadEnumMember(symbol: Symbol, container: Symbol, node: SpreadEnumMember) {
+            if (getEnumKind(symbol) !== EnumKind.Literal) {
+                error(node.name, Diagnostics.Spread_enum_member_can_only_reference_to_literal_enum_reference);
+            }
+
+            const symbolIsConstEnum = isConstEnumSymbol(symbol);
+            const containerIsConstEnum = isConstEnumSymbol(container);
+            if (!compilerOptions.preserveConstEnums && symbolIsConstEnum !== containerIsConstEnum) {
+                const diag = symbolIsConstEnum ?
+                    Diagnostics.Spread_enum_member_cannot_reference_to_const_enum_without_preserveConstEnums_flag :
+                    Diagnostics.Spread_enum_member_cannot_reference_to_non_const_enum_inside_const_enum_declaration_without_preserveConstEnums_flag;
+                error(node.name, diag);
+            }
+        }
+
+        function checkSpreadEnumMember(node: SpreadEnumMember) {
+            const container = node.parent;
+            const symbol = getSymbolOfNode(container);
+            const enumSymbol = getSymbolAtLocation(node.name);
+            if (!enumSymbol || !(enumSymbol.flags & SymbolFlags.Enum)) {
+                error(node.name, Diagnostics.Enum_expected);
+                return;
+            }
+            if (symbol === enumSymbol) {
+                error(node.name, Diagnostics.Spread_enum_member_cannot_reference_to_itself);
+            }
+
+            getExportsOfSymbol(symbol);
+            checkGrammarSpreadEnumMember(enumSymbol, symbol, node);
+            checkExpression(node.name);
         }
 
         function getFirstNonAmbientClassOrFunctionDeclaration(symbol: Symbol): Declaration | undefined {
@@ -38181,6 +38285,40 @@ namespace ts {
             }
             const symbol = getSymbolOfNode(declaration);
             return symbol && getPropertiesOfType(getTypeOfSymbol(symbol)) || emptyArray;
+        }
+
+        function getEnumMembers(node: EnumDeclaration): EnumMember[] {
+            const declaration = getParseTreeNode(node, isEnumDeclaration);
+            if (!declaration) {
+                return emptyArray;
+            }
+
+            const members: EnumMember[] = [];
+            for (const member of declaration.members) {
+                if (isEnumMember(member)) {
+                    members.push(member);
+                }
+                else {
+                    members.push(...getExportsFromSpreadEnumMember(member));
+                }
+            }
+            return members;
+        }
+
+        function getExportsFromSpreadEnumMember(member: SpreadEnumMember): EnumMember[] {
+            const enumSymbol = resolveEntityName(member.name, SymbolFlags.Enum);
+            if (!enumSymbol) {
+                return emptyArray;
+            }
+
+            const members: EnumMember[] = [];
+            const enumExports = getExportsOfSymbol(enumSymbol);
+            enumExports.forEach(enumExport => {
+                if (enumExport.valueDeclaration && isEnumMember(enumExport.valueDeclaration)) {
+                    members.push(enumExport.valueDeclaration);
+                }
+            });
+            return members;
         }
 
         function getNodeCheckFlags(node: Node): NodeCheckFlags {
