@@ -25849,6 +25849,10 @@ namespace ts {
                 checkExternalEmitHelpers(node, ExternalEmitHelpers.ClassPrivateFieldGet);
             }
             const isAnyLike = isTypeAny(apparentType) || apparentType === silentNeverType;
+            if (compilerOptions.noPropertyAccessOnAny && isPropertyAccessExpression(node) && isAnyLike) {
+                error(node.name, Diagnostics.Cannot_access_member_from_any_type);
+            }
+
             let prop: Symbol | undefined;
             if (isPrivateIdentifier(right)) {
                 const lexicallyScopedSymbol = lookupSymbolForPrivateIdentifierDeclaration(right.escapedText, right);
@@ -26372,6 +26376,10 @@ namespace ts {
             const objectType = getAssignmentTargetKind(node) !== AssignmentKind.None || isMethodAccessForCall(node) ? getWidenedType(exprType) : exprType;
             const indexExpression = node.argumentExpression;
             const indexType = checkExpression(indexExpression);
+
+            if (compilerOptions.noPropertyAccessOnAny && (isTypeAny(objectType) || objectType === silentNeverType)) {
+                error(node.argumentExpression, Diagnostics.Cannot_access_member_from_any_type);
+            }
 
             if (objectType === errorType || objectType === silentNeverType) {
                 return objectType;

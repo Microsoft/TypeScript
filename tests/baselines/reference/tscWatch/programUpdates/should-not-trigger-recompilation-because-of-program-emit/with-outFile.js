@@ -60,6 +60,7 @@ interface Array<T> { length: number; [n: number]: T; }
     // "noUnusedParameters": true,                  /* Report errors on unused parameters. */
     // "noImplicitReturns": true,                   /* Report error when not all code paths in function return a value. */
     // "noFallthroughCasesInSwitch": true,          /* Report errors for fallthrough cases in switch statement. */
+    // "noPropertyAccessOnAny": true,               /* Disallow access member from 'any' type. */
     // "noUncheckedIndexedAccess": true,            /* Include 'undefined' in index signature results */
     // "noPropertyAccessFromIndexSignature": true,  /* Require undeclared properties from index signatures to use element accesses. */
 

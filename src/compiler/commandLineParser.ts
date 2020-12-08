@@ -652,6 +652,15 @@ namespace ts {
             description: Diagnostics.Report_errors_for_fallthrough_cases_in_switch_statement
         },
         {
+            name: "noPropertyAccessOnAny",
+            type: "boolean",
+            affectsBindDiagnostics: true,
+            affectsSemanticDiagnostics: true,
+            showInSimplifiedHelpView: false,
+            category: Diagnostics.Additional_Checks,
+            description: Diagnostics.Disallow_access_member_from_any_type
+        },
+        {
             name: "noUncheckedIndexedAccess",
             type: "boolean",
             affectsSemanticDiagnostics: true,

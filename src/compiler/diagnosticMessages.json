@@ -3432,6 +3432,10 @@
         "category": "Error",
         "code": 4111
     },
+    "Cannot access member from 'any' type": {
+        "category": "Error",
+        "code": 4112
+    },
 
     "The current host does not support the '{0}' option.": {
         "category": "Error",
@@ -4748,14 +4752,18 @@
         "category": "Error",
         "code": 6504
     },
-    "Require undeclared properties from index signatures to use element accesses.": {
-        "category": "Error",
-        "code": 6803
-    },
 
     "Include 'undefined' in index signature results": {
         "category": "Message",
         "code": 6800
+    },
+    "Require undeclared properties from index signatures to use element accesses.": {
+        "category": "Error",
+        "code": 6803
+    },
+    "Disallow access member from 'any' type.": {
+        "category": "Error",
+        "code": 6804
     },
 
     "Variable '{0}' implicitly has an '{1}' type.": {
