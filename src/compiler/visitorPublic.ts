@@ -697,7 +697,7 @@ namespace ts {
 
             case SyntaxKind.AwaitExpression:
                 return factory.updateAwaitExpression(<AwaitExpression>node,
-                    nodeVisitor((<AwaitExpression>node).expression, visitor, isExpression));
+                    nodeVisitor((<AwaitExpression>node).expression, visitor, isExpression), (<AwaitExpression>node).operation);
 
             case SyntaxKind.PrefixUnaryExpression:
                 return factory.updatePrefixUnaryExpression(<PrefixUnaryExpression>node,

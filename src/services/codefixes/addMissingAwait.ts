@@ -244,7 +244,7 @@ namespace ts.codefix {
                     }
                 }
                 const type = checker.getTypeAtLocation(side);
-                const newNode = checker.getPromisedTypeOfPromise(type) ? factory.createAwaitExpression(side) : side;
+                const newNode = checker.getPromisedTypeOfPromise(type) ? factory.createAwaitExpression(side, /*operation*/ undefined) : side;
                 changeTracker.replaceNode(sourceFile, side, newNode);
             }
         }
@@ -258,7 +258,7 @@ namespace ts.codefix {
             changeTracker.replaceNode(
                 sourceFile,
                 insertionSite.parent.expression,
-                factory.createParenthesizedExpression(factory.createAwaitExpression(insertionSite.parent.expression)));
+                factory.createParenthesizedExpression(factory.createAwaitExpression(insertionSite.parent.expression, /*operation*/ undefined)));
             insertLeadingSemicolonIfNeeded(changeTracker, insertionSite.parent.expression, sourceFile);
         }
         else if (contains(callableConstructableErrorCodes, errorCode) && isCallOrNewExpression(insertionSite.parent)) {
@@ -268,7 +268,7 @@ namespace ts.codefix {
                     return;
                 }
             }
-            changeTracker.replaceNode(sourceFile, insertionSite, factory.createParenthesizedExpression(factory.createAwaitExpression(insertionSite)));
+            changeTracker.replaceNode(sourceFile, insertionSite, factory.createParenthesizedExpression(factory.createAwaitExpression(insertionSite, /*operation*/ undefined)));
             insertLeadingSemicolonIfNeeded(changeTracker, insertionSite, sourceFile);
         }
         else {
@@ -278,7 +278,7 @@ namespace ts.codefix {
                     return;
                 }
             }
-            changeTracker.replaceNode(sourceFile, insertionSite, factory.createAwaitExpression(insertionSite));
+            changeTracker.replaceNode(sourceFile, insertionSite, factory.createAwaitExpression(insertionSite, /*operation*/ undefined));
         }
     }
 

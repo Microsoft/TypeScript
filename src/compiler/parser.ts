@@ -4490,7 +4490,16 @@ namespace ts {
 
         function parseAwaitExpression() {
             const pos = getNodePos();
-            return finishNode(factory.createAwaitExpression(nextTokenAnd(parseSimpleUnaryExpression)), pos);
+            nextToken(); // advance past "await"
+            const op = tryParse(() => {
+                if (token() !== SyntaxKind.DotToken) return undefined;
+                nextToken(); // advance past the dot
+                if (!tokenIsIdentifierOrKeyword(token())) return undefined;
+                const id = parseIdentifierName().escapedText;
+                if (id === "all" || id === "race" || id === "allSettled" || id === "any") return <AwaitExpression["operation"]>id;
+                return undefined;
+            });
+            return finishNode(factory.createAwaitExpression(parseSimpleUnaryExpression(), op), pos);
         }
 
         /**
@@ -4557,6 +4566,10 @@ namespace ts {
          *      7) ~ UnaryExpression[?yield]
          *      8) ! UnaryExpression[?yield]
          *      9) [+Await] await UnaryExpression[?yield]
+         *     10) [+Await] await.all UnaryExpression[?yield]
+         *     11) [+Await] await.race UnaryExpression[?yield]
+         *     12) [+Await] await.allSettled UnaryExpression[?yield]
+         *     13) [+Await] await.any UnaryExpression[?yield]
          */
         function parseSimpleUnaryExpression(): UnaryExpression {
             switch (token()) {

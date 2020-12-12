@@ -916,7 +916,7 @@ namespace ts.refactor.extractSymbol {
             call = factory.createYieldExpression(factory.createToken(SyntaxKind.AsteriskToken), call);
         }
         if (range.facts & RangeFacts.IsAsyncFunction) {
-            call = factory.createAwaitExpression(call);
+            call = factory.createAwaitExpression(call, /*operation*/ undefined);
         }
         if (isInJSXContent(node)) {
             call = factory.createJsxExpression(/*dotDotDotToken*/ undefined, call);

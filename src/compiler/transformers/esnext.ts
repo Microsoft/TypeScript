@@ -25,7 +25,12 @@ namespace ts {
                     if (isLogicalOrCoalescingAssignmentExpression(binaryExpression)) {
                         return transformLogicalAssignment(binaryExpression);
                     }
-                // falls through
+                    // falls through
+                case SyntaxKind.AwaitExpression:
+                    if ((<AwaitExpression>node).operation) {
+                        return transformAwaitOperations(<AwaitExpression>node);
+                    }
+                    // falls through
                 default:
                     return visitEachChild(node, visitor, context);
             }
@@ -86,6 +91,22 @@ namespace ts {
                     )
                 )
             );
+        }
+
+        function transformAwaitOperations(node: AwaitExpression): VisitResult<Node> {
+            const { operation, expression } = node;
+            if (!operation) return;
+            let expr = visitor(expression);
+            if (!expr) return undefined;
+            // TODO: is this safe?
+            if (Array.isArray(expr)) expr = factory.createCommaListExpression(expr as Expression[]);
+            const call = factory.createCallExpression(
+                factory.createPropertyAccessExpression(factory.createIdentifier("Promise"), operation),
+                /*typeArguments*/ undefined,
+                // TODO: is this safe?
+                [expr as Expression]
+            );
+            return factory.createAwaitExpression(call, /*operation*/ undefined);
         }
     }
 }
