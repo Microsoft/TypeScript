@@ -24434,6 +24434,11 @@ namespace ts {
                         return propertyType;
                     }
                 }
+                else if (element.name?.kind === SyntaxKind.ComputedPropertyName) {
+                    const indexType = getTypeOfExpression(element.name.expression);
+                    return getIndexedAccessTypeOrUndefined(type, indexType);
+                }
+
                 return isNumericName(element.name!) && getIndexTypeOfContextualType(type, IndexKind.Number) ||
                     getIndexTypeOfContextualType(type, IndexKind.String);
             }
