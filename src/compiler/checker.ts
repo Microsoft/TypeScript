@@ -18354,7 +18354,7 @@ namespace ts {
                 const requireOptionalProperties = (relation === subtypeRelation || relation === strictSubtypeRelation) && !isObjectLiteralType(source) && !isEmptyArrayLiteralType(source) && !isTupleType(source);
                 const unmatchedProperty = getUnmatchedProperty(source, target, requireOptionalProperties, /*matchDiscriminantProperties*/ false);
                 if (unmatchedProperty) {
-                    if (reportErrors) {
+                    if (reportErrors && !typeOnlyHasCallOrConstructSignatures(source)) {
                         reportUnmatchedProperty(source, target, unmatchedProperty, requireOptionalProperties);
                     }
                     return Ternary.False;
@@ -18508,6 +18508,16 @@ namespace ts {
                     }
                 }
                 return result;
+            }
+
+            function typeOnlyHasCallOrConstructSignatures(type: Type): boolean {
+                const typeCallSignatures = getSignaturesOfStructuredType(type, SignatureKind.Call);
+                const typeConstructSignatures = getSignaturesOfStructuredType(type, SignatureKind.Construct);
+                const typeProperties = getPropertiesOfObjectType(type);
+                if ((typeCallSignatures.length || typeConstructSignatures.length) && !typeProperties.length) {
+                    return true;
+                }
+                return false;
             }
 
             function reportIncompatibleCallSignatureReturn(siga: Signature, sigb: Signature) {
