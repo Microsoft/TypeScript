@@ -13037,9 +13037,21 @@ namespace ts {
                         // Spread variadic elements with tuple types into the resulting tuple.
                         forEach(getTypeArguments(type), (t, n) => addElementOrRest(t, type.target.elementFlags[n], type.target.labeledElementDeclarations?.[n]));
                     }
+                    else if (getReducedApparentType(type).flags & TypeFlags.Never) {
+                        return neverType;
+                    }
                     else {
-                        // Treat everything else as an array type and create a rest element.
-                        addElementOrRest(isArrayLikeType(type) && getIndexTypeOfType(type, IndexKind.Number) || errorType, ElementFlags.Rest, target.labeledElementDeclarations?.[i]);
+                        const length = getTupleLikeLength(type);
+                        const indexType = isArrayLikeType(type) && getIndexTypeOfType(type, IndexKind.Number) || errorType;
+                        if (length !== undefined) {
+                            for (let j = 0; j < length; j++) {
+                                addElementOrRest(getTypeOfPropertyOfType(type, ("" + j) as __String) || indexType, 0, /*declaration*/ undefined);
+                            }
+                        }
+                        else {
+                            // Treat everything else as an array type and create a rest element.
+                            addElementOrRest(indexType, ElementFlags.Rest, target.labeledElementDeclarations?.[i]);
+                        }
                     }
                 }
                 else {
@@ -13085,6 +13097,19 @@ namespace ts {
                         expandedDeclarations = undefined;
                     }
                 }
+            }
+        }
+
+        function getTupleLikeLength(type: Type) {
+            const lengthSymbol = getPropertyOfType(type, "length" as __String);
+            const lengthType = lengthSymbol && getTypeOfSymbol(lengthSymbol);
+            if (lengthType?.flags! & (TypeFlags.NumberLiteral) &&
+                Number.isInteger((lengthType as NumberLiteralType).value) &&
+                (lengthType as NumberLiteralType).value >= 0 &&
+                // Ensure we are not looking at `number[] & { length: 1e9 }`
+                arrayIsEqualTo(lengthSymbol!.declarations, getPropertyOfType(globalArrayType, "length" as __String)!.declarations)
+            ) {
+                return (lengthType as NumberLiteralType).value;
             }
         }
 
