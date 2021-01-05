@@ -986,17 +986,18 @@ namespace ts {
             let statementOffset = 0;
             if (!hasSynthesizedSuper) statementOffset = factory.copyStandardPrologue(constructor.body.statements, prologue, /*ensureUseStrict*/ false);
             addDefaultValueAssignmentsIfNeeded(statements, constructor);
-            addRestParameterIfNeeded(statements, constructor, hasSynthesizedSuper);
             if (!hasSynthesizedSuper) statementOffset = factory.copyCustomPrologue(constructor.body.statements, statements, statementOffset, visitor);
 
             // If the first statement is a call to `super()`, visit the statement directly
             let superCallExpression: Expression | undefined;
+            let superCallStatement: Statement | undefined;
             if (hasSynthesizedSuper) {
                 superCallExpression = createDefaultSuperCallOrThis();
             }
             else if (isDerivedClass && statementOffset < constructor.body.statements.length) {
                 const firstStatement = constructor.body.statements[statementOffset];
                 if (isExpressionStatement(firstStatement) && isSuperCall(firstStatement.expression)) {
+                    superCallStatement = firstStatement;
                     superCallExpression = visitImmediateSuperCallInBody(firstStatement.expression);
                 }
             }
@@ -1013,7 +1014,7 @@ namespace ts {
             insertCaptureNewTargetIfNeeded(prologue, constructor, /*copyOnWrite*/ false);
 
             if (isDerivedClass) {
-                if (superCallExpression && statementOffset === constructor.body.statements.length && !(constructor.body.transformFlags & TransformFlags.ContainsLexicalThis)) {
+                if (superCallExpression && superCallStatement && statementOffset === constructor.body.statements.length && !(constructor.body.transformFlags & TransformFlags.ContainsLexicalThis)) {
                     // If the subclass constructor does *not* contain `this` and *ends* with a `super()` call, we will use the
                     // following representation:
                     //
@@ -1035,6 +1036,7 @@ namespace ts {
                     // ```
                     const superCall = cast(cast(superCallExpression, isBinaryExpression).left, isCallExpression);
                     const returnStatement = factory.createReturnStatement(superCallExpression);
+                    setOriginalNode(returnStatement, superCallStatement);
                     setCommentRange(returnStatement, getCommentRange(superCall));
                     setEmitFlags(superCall, EmitFlags.NoComments);
                     statements.push(returnStatement);
@@ -1064,8 +1066,7 @@ namespace ts {
 
                     // Since the `super()` call was the first statement, we insert the `this` capturing call to
                     // `super()` at the top of the list of `statements` (after any pre-existing custom prologues).
-                    insertCaptureThisForNode(statements, constructor, superCallExpression || createActualThis());
-
+                    insertCaptureThisForNode(statements, constructor, superCallExpression || createActualThis(), superCallStatement);
                     if (!isSufficientlyCoveredByReturnStatements(constructor.body)) {
                         statements.push(factory.createReturnStatement(factory.createUniqueName("_this", GeneratedIdentifierFlags.Optimistic | GeneratedIdentifierFlags.FileLevel)));
                     }
@@ -1089,6 +1090,7 @@ namespace ts {
                 insertCaptureThisForNodeIfNeeded(prologue, constructor);
             }
 
+            addRestParameterIfNeeded(statements, constructor, hasSynthesizedSuper);
             const block = factory.createBlock(
                 setTextRange(
                     factory.createNodeArray(
@@ -1364,6 +1366,11 @@ namespace ts {
                 return false;
             }
 
+            const firstStatementContainsRestParameter = find(statements, stmt => !!(getOriginalNode(stmt).flags & NodeFlags.ContainsRestParameterReference));
+            if (!firstStatementContainsRestParameter && !((getOriginalNode(parameter).flags & NodeFlags.RestParameterMustEmitAtTop))) {
+                return false;
+            }
+
             // `declarationName` is the name of the local declaration for the parameter.
             // TODO(rbuckton): Does this need to be parented?
             const declarationName = parameter.name.kind === SyntaxKind.Identifier ? setParent(setTextRange(factory.cloneNode(parameter.name), parameter.name), parameter.name.parent) : factory.createTempVariable(/*recordTempVariable*/ undefined);
@@ -1455,7 +1462,14 @@ namespace ts {
                 );
             }
 
-            insertStatementsAfterCustomPrologue(statements, prologueStatements);
+            if (!firstStatementContainsRestParameter || (getOriginalNode(parameter).flags & NodeFlags.RestParameterMustEmitAtTop) || !node.body || isExpression(node.body)) {
+                insertStatementsAfterCustomPrologue(statements, prologueStatements);
+            }
+            else {
+                const idx = statements.indexOf(firstStatementContainsRestParameter);
+                Debug.assert(idx > -1);
+                statements.splice(idx, 0, ...prologueStatements);
+            }
             return true;
         }
 
@@ -1468,13 +1482,13 @@ namespace ts {
          */
         function insertCaptureThisForNodeIfNeeded(statements: Statement[], node: Node): boolean {
             if (hierarchyFacts & HierarchyFacts.CapturedLexicalThis && node.kind !== SyntaxKind.ArrowFunction) {
-                insertCaptureThisForNode(statements, node, factory.createThis());
+                insertCaptureThisForNode(statements, node, factory.createThis(), /* originalNode */ undefined);
                 return true;
             }
             return false;
         }
 
-        function insertCaptureThisForNode(statements: Statement[], node: Node, initializer: Expression | undefined): void {
+        function insertCaptureThisForNode(statements: Statement[], node: Node, initializer: Expression | undefined, originalNode: Node | undefined): void {
             enableSubstitutionsForCapturedThis();
             const captureThisStatement = factory.createVariableStatement(
                 /*modifiers*/ undefined,
@@ -1488,6 +1502,7 @@ namespace ts {
                 ])
             );
             setEmitFlags(captureThisStatement, EmitFlags.NoComments | EmitFlags.CustomPrologue);
+            setOriginalNode(captureThisStatement, originalNode);
             setSourceMapRange(captureThisStatement, node);
             insertStatementAfterCustomPrologue(statements, captureThisStatement);
         }
@@ -1891,7 +1906,6 @@ namespace ts {
             }
 
             multiLine = addDefaultValueAssignmentsIfNeeded(statements, node) || multiLine;
-            multiLine = addRestParameterIfNeeded(statements, node, /*inConstructorWithSynthesizedSuper*/ false) || multiLine;
 
             if (isBlock(body)) {
                 // addCustomPrologue puts already-existing directives at the beginning of the target statement-array
@@ -1926,6 +1940,7 @@ namespace ts {
 
                 const expression = visitNode(body, visitor, isExpression);
                 const returnStatement = factory.createReturnStatement(expression);
+                setOriginalNode(returnStatement, expression);
                 setTextRange(returnStatement, body);
                 moveSyntheticComments(returnStatement, body);
                 setEmitFlags(returnStatement, EmitFlags.NoTokenSourceMaps | EmitFlags.NoTrailingSourceMap | EmitFlags.NoTrailingComments);
@@ -1935,6 +1950,8 @@ namespace ts {
                 // source map location for the close brace.
                 closeBraceLocation = body;
             }
+
+            multiLine = addRestParameterIfNeeded(statements, node, /*inConstructorWithSynthesizedSuper*/ false) || multiLine;
 
             factory.mergeLexicalEnvironment(prologue, endLexicalEnvironment());
             insertCaptureNewTargetIfNeeded(prologue, node, /*copyOnWrite*/ false);
@@ -2496,6 +2513,7 @@ namespace ts {
                 ),
                 /*location*/ node
             );
+            setOriginalNode(forStatement, node);
 
             // Disable trailing source maps for the OpenParenToken to align source map emit with the old emitter.
             setEmitFlags(forStatement, EmitFlags.NoTokenTrailingSourceMaps);
@@ -2547,7 +2565,7 @@ namespace ts {
                 EmitFlags.NoTokenTrailingSourceMaps
             );
 
-            return factory.createTryStatement(
+            const stmt = factory.createTryStatement(
                 factory.createBlock([
                     factory.restoreEnclosingLabel(
                         forStatement,
@@ -2612,6 +2630,8 @@ namespace ts {
                     )
                 ])
             );
+            setOriginalNode(stmt, node);
+            return stmt;
         }
 
         /**

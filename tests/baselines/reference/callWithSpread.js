@@ -83,10 +83,6 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 var _a, _b, _c, _d, _e, _f, _g;
 function foo(x, y) {
-    var z = [];
-    for (var _i = 2; _i < arguments.length; _i++) {
-        z[_i - 2] = arguments[_i];
-    }
 }
 var a;
 var z;
@@ -113,18 +109,14 @@ xa[1].foo(1, 2, "abc");
 (_g = xa[1]).foo.apply(_g, [1, 2, "abc"]);
 var C = /** @class */ (function () {
     function C(x, y) {
+        this.foo(x, y);
         var z = [];
         for (var _i = 2; _i < arguments.length; _i++) {
             z[_i - 2] = arguments[_i];
         }
-        this.foo(x, y);
         this.foo.apply(this, __spreadArrays([x, y], z));
     }
     C.prototype.foo = function (x, y) {
-        var z = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            z[_i - 2] = arguments[_i];
-        }
     };
     return C;
 }());

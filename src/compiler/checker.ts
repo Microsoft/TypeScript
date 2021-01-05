@@ -22996,6 +22996,8 @@ namespace ts {
                 return getTypeOfSymbol(symbol);
             }
 
+            checkIdentifierForRestParameter(node, symbol);
+
             // We should only mark aliases as referenced if there isn't a local value declaration
             // for the symbol. Also, don't mark any property access expression LHS - checkPropertyAccessExpression will handle that
             if (!(node.parent && isPropertyAccessExpression(node.parent) && node.parent.expression === node)) {
@@ -23090,7 +23092,7 @@ namespace ts {
             // The declaration container is the innermost function that encloses the declaration of the variable
             // or parameter. The flow container is the innermost function starting with which we analyze the control
             // flow graph to determine the control flow based type.
-            const isParameter = getRootDeclaration(declaration).kind === SyntaxKind.Parameter;
+            const isParameterDecl = getRootDeclaration(declaration).kind === SyntaxKind.Parameter;
             const declarationContainer = getControlFlowContainer(declaration);
             let flowContainer = getControlFlowContainer(node);
             const isOuterVariable = flowContainer !== declarationContainer;
@@ -23101,19 +23103,19 @@ namespace ts {
             // analysis to include the immediately enclosing function.
             while (flowContainer !== declarationContainer && (flowContainer.kind === SyntaxKind.FunctionExpression ||
                 flowContainer.kind === SyntaxKind.ArrowFunction || isObjectLiteralOrClassExpressionMethod(flowContainer)) &&
-                (isConstVariable(localOrExportSymbol) || isParameter && !isParameterAssigned(localOrExportSymbol))) {
+                (isConstVariable(localOrExportSymbol) || isParameterDecl && !isParameterAssigned(localOrExportSymbol))) {
                 flowContainer = getControlFlowContainer(flowContainer);
             }
             // We only look for uninitialized variables in strict null checking mode, and only when we can analyze
             // the entire control flow graph from the variable's declaration (i.e. when the flow container and
             // declaration container are the same).
-            const assumeInitialized = isParameter || isAlias || isOuterVariable || isSpreadDestructuringAssignmentTarget || isModuleExports || isBindingElement(declaration) ||
+            const assumeInitialized = isParameterDecl || isAlias || isOuterVariable || isSpreadDestructuringAssignmentTarget || isModuleExports || isBindingElement(declaration) ||
                 type !== autoType && type !== autoArrayType && (!strictNullChecks || (type.flags & (TypeFlags.AnyOrUnknown | TypeFlags.Void)) !== 0 ||
                 isInTypeQuery(node) || node.parent.kind === SyntaxKind.ExportSpecifier) ||
                 node.parent.kind === SyntaxKind.NonNullExpression ||
                 declaration.kind === SyntaxKind.VariableDeclaration && (<VariableDeclaration>declaration).exclamationToken ||
                 declaration.flags & NodeFlags.Ambient;
-            const initialType = assumeInitialized ? (isParameter ? removeOptionalityFromDeclaredType(type, declaration as VariableLikeDeclaration) : type) :
+            const initialType = assumeInitialized ? (isParameterDecl ? removeOptionalityFromDeclaredType(type, declaration as VariableLikeDeclaration) : type) :
                 type === autoType || type === autoArrayType ? undefinedType :
                 getOptionalType(type);
             const flowType = getFlowTypeOfReference(node, type, initialType, flowContainer, !assumeInitialized);
@@ -23135,6 +23137,36 @@ namespace ts {
                 return type;
             }
             return assignmentKind ? getBaseTypeOfLiteralType(flowType) : flowType;
+        }
+
+        function checkIdentifierForRestParameter(node: Identifier, symbol: Symbol) {
+            if ((symbol.flags & SymbolFlags.Value) && symbol.valueDeclaration && isParameter(symbol.valueDeclaration) &&
+                (symbol.valueDeclaration !== node.parent || isParameterPropertyDeclaration(symbol.valueDeclaration, symbol.valueDeclaration.parent)) &&
+                isRestParameter(symbol.valueDeclaration) && !(symbol.valueDeclaration.flags & NodeFlags.RestParameterMustEmitAtTop)) {
+                const containerFunctionLikeDeclaration = findAncestor(symbol.valueDeclaration, isFunctionLikeDeclaration);
+                if (containerFunctionLikeDeclaration) {
+                    const mutableValueDeclaration = <Mutable<Node>>symbol.valueDeclaration;
+                    if (isParameterPropertyDeclaration(symbol.valueDeclaration, symbol.valueDeclaration.parent)) {
+                        mutableValueDeclaration.flags |= NodeFlags.RestParameterMustEmitAtTop;
+                    }
+                    else {
+                        let insideOtherFunctionLikeScope = false;
+                        const topLevelStatementInContainer = findAncestor(node, n => {
+                            if (isFunctionLikeDeclaration(n)) {
+                                insideOtherFunctionLikeScope = true;
+                                return "quit";
+                            }
+                            return n.parent && (isBlock(n.parent) ? n.parent.parent === containerFunctionLikeDeclaration : n.parent === containerFunctionLikeDeclaration);
+                        });
+                        if (insideOtherFunctionLikeScope) {
+                            mutableValueDeclaration.flags |= NodeFlags.RestParameterMustEmitAtTop;
+                        }
+                        else if(topLevelStatementInContainer) {
+                            (<Mutable<Node>>topLevelStatementInContainer).flags |= NodeFlags.ContainsRestParameterReference;
+                        }
+                    }
+                }
+            }
         }
 
         function isInsideFunction(node: Node, threshold: Node): boolean {
@@ -31488,6 +31520,9 @@ namespace ts {
             checkVariableLikeDeclaration(node);
             const func = getContainingFunction(node)!;
             if (hasSyntacticModifier(node, ModifierFlags.ParameterPropertyModifier)) {
+                if (isIdentifier(node.name)) {
+                    checkIdentifierForRestParameter(node.name, getResolvedSymbol(node.name));
+                }
                 if (!(func.kind === SyntaxKind.Constructor && nodeIsPresent(func.body))) {
                     error(node, Diagnostics.A_parameter_property_is_only_allowed_in_a_constructor_implementation);
                 }
