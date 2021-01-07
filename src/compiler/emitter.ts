@@ -3152,6 +3152,12 @@ namespace ts {
             writeKeyword("enum");
             writeSpace();
             emit(node.name);
+            if (node.type) {
+                writeSpace();
+                writePunctuation(":");
+                writeSpace();
+                emit(node.type);
+            }
 
             writeSpace();
             writePunctuation("{");

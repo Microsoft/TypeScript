@@ -3647,6 +3647,7 @@ namespace ts {
             decorators: readonly Decorator[] | undefined,
             modifiers: readonly Modifier[] | undefined,
             name: string | Identifier,
+            type: Identifier | undefined,
             members: readonly EnumMember[]
         ) {
             const node = createBaseNamedDeclaration<EnumDeclaration>(
@@ -3655,6 +3656,7 @@ namespace ts {
                 modifiers,
                 name
             );
+            node.type = type;
             node.members = createNodeArray(members);
             node.transformFlags |=
                 propagateChildrenFlags(node.members) |
@@ -3669,12 +3671,14 @@ namespace ts {
             decorators: readonly Decorator[] | undefined,
             modifiers: readonly Modifier[] | undefined,
             name: Identifier,
+            type: Identifier | undefined,
             members: readonly EnumMember[]) {
             return node.decorators !== decorators
                 || node.modifiers !== modifiers
                 || node.name !== name
+                || node.type !== type
                 || node.members !== members
-                ? update(createEnumDeclaration(decorators, modifiers, name, members), node)
+                ? update(createEnumDeclaration(decorators, modifiers, name, type, members), node)
                 : node;
         }
 
@@ -5800,7 +5804,7 @@ namespace ts {
                 isClassDeclaration(node) ? updateClassDeclaration(node, node.decorators, modifiers, node.name, node.typeParameters, node.heritageClauses, node.members) :
                 isInterfaceDeclaration(node) ? updateInterfaceDeclaration(node, node.decorators, modifiers, node.name, node.typeParameters, node.heritageClauses, node.members) :
                 isTypeAliasDeclaration(node) ? updateTypeAliasDeclaration(node, node.decorators, modifiers, node.name, node.typeParameters, node.type) :
-                isEnumDeclaration(node) ? updateEnumDeclaration(node, node.decorators, modifiers, node.name, node.members) :
+                isEnumDeclaration(node) ? updateEnumDeclaration(node, node.decorators, modifiers, node.name, node.type, node.members) :
                 isModuleDeclaration(node) ? updateModuleDeclaration(node, node.decorators, modifiers, node.name, node.body) :
                 isImportEqualsDeclaration(node) ? updateImportEqualsDeclaration(node, node.decorators, modifiers, node.isTypeOnly, node.name, node.moduleReference) :
                 isImportDeclaration(node) ? updateImportDeclaration(node, node.decorators, modifiers, node.importClause, node.moduleSpecifier) :
