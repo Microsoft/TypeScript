@@ -5300,19 +5300,29 @@ namespace ts {
                 return parameterNode;
 
                 function cloneBindingName(node: BindingName): BindingName {
-                    return <BindingName>elideInitializerAndSetEmitFlags(node);
-                    function elideInitializerAndSetEmitFlags(node: Node): Node {
+                    return <BindingName>elideInitializerAndPropertyRenamingAndSetEmitFlags(node);
+                    function elideInitializerAndPropertyRenamingAndSetEmitFlags(node: Node): Node {
                         if (context.tracker.trackSymbol && isComputedPropertyName(node) && isLateBindableName(node)) {
                             trackComputedName(node.expression, context.enclosingDeclaration, context);
                         }
-                        let visited = visitEachChild(node, elideInitializerAndSetEmitFlags, nullTransformationContext, /*nodesVisitor*/ undefined, elideInitializerAndSetEmitFlags)!;
+                        let visited = visitEachChild(node, elideInitializerAndPropertyRenamingAndSetEmitFlags, nullTransformationContext, /*nodesVisitor*/ undefined, elideInitializerAndPropertyRenamingAndSetEmitFlags)!;
                         if (isBindingElement(visited)) {
-                            visited = factory.updateBindingElement(
-                                visited,
-                                visited.dotDotDotToken,
-                                visited.propertyName,
-                                visited.name,
-                                /*initializer*/ undefined);
+                            if (visited.propertyName && isIdentifier(visited.propertyName) && isIdentifier(visited.name)) {
+                                visited = factory.updateBindingElement(
+                                    visited,
+                                    visited.dotDotDotToken,
+                                    /* propertyName*/ undefined,
+                                    visited.propertyName,
+                                    /*initializer*/ undefined);
+                            }
+                            else {
+                                visited = factory.updateBindingElement(
+                                    visited,
+                                    visited.dotDotDotToken,
+                                    visited.propertyName,
+                                    visited.name,
+                                    /*initializer*/ undefined);
+                            }
                         }
                         if (!nodeIsSynthesized(visited)) {
                             visited = factory.cloneNode(visited);
@@ -33985,6 +33995,14 @@ namespace ts {
             }
 
             if (node.kind === SyntaxKind.BindingElement) {
+                if (node.propertyName && isIdentifier(node.propertyName) && isIdentifier(node.name) && isParameterDeclaration(node) && nodeIsMissing((getContainingFunction(node) as FunctionLikeDeclaration).body)) {
+                    // type F = ({a: string}) => void;
+                    //               ^^^^^^
+                    // variable renaming in function type notation is confusing, so forbid it
+                    error(node.name, Diagnostics.Renaming_a_property_in_destructuring_assignment_is_only_allowed_in_a_function_or_constructor_implementation);
+                    return;
+                }
+
                 if (node.parent.kind === SyntaxKind.ObjectBindingPattern && languageVersion < ScriptTarget.ESNext) {
                     checkExternalEmitHelpers(node, ExternalEmitHelpers.Rest);
                 }
