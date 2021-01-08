@@ -8,18 +8,15 @@ tests/cases/compiler/baseClassImprovedMismatchErrors.ts(8,5): error TS2416: Prop
 tests/cases/compiler/baseClassImprovedMismatchErrors.ts(9,5): error TS2416: Property 'fn' in type 'Derived' is not assignable to the same property in base type 'Base'.
   Type '() => string | number' is not assignable to type '() => number'.
     Type 'string | number' is not assignable to type 'number'.
-      Type 'string' is not assignable to type 'number'.
 tests/cases/compiler/baseClassImprovedMismatchErrors.ts(14,5): error TS2416: Property 'n' in type 'DerivedInterface' is not assignable to the same property in base type 'Base'.
   Type 'string | DerivedInterface' is not assignable to type 'string | Base'.
     Type 'DerivedInterface' is not assignable to type 'string | Base'.
       Type 'DerivedInterface' is not assignable to type 'Base'.
         The types returned by 'fn()' are incompatible between these types.
           Type 'string | number' is not assignable to type 'number'.
-            Type 'string' is not assignable to type 'number'.
 tests/cases/compiler/baseClassImprovedMismatchErrors.ts(15,5): error TS2416: Property 'fn' in type 'DerivedInterface' is not assignable to the same property in base type 'Base'.
   Type '() => string | number' is not assignable to type '() => number'.
     Type 'string | number' is not assignable to type 'number'.
-      Type 'string' is not assignable to type 'number'.
 
 
 ==== tests/cases/compiler/baseClassImprovedMismatchErrors.ts (4 errors) ====
@@ -44,7 +41,6 @@ tests/cases/compiler/baseClassImprovedMismatchErrors.ts(15,5): error TS2416: Pro
 !!! error TS2416: Property 'fn' in type 'Derived' is not assignable to the same property in base type 'Base'.
 !!! error TS2416:   Type '() => string | number' is not assignable to type '() => number'.
 !!! error TS2416:     Type 'string | number' is not assignable to type 'number'.
-!!! error TS2416:       Type 'string' is not assignable to type 'number'.
             return 10 as number | string;
         }
     }
@@ -57,13 +53,11 @@ tests/cases/compiler/baseClassImprovedMismatchErrors.ts(15,5): error TS2416: Pro
 !!! error TS2416:       Type 'DerivedInterface' is not assignable to type 'Base'.
 !!! error TS2416:         The types returned by 'fn()' are incompatible between these types.
 !!! error TS2416:           Type 'string | number' is not assignable to type 'number'.
-!!! error TS2416:             Type 'string' is not assignable to type 'number'.
         fn() {
         ~~
 !!! error TS2416: Property 'fn' in type 'DerivedInterface' is not assignable to the same property in base type 'Base'.
 !!! error TS2416:   Type '() => string | number' is not assignable to type '() => number'.
 !!! error TS2416:     Type 'string | number' is not assignable to type 'number'.
-!!! error TS2416:       Type 'string' is not assignable to type 'number'.
             return 10 as number | string;
         }
     }

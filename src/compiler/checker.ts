@@ -4552,7 +4552,24 @@ namespace ts {
                 }
 
                 if (!inTypeAlias && type.aliasSymbol && (context.flags & NodeBuilderFlags.UseAliasDefinedOutsideCurrentScope || isTypeSymbolAccessible(type.aliasSymbol, context.enclosingDeclaration))) {
-                    const typeArgumentNodes = mapToTypeNodes(type.aliasTypeArguments, context);
+                    // An `Independent` type variable is unused - so it won't factor into the cache key of the type being aliased, meaning no matter how the
+                    // type argument changes, the same underlying type is used. This means that for aliases, the _first_ type argument we encounter gets
+                    // cached as the alias type argument, then reused forevermore. This means an uninstantiated type parameter can leak out of its
+                    // intended context, since completely unrelated locations will end up pointing to the same instantiation. To entirely avoid needing
+                    // to check for such a scenario (and then issuing a very odd visbility error), we simply replace all `Independent` type argument locations
+                    // whose cached value is unreachable with `unknown`, as their actual value has no bearing on the constructed type. This can cause some visual oddness,
+                    // like `fn<T>(arg: T): PublicWrap<T>` at a use-site becoming `fn<{x: number}>(arg: {x: number}): PublicWrap<unknown>` when `T` is independent,
+                    // but has no bearing on relationships, (as the underlying types are the still just the one type) and always produces a functioning declaration file.
+                    const variances = getAliasVariances(type.aliasSymbol);
+                    const typeNodeOverrides = map(variances, (v, i) => {
+                       const typeArg = type.aliasTypeArguments?.[i];
+                       if ((v & VarianceFlags.VarianceMask) === VarianceFlags.Independent && !!typeArg && !!(typeArg.flags & TypeFlags.TypeParameter) && !isTypeSymbolAccessible(typeArg.symbol, context.enclosingDeclaration)) {
+                           context.approximateLength += 7;
+                           return factory.createKeywordTypeNode(SyntaxKind.UnknownKeyword);
+                       }
+                       return undefined;
+                    });
+                    const typeArgumentNodes = mapToTypeNodes(type.aliasTypeArguments, context, /*isBareList*/ undefined, typeNodeOverrides);
                     if (isReservedMemberName(type.aliasSymbol.escapedName) && !(type.aliasSymbol.flags & SymbolFlags.Class)) return factory.createTypeReferenceNode(factory.createIdentifier(""), typeArgumentNodes);
                     return symbolToTypeNode(type.aliasSymbol, context, SymbolFlags.Type, typeArgumentNodes);
                 }
@@ -5119,7 +5136,7 @@ namespace ts {
                 }
             }
 
-            function mapToTypeNodes(types: readonly Type[] | undefined, context: NodeBuilderContext, isBareList?: boolean): TypeNode[] | undefined {
+            function mapToTypeNodes(types: readonly Type[] | undefined, context: NodeBuilderContext, isBareList?: boolean, typeNodeOverrides?: (TypeNode | undefined)[]): TypeNode[] | undefined {
                 if (some(types)) {
                     if (checkTruncationLength(context)) {
                         if (!isBareList) {
@@ -5149,7 +5166,7 @@ namespace ts {
                             break;
                         }
                         context.approximateLength += 2; // Account for whitespace + separator
-                        const typeNode = typeToTypeNodeHelper(type, context);
+                        const typeNode = typeNodeOverrides?.[i - 1] || typeToTypeNodeHelper(type, context);
                         if (typeNode) {
                             result.push(typeNode);
                             if (seenNames && isIdentifierTypeReference(typeNode)) {
@@ -17078,9 +17095,7 @@ namespace ts {
                 // we need to deconstruct unions before intersections (because unions are always at the top),
                 // and we need to handle "each" relations before "some" relations for the same kind of type.
                 if (source.flags & TypeFlags.UnionOrIntersection || target.flags & TypeFlags.UnionOrIntersection) {
-                    result = getConstituentCount(source) * getConstituentCount(target) >= 4 ?
-                        recursiveTypeRelatedTo(source, target, reportErrors, intersectionState | IntersectionState.UnionIntersectionCheck) :
-                        structuredTypeRelatedTo(source, target, reportErrors, intersectionState | IntersectionState.UnionIntersectionCheck);
+                    result = recursiveTypeRelatedTo(source, target, reportErrors, intersectionState | IntersectionState.UnionIntersectionCheck);
                 }
                 if (!result && !(source.flags & TypeFlags.Union) && (source.flags & (TypeFlags.StructuredOrInstantiable) || target.flags & TypeFlags.StructuredOrInstantiable)) {
                     if (result = recursiveTypeRelatedTo(source, target, reportErrors, intersectionState)) {
@@ -17483,7 +17498,7 @@ namespace ts {
             // Third, check if both types are part of deeply nested chains of generic type instantiations and if so assume the types are
             // equal and infinitely expanding. Fourth, if we have reached a depth of 100 nested comparisons, assume we have runaway recursion
             // and issue an error. Otherwise, actually compare the structure of the two types.
-            function recursiveTypeRelatedTo(source: Type, target: Type, reportErrors: boolean, intersectionState: IntersectionState): Ternary {
+            function recursiveTypeRelatedTo(source: Type, target: Type, reportErrors: boolean, intersectionState: IntersectionState, recurRelation = structuredTypeRelatedTo): Ternary {
                 if (overflow) {
                     return Ternary.False;
                 }
@@ -17554,7 +17569,7 @@ namespace ts {
                     });
                 }
 
-                const result = expandingFlags !== ExpandingFlags.Both ? structuredTypeRelatedTo(source, target, reportErrors, intersectionState) : Ternary.Maybe;
+                const result = expandingFlags !== ExpandingFlags.Both ? recurRelation(source, target, reportErrors, intersectionState) : Ternary.Maybe;
                 if (outofbandVarianceMarkerHandler) {
                     outofbandVarianceMarkerHandler = originalHandler;
                 }
@@ -19115,6 +19130,11 @@ namespace ts {
             if (type.flags & TypeFlags.Conditional) {
                 // The root object represents the origin of the conditional type
                 return (type as ConditionalType).root;
+            }
+            if (type.flags & TypeFlags.UnionOrIntersection && type.aliasSymbol && type.aliasTypeArguments) {
+                // Unions and intersections are difficult to make recusive, but they can be, if they have an associated alias
+                // (which is then later used to make a recursive type reference). In such cases, use the alias symbol as the identity.
+                return type.aliasSymbol;
             }
             return undefined;
         }
@@ -21588,10 +21608,6 @@ namespace ts {
                 }
             }
             return mappedTypes && getUnionType(mappedTypes, noReductions ? UnionReduction.None : UnionReduction.Literal);
-        }
-
-        function getConstituentCount(type: Type) {
-            return type.flags & TypeFlags.UnionOrIntersection ? (<UnionOrIntersectionType>type).types.length : 1;
         }
 
         function extractTypesOfKind(type: Type, kind: TypeFlags) {
