@@ -90,3 +90,43 @@ const generic: {
 
 };
 
+const thisType = {
+>thisType : Symbol(thisType, Decl(contextualTypeInObjectProperty.ts, 32, 5))
+
+  [getC()]: function() {
+>[getC()] : Symbol([getC()], Decl(contextualTypeInObjectProperty.ts, 32, 18))
+>getC : Symbol(getC, Decl(contextualTypeInObjectProperty.ts, 6, 5))
+
+    this.c();
+>this.c : Symbol([getC()], Decl(contextualTypeInObjectProperty.ts, 32, 18))
+>this : Symbol(thisType, Decl(contextualTypeInObjectProperty.ts, 32, 16))
+>c : Symbol([getC()], Decl(contextualTypeInObjectProperty.ts, 32, 18))
+  }
+};
+
+
+declare function f<T extends object>(data: T, handlers: { [P in keyof T]: (value: T[P], prop: P) => void; }): void;
+>f : Symbol(f, Decl(contextualTypeInObjectProperty.ts, 36, 2))
+>T : Symbol(T, Decl(contextualTypeInObjectProperty.ts, 39, 19))
+>data : Symbol(data, Decl(contextualTypeInObjectProperty.ts, 39, 37))
+>T : Symbol(T, Decl(contextualTypeInObjectProperty.ts, 39, 19))
+>handlers : Symbol(handlers, Decl(contextualTypeInObjectProperty.ts, 39, 45))
+>P : Symbol(P, Decl(contextualTypeInObjectProperty.ts, 39, 59))
+>T : Symbol(T, Decl(contextualTypeInObjectProperty.ts, 39, 19))
+>value : Symbol(value, Decl(contextualTypeInObjectProperty.ts, 39, 75))
+>T : Symbol(T, Decl(contextualTypeInObjectProperty.ts, 39, 19))
+>P : Symbol(P, Decl(contextualTypeInObjectProperty.ts, 39, 59))
+>prop : Symbol(prop, Decl(contextualTypeInObjectProperty.ts, 39, 87))
+>P : Symbol(P, Decl(contextualTypeInObjectProperty.ts, 39, 59))
+
+f({ data: 0 }, {
+>f : Symbol(f, Decl(contextualTypeInObjectProperty.ts, 36, 2))
+>data : Symbol(data, Decl(contextualTypeInObjectProperty.ts, 40, 3))
+
+  [(() => 'data' as const)()](value, key) {
+>[(() => 'data' as const)()] : Symbol([(() => 'data' as const)()], Decl(contextualTypeInObjectProperty.ts, 40, 16))
+>value : Symbol(value, Decl(contextualTypeInObjectProperty.ts, 41, 30))
+>key : Symbol(key, Decl(contextualTypeInObjectProperty.ts, 41, 36))
+
+  },
+});
