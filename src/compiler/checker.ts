@@ -3084,7 +3084,7 @@ namespace ts {
         /**
          * Resolves a qualified name and any involved aliases.
          */
-        function resolveEntityName(name: EntityNameOrEntityNameExpression, meaning: SymbolFlags, ignoreErrors?: boolean, dontResolveAlias?: boolean, location?: Node): Symbol | undefined {
+        function resolveEntityName(name: EntityNameOrEntityNameExpression, meaning: SymbolFlags, ignoreErrors?: boolean, dontResolveAlias?: boolean, location?: Node, needSuggestedNameNotFoundMessage?: boolean): Symbol | undefined {
             if (nodeIsMissing(name)) {
                 return undefined;
             }
@@ -3094,7 +3094,16 @@ namespace ts {
             if (name.kind === SyntaxKind.Identifier) {
                 const message = meaning === namespaceMeaning || nodeIsSynthesized(name) ? Diagnostics.Cannot_find_namespace_0 : getCannotFindNameDiagnosticForName(getFirstIdentifier(name));
                 const symbolFromJSPrototype = isInJSFile(name) && !nodeIsSynthesized(name) ? resolveEntityNameFromAssignmentDeclaration(name, meaning) : undefined;
-                symbol = getMergedSymbol(resolveName(location || name, name.escapedText, meaning, ignoreErrors || symbolFromJSPrototype ? undefined : message, name, /*isUse*/ true));
+                let suggestedNameNotFoundMessage: DiagnosticMessage | undefined;
+                if (needSuggestedNameNotFoundMessage) {
+                    if (message === Diagnostics.Cannot_find_namespace_0) {
+                        suggestedNameNotFoundMessage = Diagnostics.Cannot_find_namespace_0_Did_you_mean_1;
+                    }
+                    else if (message === Diagnostics.Cannot_find_name_0) {
+                        suggestedNameNotFoundMessage = Diagnostics.Cannot_find_name_0_Did_you_mean_1;
+                    }
+                }
+                symbol = getMergedSymbol(resolveName(location || name, name.escapedText, meaning, ignoreErrors || symbolFromJSPrototype ? undefined : message, name, /*isUse*/ true, false, suggestedNameNotFoundMessage));
                 if (!symbol) {
                     return getMergedSymbol(symbolFromJSPrototype);
                 }
@@ -3102,7 +3111,7 @@ namespace ts {
             else if (name.kind === SyntaxKind.QualifiedName || name.kind === SyntaxKind.PropertyAccessExpression) {
                 const left = name.kind === SyntaxKind.QualifiedName ? name.left : name.expression;
                 const right = name.kind === SyntaxKind.QualifiedName ? name.right : name.name;
-                let namespace = resolveEntityName(left, namespaceMeaning, ignoreErrors, /*dontResolveAlias*/ false, location);
+                let namespace = resolveEntityName(left, namespaceMeaning, ignoreErrors, /*dontResolveAlias*/ false, location, needSuggestedNameNotFoundMessage);
                 if (!namespace || nodeIsMissing(right)) {
                     return undefined;
                 }
@@ -12530,7 +12539,7 @@ namespace ts {
                 return unknownSymbol;
             }
 
-            return resolveEntityName(typeReferenceName, meaning, ignoreErrors) || unknownSymbol;
+            return resolveEntityName(typeReferenceName, meaning, ignoreErrors, /*dontResolveAlias*/ false, /*location*/ undefined, /*needSuggestedNameNotFoundMessage*/ true) || unknownSymbol;
         }
 
         function getTypeReferenceType(node: NodeWithTypeArguments, symbol: Symbol): Type {
