@@ -27214,7 +27214,7 @@ namespace ts {
             const thisType = getThisTypeOfSignature(signature);
             if (thisType) {
                 const thisArgumentNode = getThisArgumentOfCall(node);
-                const thisArgumentType = thisArgumentNode ? checkExpression(thisArgumentNode) : voidType;
+                const thisArgumentType = thisArgumentNode ? checkExpressionWithContextualType(thisArgumentNode, thisType, context, checkMode) : voidType;
                 inferTypes(context.inferences, thisArgumentType, thisType);
             }
 
