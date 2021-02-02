@@ -24,10 +24,11 @@ namespace ts {
         Destructuring = AllowsSyncIterablesFlag | DestructuringFlag,
 
         ForOf = AllowsSyncIterablesFlag | AllowsStringInputFlag | ForOfFlag,
-        ForAwaitOf = AllowsSyncIterablesFlag | AllowsAsyncIterablesFlag | AllowsStringInputFlag | ForOfFlag,
+        AllowsSyncOrAsyncIterablesFlag = AllowsSyncIterablesFlag | AllowsAsyncIterablesFlag,
+        ForAwaitOf = AllowsSyncOrAsyncIterablesFlag | AllowsStringInputFlag | ForOfFlag,
 
         YieldStar = AllowsSyncIterablesFlag | YieldStarFlag,
-        AsyncYieldStar = AllowsSyncIterablesFlag | AllowsAsyncIterablesFlag | YieldStarFlag,
+        AsyncYieldStar = AllowsSyncOrAsyncIterablesFlag | YieldStarFlag,
 
         GeneratorReturnType = AllowsSyncIterablesFlag,
         AsyncGeneratorReturnType = AllowsAsyncIterablesFlag,
@@ -6163,8 +6164,8 @@ namespace ts {
             }
 
             function symbolTableToDeclarationStatements(symbolTable: SymbolTable, context: NodeBuilderContext, bundled?: boolean): Statement[] {
-                const serializePropertySymbolForClass = makeSerializePropertySymbol<ClassElement>(factory.createPropertyDeclaration, SyntaxKind.MethodDeclaration, /*useAcessors*/ true);
-                const serializePropertySymbolForInterfaceWorker = makeSerializePropertySymbol<TypeElement>((_decorators, mods, name, question, type) => factory.createPropertySignature(mods, name, question, type), SyntaxKind.MethodSignature, /*useAcessors*/ false);
+                const serializePropertySymbolForClass = makeSerializePropertySymbol<ClassElement>(factory.createPropertyDeclaration, SyntaxKind.MethodDeclaration, /*useAccessors*/ true);
+                const serializePropertySymbolForInterfaceWorker = makeSerializePropertySymbol<TypeElement>((_decorators, mods, name, question, type) => factory.createPropertySignature(mods, name, question, type), SyntaxKind.MethodSignature, /*useAccessors*/ false);
 
                 // TODO: Use `setOriginalNode` on original declaration names where possible so these declarations see some kind of
                 // declaration mapping
@@ -6446,7 +6447,7 @@ namespace ts {
                         || (symbol.flags & SymbolFlags.Function && length(getPropertiesOfType(getTypeOfSymbol(symbol))))
                     ) && !(symbol.flags & SymbolFlags.Alias); // An alias symbol should preclude needing to make an alias ourselves
                     let needsExportDeclaration = !needsPostExportDefault && !isPrivate && isStringANonContextualKeyword(symbolName) && !isDefault;
-                    // `serializeVariableOrProperty` will handle adding the export declaration if it is run (since `getInternalSymbolName` will create the name mapping), so we need to ensuer we unset `needsExportDeclaration` if it is
+                    // `serializeVariableOrProperty` will handle adding the export declaration if it is run (since `getInternalSymbolName` will create the name mapping), so we need to ensure we unset `needsExportDeclaration` if it is
                     if (needsPostExportDefault || needsExportDeclaration) {
                         isPrivate = true;
                     }
@@ -26925,33 +26926,33 @@ namespace ts {
             return true;
         }
 
-        function callLikeExpressionMayHaveTypeArguments(node: CallLikeExpression): node is CallExpression | NewExpression | TaggedTemplateExpression | JsxOpeningElement {
+        function callLikeExpressionMayHaveTypeArguments(node: Node): node is CallExpression | NewExpression | TaggedTemplateExpression | JsxOpeningElement {
             return isCallOrNewExpression(node) || isTaggedTemplateExpression(node) || isJsxOpeningLikeElement(node);
         }
 
-        function resolveUntypedCall(node: CallLikeExpression): Signature {
-            if (callLikeExpressionMayHaveTypeArguments(node)) {
-                // Check type arguments even though we will give an error that untyped calls may not accept type arguments.
-                // This gets us diagnostics for the type arguments and marks them as referenced.
-                forEach(node.typeArguments, checkSourceElement);
-            }
+        function resolveUntypedCall(node: Node): Signature {
+            // Check typeArguments even though we will give an error that untyped calls may not accept type arguments.
+            // This gets us diagnostics for the type arguments and marks them as referenced.
 
-            if (node.kind === SyntaxKind.TaggedTemplateExpression) {
+            if (isTaggedTemplateExpression(node)) {
+                forEach(node.typeArguments, checkSourceElement);
                 checkExpression(node.template);
             }
             else if (isJsxOpeningLikeElement(node)) {
+                forEach(node.typeArguments, checkSourceElement);
                 checkExpression(node.attributes);
             }
-            else if (node.kind !== SyntaxKind.Decorator) {
-                forEach((<CallExpression>node).arguments, argument => {
+            else if (isCallOrNewExpression(node)) {
+                forEach(node.typeArguments, checkSourceElement);
+                forEach(node.arguments, argument => {
                     checkExpression(argument);
                 });
             }
             return anySignature;
         }
 
-        function resolveErrorCall(node: CallLikeExpression): Signature {
-            resolveUntypedCall(node);
+        function resolveErrorCall(node?: Node): Signature {
+            if (node) resolveUntypedCall(node);
             return unknownSignature;
         }
 
@@ -27025,57 +27026,67 @@ namespace ts {
             return !!(t.flags & (TypeFlags.Void | TypeFlags.Undefined | TypeFlags.Unknown | TypeFlags.Any));
         }
 
-        function hasCorrectArity(node: CallLikeExpression, args: readonly Expression[], signature: Signature, signatureHelpTrailingComma = false) {
+        function hasCorrectArity(node: Node | undefined, args: readonly Expression[], signature: Signature, signatureHelpTrailingComma: boolean, implicitThisType?: Type) {
             let argCount: number;
             let callIsIncomplete = false; // In incomplete call we want to be lenient when we have too few arguments
+
             let effectiveParameterCount = getParameterCount(signature);
             let effectiveMinimumArguments = getMinArgumentCount(signature);
 
-            if (node.kind === SyntaxKind.TaggedTemplateExpression) {
-                argCount = args.length;
-                if (node.template.kind === SyntaxKind.TemplateExpression) {
-                    // If a tagged template expression lacks a tail literal, the call is incomplete.
-                    // Specifically, a template only can end in a TemplateTail or a Missing literal.
-                    const lastSpan = last(node.template.templateSpans); // we should always have at least one span.
-                    callIsIncomplete = nodeIsMissing(lastSpan.literal) || !!lastSpan.literal.isUnterminated;
+            if (node && !implicitThisType) {
+                if (isTaggedTemplateExpression(node)) {
+                    argCount = args.length;
+                    if (node.template.kind === SyntaxKind.TemplateExpression) {
+                        // If a tagged template expression lacks a tail literal, the call is incomplete.
+                        // Specifically, a template only can end in a TemplateTail or a Missing literal.
+                        const lastSpan = last(node.template.templateSpans); // we should always have at least one span.
+                        callIsIncomplete = nodeIsMissing(lastSpan.literal) || !!lastSpan.literal.isUnterminated;
+                    }
+                    else {
+                        // If the template didn't end in a backtick, or its beginning occurred right prior to EOF,
+                        // then this might actually turn out to be a TemplateHead in the future;
+                        // so we consider the call to be incomplete.
+                        const templateLiteral = <LiteralExpression>node.template;
+                        Debug.assert(templateLiteral.kind === SyntaxKind.NoSubstitutionTemplateLiteral);
+                        callIsIncomplete = !!templateLiteral.isUnterminated;
+                    }
+                }
+                else if (isDecorator(node)) {
+                    argCount = getDecoratorArgumentCount(node, signature);
+                }
+                else if (isJsxOpeningLikeElement(node)) {
+                    callIsIncomplete = node.attributes.end === node.end;
+                    if (callIsIncomplete) {
+                        return true;
+                    }
+                    argCount = effectiveMinimumArguments === 0 ? args.length : 1;
+                    effectiveParameterCount = args.length === 0 ? effectiveParameterCount : 1; // class may have argumentless ctor functions - still resolve ctor and compare vs props member type
+                    effectiveMinimumArguments = Math.min(effectiveMinimumArguments, 1); // sfc may specify context argument - handled by framework and not typechecked
+                }
+                else if (isCallOrNewExpression(node)) {
+                    if (!node.arguments) {
+                        // This only happens when we have something of the form: 'new C'
+                        Debug.assert(node.kind === SyntaxKind.NewExpression);
+                        return getMinArgumentCount(signature) === 0;
+                    }
+
+                    argCount = +signatureHelpTrailingComma + args.length;
+
+                    // If we are missing the close parenthesis, the call is incomplete.
+                    callIsIncomplete = node.arguments.end === node.end;
+
+                    // If a spread argument is present, check that it corresponds to a rest parameter or at least that it's in the valid range.
+                    const spreadArgIndex = getSpreadArgumentIndex(args);
+                    if (spreadArgIndex >= 0) {
+                        return spreadArgIndex >= getMinArgumentCount(signature) && (hasEffectiveRestParameter(signature) || spreadArgIndex < getParameterCount(signature));
+                    }
                 }
                 else {
-                    // If the template didn't end in a backtick, or its beginning occurred right prior to EOF,
-                    // then this might actually turn out to be a TemplateHead in the future;
-                    // so we consider the call to be incomplete.
-                    const templateLiteral = <LiteralExpression>node.template;
-                    Debug.assert(templateLiteral.kind === SyntaxKind.NoSubstitutionTemplateLiteral);
-                    callIsIncomplete = !!templateLiteral.isUnterminated;
+                    argCount = 0;
                 }
-            }
-            else if (node.kind === SyntaxKind.Decorator) {
-                argCount = getDecoratorArgumentCount(node, signature);
-            }
-            else if (isJsxOpeningLikeElement(node)) {
-                callIsIncomplete = node.attributes.end === node.end;
-                if (callIsIncomplete) {
-                    return true;
-                }
-                argCount = effectiveMinimumArguments === 0 ? args.length : 1;
-                effectiveParameterCount = args.length === 0 ? effectiveParameterCount : 1; // class may have argumentless ctor functions - still resolve ctor and compare vs props member type
-                effectiveMinimumArguments = Math.min(effectiveMinimumArguments, 1); // sfc may specify context argument - handled by framework and not typechecked
-            }
-            else if (!node.arguments) {
-                // This only happens when we have something of the form: 'new C'
-                Debug.assert(node.kind === SyntaxKind.NewExpression);
-                return getMinArgumentCount(signature) === 0;
             }
             else {
-                argCount = signatureHelpTrailingComma ? args.length + 1 : args.length;
-
-                // If we are missing the close parenthesis, the call is incomplete.
-                callIsIncomplete = node.arguments.end === node.end;
-
-                // If a spread argument is present, check that it corresponds to a rest parameter or at least that it's in the valid range.
-                const spreadArgIndex = getSpreadArgumentIndex(args);
-                if (spreadArgIndex >= 0) {
-                    return spreadArgIndex >= getMinArgumentCount(signature) && (hasEffectiveRestParameter(signature) || spreadArgIndex < getParameterCount(signature));
-                }
+                argCount = 0;
             }
 
             // Too many arguments implies incorrect arity.
@@ -27159,46 +27170,48 @@ namespace ts {
             return getInferredTypes(context);
         }
 
-        function inferTypeArguments(node: CallLikeExpression, signature: Signature, args: readonly Expression[], checkMode: CheckMode, context: InferenceContext): Type[] {
-            if (isJsxOpeningLikeElement(node)) {
-                return inferJsxTypeArguments(node, signature, checkMode, context);
-            }
+        function inferTypeArguments(node: Node | undefined, signature: Signature, args: readonly Expression[], checkMode: CheckMode, context: InferenceContext, implicitThisType?: Type): Type[] {
+            if (node && !implicitThisType) {
+                if (isJsxOpeningLikeElement(node)) {
+                    return inferJsxTypeArguments(node, signature, checkMode, context);
+                }
 
-            // If a contextual type is available, infer from that type to the return type of the call expression. For
-            // example, given a 'function wrap<T, U>(cb: (x: T) => U): (x: T) => U' and a call expression
-            // 'let f: (x: string) => number = wrap(s => s.length)', we infer from the declared type of 'f' to the
-            // return type of 'wrap'.
-            if (node.kind !== SyntaxKind.Decorator) {
-                const contextualType = getContextualType(node, every(signature.typeParameters, p => !!getDefaultFromTypeParameter(p)) ? ContextFlags.SkipBindingPatterns : ContextFlags.None);
-                if (contextualType) {
-                    // We clone the inference context to avoid disturbing a resolution in progress for an
-                    // outer call expression. Effectively we just want a snapshot of whatever has been
-                    // inferred for any outer call expression so far.
-                    const outerContext = getInferenceContext(node);
-                    const outerMapper = getMapperFromContext(cloneInferenceContext(outerContext, InferenceFlags.NoDefault));
-                    const instantiatedType = instantiateType(contextualType, outerMapper);
-                    // If the contextual type is a generic function type with a single call signature, we
-                    // instantiate the type with its own type parameters and type arguments. This ensures that
-                    // the type parameters are not erased to type any during type inference such that they can
-                    // be inferred as actual types from the contextual type. For example:
-                    //   declare function arrayMap<T, U>(f: (x: T) => U): (a: T[]) => U[];
-                    //   const boxElements: <A>(a: A[]) => { value: A }[] = arrayMap(value => ({ value }));
-                    // Above, the type of the 'value' parameter is inferred to be 'A'.
-                    const contextualSignature = getSingleCallSignature(instantiatedType);
-                    const inferenceSourceType = contextualSignature && contextualSignature.typeParameters ?
-                        getOrCreateTypeFromSignature(getSignatureInstantiationWithoutFillingInTypeArguments(contextualSignature, contextualSignature.typeParameters)) :
-                        instantiatedType;
-                    const inferenceTargetType = getReturnTypeOfSignature(signature);
-                    // Inferences made from return types have lower priority than all other inferences.
-                    inferTypes(context.inferences, inferenceSourceType, inferenceTargetType, InferencePriority.ReturnType);
-                    // Create a type mapper for instantiating generic contextual types using the inferences made
-                    // from the return type. We need a separate inference pass here because (a) instantiation of
-                    // the source type uses the outer context's return mapper (which excludes inferences made from
-                    // outer arguments), and (b) we don't want any further inferences going into this context.
-                    const returnContext = createInferenceContext(signature.typeParameters!, signature, context.flags);
-                    const returnSourceType = instantiateType(contextualType, outerContext && outerContext.returnMapper);
-                    inferTypes(returnContext.inferences, returnSourceType, inferenceTargetType);
-                    context.returnMapper = some(returnContext.inferences, hasInferenceCandidates) ? getMapperFromContext(cloneInferredPartOfContext(returnContext)) : undefined;
+                // If a contextual type is available, infer from that type to the return type of the call expression. For
+                // example, given a 'function wrap<T, U>(cb: (x: T) => U): (x: T) => U' and a call expression
+                // 'let f: (x: string) => number = wrap(s => s.length)', we infer from the declared type of 'f' to the
+                // return type of 'wrap'.
+                if (isTaggedTemplateExpression(node) || isCallOrNewExpression(node)) {
+                    const contextualType = getContextualType(node, every(signature.typeParameters, p => !!getDefaultFromTypeParameter(p)) ? ContextFlags.SkipBindingPatterns : ContextFlags.None);
+                    if (contextualType) {
+                        // We clone the inference context to avoid disturbing a resolution in progress for an
+                        // outer call expression. Effectively we just want a snapshot of whatever has been
+                        // inferred for any outer call expression so far.
+                        const outerContext = getInferenceContext(node);
+                        const outerMapper = getMapperFromContext(cloneInferenceContext(outerContext, InferenceFlags.NoDefault));
+                        const instantiatedType = instantiateType(contextualType, outerMapper);
+                        // If the contextual type is a generic function type with a single call signature, we
+                        // instantiate the type with its own type parameters and type arguments. This ensures that
+                        // the type parameters are not erased to type any during type inference such that they can
+                        // be inferred as actual types from the contextual type. For example:
+                        //   declare function arrayMap<T, U>(f: (x: T) => U): (a: T[]) => U[];
+                        //   const boxElements: <A>(a: A[]) => { value: A }[] = arrayMap(value => ({ value }));
+                        // Above, the type of the 'value' parameter is inferred to be 'A'.
+                        const contextualSignature = getSingleCallSignature(instantiatedType);
+                        const inferenceSourceType = contextualSignature && contextualSignature.typeParameters ?
+                            getOrCreateTypeFromSignature(getSignatureInstantiationWithoutFillingInTypeArguments(contextualSignature, contextualSignature.typeParameters)) :
+                            instantiatedType;
+                        const inferenceTargetType = getReturnTypeOfSignature(signature);
+                        // Inferences made from return types have lower priority than all other inferences.
+                        inferTypes(context.inferences, inferenceSourceType, inferenceTargetType, InferencePriority.ReturnType);
+                        // Create a type mapper for instantiating generic contextual types using the inferences made
+                        // from the return type. We need a separate inference pass here because (a) instantiation of
+                        // the source type uses the outer context's return mapper (which excludes inferences made from
+                        // outer arguments), and (b) we don't want any further inferences going into this context.
+                        const returnContext = createInferenceContext(signature.typeParameters!, signature, context.flags);
+                        const returnSourceType = instantiateType(contextualType, outerContext && outerContext.returnMapper);
+                        inferTypes(returnContext.inferences, returnSourceType, inferenceTargetType);
+                        context.returnMapper = some(returnContext.inferences, hasInferenceCandidates) ? getMapperFromContext(cloneInferredPartOfContext(returnContext)) : undefined;
+                    }
                 }
             }
 
@@ -27213,9 +27226,11 @@ namespace ts {
 
             const thisType = getThisTypeOfSignature(signature);
             if (thisType) {
-                const thisArgumentNode = getThisArgumentOfCall(node);
-                const thisArgumentType = thisArgumentNode ? checkExpression(thisArgumentNode) : voidType;
-                inferTypes(context.inferences, thisArgumentType, thisType);
+                if (!implicitThisType) {
+                    const thisArgumentNode = getThisArgumentOfCall(node);
+                    implicitThisType = thisArgumentNode ? checkExpression(thisArgumentNode) : voidType;
+                }
+                inferTypes(context.inferences, implicitThisType, thisType);
             }
 
             for (let i = 0; i < argCount; i++) {
@@ -27433,17 +27448,17 @@ namespace ts {
         }
 
         function getSignatureApplicabilityError(
-            node: CallLikeExpression,
+            node: Node | undefined,
             args: readonly Expression[],
             signature: Signature,
             relation: ESMap<string, RelationComparisonResult>,
             checkMode: CheckMode,
             reportErrors: boolean,
             containingMessageChain: (() => DiagnosticMessageChain | undefined) | undefined,
+            implicitThisType?: Type,
         ): readonly Diagnostic[] | undefined {
-
             const errorOutputContainer: { errors?: Diagnostic[], skipLogging?: boolean } = { errors: undefined, skipLogging: true };
-            if (isJsxOpeningLikeElement(node)) {
+            if (node && !implicitThisType && isJsxOpeningLikeElement(node)) {
                 if (!checkApplicableSignatureForJsxOpeningLikeElement(node, signature, relation, checkMode, reportErrors, containingMessageChain, errorOutputContainer)) {
                     Debug.assert(!reportErrors || !!errorOutputContainer.errors, "jsx should have errors when reporting errors");
                     return errorOutputContainer.errors || emptyArray;
@@ -27451,28 +27466,33 @@ namespace ts {
                 return undefined;
             }
             const thisType = getThisTypeOfSignature(signature);
-            if (thisType && thisType !== voidType && node.kind !== SyntaxKind.NewExpression) {
+            if (thisType && thisType !== voidType && (implicitThisType || node === undefined || node.kind !== SyntaxKind.NewExpression)) {
                 // If the called expression is not of the form `x.f` or `x["f"]`, then sourceType = voidType
                 // If the signature's 'this' type is voidType, then the check is skipped -- anything is compatible.
                 // If the expression is a new expression, then the check is skipped.
-                const thisArgumentNode = getThisArgumentOfCall(node);
-                let thisArgumentType: Type;
-                if (thisArgumentNode) {
-                    thisArgumentType = checkExpression(thisArgumentNode);
-                    if (isOptionalChainRoot(thisArgumentNode.parent)) {
-                        thisArgumentType = getNonNullableType(thisArgumentType);
+
+                // if `thisArgumentType` is passed, assume it is derived from `node` (for implicit function calls like Symbol.iterator calls)
+                let thisArgumentNode: ReturnType<typeof getThisArgumentOfCall>;
+
+                if (!implicitThisType) {
+                    thisArgumentNode = getThisArgumentOfCall(node);
+                    if (thisArgumentNode) {
+                        implicitThisType = checkExpression(thisArgumentNode);
+                        if (isOptionalChainRoot(thisArgumentNode.parent)) {
+                            implicitThisType = getNonNullableType(implicitThisType);
+                        }
+                        else if (isOptionalChain(thisArgumentNode.parent)) {
+                            implicitThisType = removeOptionalTypeMarker(implicitThisType);
+                        }
                     }
-                    else if (isOptionalChain(thisArgumentNode.parent)) {
-                        thisArgumentType = removeOptionalTypeMarker(thisArgumentType);
+                    else {
+                        implicitThisType = voidType;
                     }
-                }
-                else {
-                    thisArgumentType = voidType;
                 }
 
                 const errorNode = reportErrors ? (thisArgumentNode || node) : undefined;
                 const headMessage = Diagnostics.The_this_context_of_type_0_is_not_assignable_to_method_s_this_of_type_1;
-                if (!checkTypeRelatedTo(thisArgumentType, thisType, relation, errorNode, headMessage, containingMessageChain, errorOutputContainer)) {
+                if (!checkTypeRelatedTo(implicitThisType, thisType, relation, errorNode, headMessage, containingMessageChain, errorOutputContainer)) {
                     Debug.assert(!reportErrors || !!errorOutputContainer.errors, "this parameter should have errors when reporting errors");
                     return errorOutputContainer.errors || emptyArray;
                 }
@@ -27528,8 +27548,8 @@ namespace ts {
         /**
          * Returns the this argument in calls like x.f(...) and x[f](...). Undefined otherwise.
          */
-        function getThisArgumentOfCall(node: CallLikeExpression): LeftHandSideExpression | undefined {
-            if (node.kind === SyntaxKind.CallExpression) {
+        function getThisArgumentOfCall(node?: Node): LeftHandSideExpression | undefined {
+            if (node && isCallExpression(node)) {
                 const callee = skipOuterExpressions(node.expression);
                 if (isAccessExpression(callee)) {
                     return callee.expression;
@@ -27547,8 +27567,9 @@ namespace ts {
         /**
          * Returns the effective arguments for an expression that works like a function invocation.
          */
-        function getEffectiveCallArguments(node: CallLikeExpression): readonly Expression[] {
-            if (node.kind === SyntaxKind.TaggedTemplateExpression) {
+        function getEffectiveCallArguments(node?: Node): readonly Expression[] {
+            if (node === undefined) return [];
+            if (isTaggedTemplateExpression(node)) {
                 const template = node.template;
                 const args: Expression[] = [createSyntheticExpression(template, getGlobalTemplateStringsArrayType())];
                 if (template.kind === SyntaxKind.TemplateExpression) {
@@ -27558,13 +27579,14 @@ namespace ts {
                 }
                 return args;
             }
-            if (node.kind === SyntaxKind.Decorator) {
+            if (isDecorator(node)) {
                 return getEffectiveDecoratorArguments(node);
             }
             if (isJsxOpeningLikeElement(node)) {
                 return node.attributes.properties.length > 0 || (isJsxOpeningElement(node) && node.parent.children.length > 0) ? [node.attributes] : emptyArray;
             }
-            const args = node.arguments || emptyArray;
+
+            const args = isCallOrNewExpression(node) && node.arguments || emptyArray;
             const spreadIndex = getSpreadArgumentIndex(args);
             if (spreadIndex >= 0) {
                 // Create synthetic arguments from spreads of tuple types.
@@ -27668,7 +27690,7 @@ namespace ts {
             }
             return { start, length, sourceFile };
         }
-        function getDiagnosticForCallNode(node: CallLikeExpression, message: DiagnosticMessage, arg0?: string | number, arg1?: string | number, arg2?: string | number, arg3?: string | number): DiagnosticWithLocation {
+        function getDiagnosticForCallNode(node: Node, message: DiagnosticMessage, arg0?: string | number, arg1?: string | number, arg2?: string | number, arg3?: string | number): DiagnosticWithLocation {
             if (isCallExpression(node)) {
                 const { sourceFile, start, length } = getDiagnosticSpanForCallNode(node);
                 return createFileDiagnostic(sourceFile, start, length, message, arg0, arg1, arg2, arg3);
@@ -27678,9 +27700,8 @@ namespace ts {
             }
         }
 
-        function isPromiseResolveArityError(node: CallLikeExpression) {
-            if (!isCallExpression(node) || !isIdentifier(node.expression)) return false;
-
+        function isPromiseResolveArityError(node?: Node) {
+            if (node === undefined || !isCallExpression(node) || !isIdentifier(node.expression)) return false;
             const symbol = resolveName(node.expression, node.expression.escapedText, SymbolFlags.Value, undefined, undefined, false);
             const decl = symbol?.valueDeclaration;
             if (!decl || !isParameter(decl) || !isFunctionExpressionOrArrowFunction(decl.parent) || !isNewExpression(decl.parent.parent) || !isIdentifier(decl.parent.parent.expression)) {
@@ -27694,7 +27715,7 @@ namespace ts {
             return constructorSymbol === globalPromiseSymbol;
         }
 
-        function getArgumentArityError(node: CallLikeExpression, signatures: readonly Signature[], args: readonly Expression[]) {
+        function getArgumentArityError(node: Node, signatures: readonly Signature[], args: readonly Expression[], implicitThisType?: Type) {
             let min = Number.POSITIVE_INFINITY;
             let max = Number.NEGATIVE_INFINITY;
             let belowArgCount = Number.NEGATIVE_INFINITY;
@@ -27732,7 +27753,7 @@ namespace ts {
                     hasRestParameter ?
                         Diagnostics.Expected_at_least_0_arguments_but_got_1 :
                         Diagnostics.Expected_0_arguments_but_got_1_or_more :
-                    paramRange === 1 && argCount === 0 && isPromiseResolveArityError(node) ?
+                    paramRange === 1 && argCount === 0 && !implicitThisType && isPromiseResolveArityError(node) ?
                         Diagnostics.Expected_0_arguments_but_got_1_Did_you_forget_to_include_void_in_your_type_argument_to_Promise :
                         Diagnostics.Expected_0_arguments_but_got_1;
 
@@ -27806,34 +27827,27 @@ namespace ts {
             return createDiagnosticForNodeArray(getSourceFileOfNode(node), typeArguments, Diagnostics.Expected_0_type_arguments_but_got_1, belowArgCount === -Infinity ? aboveArgCount : belowArgCount, argCount);
         }
 
-        function resolveCall(node: CallLikeExpression, signatures: readonly Signature[], candidatesOutArray: Signature[] | undefined, checkMode: CheckMode, callChainFlags: SignatureFlags, fallbackError?: DiagnosticMessage): Signature {
-            const isTaggedTemplate = node.kind === SyntaxKind.TaggedTemplateExpression;
-            const isDecorator = node.kind === SyntaxKind.Decorator;
-            const isJsxOpeningOrSelfClosingElement = isJsxOpeningLikeElement(node);
-            const reportErrors = !candidatesOutArray && produceDiagnostics;
+        function resolveCall(node: Node | undefined, signatures: readonly Signature[], candidatesOutArray: Signature[] | undefined, checkMode: CheckMode, callChainFlags: SignatureFlags, typeArguments: NodeArray<TypeNode> | undefined, fallbackError?: DiagnosticMessage, implicitThisType?: Type) {
+            // `implicitThisType` is used with for..of / spread destructuring / etc
+            // If `implicitThisType` is defined then `node` should be treated exclusively as an `errorNode`.
+            // That means no node-specific logic (except in determining the node text range for error messages)
+            // For example, `for (const x of foo<R>("a"))` should not be analyzing `foo<R>("a")` as a CallExpression.
+            // If you did, you would find: typeArgs = [R], args = ["a"], thisType = `void`, etc.
 
-            let typeArguments: NodeArray<TypeNode> | undefined;
-
-            if (!isDecorator) {
-                typeArguments = (<CallExpression>node).typeArguments;
-
-                // We already perform checking on the type arguments on the class declaration itself.
-                if (isTaggedTemplate || isJsxOpeningOrSelfClosingElement || (<CallExpression>node).expression.kind !== SyntaxKind.SuperKeyword) {
-                    forEach(typeArguments, checkSourceElement);
-                }
-            }
+            const isDecorator = node && node.kind === SyntaxKind.Decorator;
+            const reportErrors = !!node && !candidatesOutArray && produceDiagnostics;
 
             const candidates = candidatesOutArray || [];
             // reorderCandidates fills up the candidates array directly
             reorderCandidates(signatures, candidates, callChainFlags);
             if (!candidates.length) {
-                if (reportErrors) {
+                if (node && reportErrors) {
                     diagnostics.add(getDiagnosticForCallNode(node, Diagnostics.Call_target_does_not_contain_any_signatures));
                 }
                 return resolveErrorCall(node);
             }
 
-            const args = getEffectiveCallArguments(node);
+            const args = implicitThisType ? [] : getEffectiveCallArguments(node);
 
             // The excludeArgument array contains true for each context sensitive argument (an argument
             // is context sensitive it is susceptible to a one-time permanent contextual typing).
@@ -27848,7 +27862,7 @@ namespace ts {
             // For a decorator, no arguments are susceptible to contextual typing due to the fact
             // decorators are applied to a declaration by the emitter, and not to an expression.
             const isSingleNonGenericCandidate = candidates.length === 1 && !candidates[0].typeParameters;
-            let argCheckMode = !isDecorator && !isSingleNonGenericCandidate && some(args, isContextSensitive) ? CheckMode.SkipContextSensitive : CheckMode.Normal;
+            let argCheckMode = node && !isDecorator && !isSingleNonGenericCandidate && some(args, isContextSensitive) ? CheckMode.SkipContextSensitive : CheckMode.Normal;
 
             // The following variables are captured and modified by calls to chooseOverload.
             // If overload resolution or type argument inference fails, we want to report the
@@ -27874,12 +27888,11 @@ namespace ts {
             let candidatesForArgumentError: Signature[] | undefined;
             let candidateForArgumentArityError: Signature | undefined;
             let candidateForTypeArgumentError: Signature | undefined;
-            let result: Signature | undefined;
 
             // If we are in signature help, a trailing comma indicates that we intend to provide another argument,
             // so we will only accept overloads with arity at least 1 higher than the current number of provided arguments.
             const signatureHelpTrailingComma =
-                !!(checkMode & CheckMode.IsForSignatureHelp) && node.kind === SyntaxKind.CallExpression && node.arguments.hasTrailingComma;
+                !!(checkMode & CheckMode.IsForSignatureHelp && !implicitThisType && node && isCallExpression(node) && node.arguments.hasTrailingComma);
 
             // Section 4.12.1:
             // if the candidate list contains one or more signatures for which the type of each argument
@@ -27891,12 +27904,9 @@ namespace ts {
             // Whether the call is an error is determined by assignability of the arguments. The subtype pass
             // is just important for choosing the best signature. So in the case where there is only one
             // signature, the subtype pass is useless. So skipping it is an optimization.
-            if (candidates.length > 1) {
-                result = chooseOverload(candidates, subtypeRelation, isSingleNonGenericCandidate, signatureHelpTrailingComma);
-            }
-            if (!result) {
-                result = chooseOverload(candidates, assignableRelation, isSingleNonGenericCandidate, signatureHelpTrailingComma);
-            }
+            const result = candidates.length > 1 &&
+                chooseOverload(candidates, subtypeRelation, isSingleNonGenericCandidate, signatureHelpTrailingComma) || chooseOverload(candidates, assignableRelation, isSingleNonGenericCandidate, signatureHelpTrailingComma);
+
             if (result) {
                 return result;
             }
@@ -27905,7 +27915,7 @@ namespace ts {
             // no arguments excluded from assignability checks.
             // If candidate is undefined, it means that no candidates had a suitable arity. In that case,
             // skip the checkApplicableSignature check.
-            if (reportErrors) {
+            if (node && reportErrors) {
                 if (candidatesForArgumentError) {
                     if (candidatesForArgumentError.length === 1 || candidatesForArgumentError.length > 3) {
                         const last = candidatesForArgumentError[candidatesForArgumentError.length - 1];
@@ -27914,7 +27924,7 @@ namespace ts {
                             chain = chainDiagnosticMessages(chain, Diagnostics.The_last_overload_gave_the_following_error);
                             chain = chainDiagnosticMessages(chain, Diagnostics.No_overload_matches_this_call);
                         }
-                        const diags = getSignatureApplicabilityError(node, args, last, assignableRelation, CheckMode.Normal, /*reportErrors*/ true, () => chain);
+                        const diags = getSignatureApplicabilityError(node, args, last, assignableRelation, CheckMode.Normal, /*reportErrors*/ true, () => chain, implicitThisType);
                         if (diags) {
                             for (const d of diags) {
                                 if (last.declaration && candidatesForArgumentError.length > 3) {
@@ -27936,7 +27946,7 @@ namespace ts {
                         let i = 0;
                         for (const c of candidatesForArgumentError) {
                             const chain = () => chainDiagnosticMessages(/*details*/ undefined, Diagnostics.Overload_0_of_1_2_gave_the_following_error, i + 1, candidates.length, signatureToString(c));
-                            const diags = getSignatureApplicabilityError(node, args, c, assignableRelation, CheckMode.Normal, /*reportErrors*/ true, chain);
+                            const diags = getSignatureApplicabilityError(node, args, c, assignableRelation, CheckMode.Normal, /*reportErrors*/ true, chain, implicitThisType);
                             if (diags) {
                                 if (diags.length <= min) {
                                     min = diags.length;
@@ -27972,7 +27982,7 @@ namespace ts {
                     }
                 }
                 else if (candidateForArgumentArityError) {
-                    diagnostics.add(getArgumentArityError(node, [candidateForArgumentArityError], args));
+                    diagnostics.add(getArgumentArityError(node, [candidateForArgumentArityError], args, implicitThisType));
                 }
                 else if (candidateForTypeArgumentError) {
                     checkTypeArguments(candidateForTypeArgumentError, (node as CallExpression | TaggedTemplateExpression | JsxOpeningLikeElement).typeArguments!, /*reportErrors*/ true, fallbackError);
@@ -27983,7 +27993,7 @@ namespace ts {
                         diagnostics.add(getTypeArgumentArityError(node, signatures, typeArguments!));
                     }
                     else if (!isDecorator) {
-                        diagnostics.add(getArgumentArityError(node, signaturesWithCorrectTypeArgumentArity, args));
+                        diagnostics.add(getArgumentArityError(node, signaturesWithCorrectTypeArgumentArity, args, implicitThisType));
                     }
                     else if (fallbackError) {
                         diagnostics.add(getDiagnosticForCallNode(node, fallbackError));
@@ -27991,7 +28001,9 @@ namespace ts {
                 }
             }
 
-            return getCandidateForOverloadFailure(node, candidates, args, !!candidatesOutArray);
+            return (languageVersion >= ScriptTarget.ES2015 || compilerOptions.downlevelIteration) && implicitThisType
+                ? anySignature
+                : getCandidateForOverloadFailure(node!, candidates, args, !!candidatesOutArray);
 
             function addImplementationSuccessElaboration(failed: Signature, diagnostic: Diagnostic) {
                 const oldCandidatesForArgumentError = candidatesForArgumentError;
@@ -28004,7 +28016,7 @@ namespace ts {
                 if (implDecl) {
                     const candidate = getSignatureFromDeclaration(implDecl as FunctionLikeDeclaration);
                     const isSingleNonGenericCandidate = !candidate.typeParameters;
-                    if (chooseOverload([candidate], assignableRelation, isSingleNonGenericCandidate)) {
+                    if (chooseOverload([candidate], assignableRelation, isSingleNonGenericCandidate, /*signatureHelpTrailingComma*/ false)) {
                         addRelatedInfo(diagnostic, createDiagnosticForNode(implDecl, Diagnostics.The_call_would_have_succeeded_against_this_implementation_but_implementation_signatures_of_overloads_are_not_externally_visible));
                     }
                 }
@@ -28014,17 +28026,17 @@ namespace ts {
                 candidateForTypeArgumentError = oldCandidateForTypeArgumentError;
             }
 
-            function chooseOverload(candidates: Signature[], relation: ESMap<string, RelationComparisonResult>, isSingleNonGenericCandidate: boolean, signatureHelpTrailingComma = false) {
+            function chooseOverload(candidates: Signature[], relation: ESMap<string, RelationComparisonResult>, isSingleNonGenericCandidate: boolean, signatureHelpTrailingComma: boolean) {
                 candidatesForArgumentError = undefined;
                 candidateForArgumentArityError = undefined;
                 candidateForTypeArgumentError = undefined;
 
                 if (isSingleNonGenericCandidate) {
                     const candidate = candidates[0];
-                    if (some(typeArguments) || !hasCorrectArity(node, args, candidate, signatureHelpTrailingComma)) {
+                    if (some(typeArguments) || !hasCorrectArity(node, args, candidate, signatureHelpTrailingComma, implicitThisType)) {
                         return undefined;
                     }
-                    if (getSignatureApplicabilityError(node, args, candidate, relation, CheckMode.Normal, /*reportErrors*/ false, /*containingMessageChain*/ undefined)) {
+                    if (getSignatureApplicabilityError(node, args, candidate, relation, CheckMode.Normal, /*reportErrors*/ false, /*containingMessageChain*/ undefined, implicitThisType)) {
                         candidatesForArgumentError = [candidate];
                         return undefined;
                     }
@@ -28033,7 +28045,7 @@ namespace ts {
 
                 for (let candidateIndex = 0; candidateIndex < candidates.length; candidateIndex++) {
                     const candidate = candidates[candidateIndex];
-                    if (!hasCorrectTypeArgumentArity(candidate, typeArguments) || !hasCorrectArity(node, args, candidate, signatureHelpTrailingComma)) {
+                    if (!hasCorrectTypeArgumentArity(candidate, typeArguments) || !hasCorrectArity(node, args, candidate, signatureHelpTrailingComma, implicitThisType)) {
                         continue;
                     }
 
@@ -28051,13 +28063,13 @@ namespace ts {
                         }
                         else {
                             inferenceContext = createInferenceContext(candidate.typeParameters, candidate, /*flags*/ isInJSFile(node) ? InferenceFlags.AnyDefault : InferenceFlags.None);
-                            typeArgumentTypes = inferTypeArguments(node, candidate, args, argCheckMode | CheckMode.SkipGenericFunctions, inferenceContext);
+                            typeArgumentTypes = inferTypeArguments(node, candidate, args, argCheckMode | CheckMode.SkipGenericFunctions, inferenceContext, implicitThisType);
                             argCheckMode |= inferenceContext.flags & InferenceFlags.SkippedGenericFunction ? CheckMode.SkipGenericFunctions : CheckMode.Normal;
                         }
                         checkCandidate = getSignatureInstantiation(candidate, typeArgumentTypes, isInJSFile(candidate.declaration), inferenceContext && inferenceContext.inferredTypeParameters);
                         // If the original signature has a generic rest type, instantiation may produce a
                         // signature with different arity and we need to perform another arity check.
-                        if (getNonArrayRestType(candidate) && !hasCorrectArity(node, args, checkCandidate, signatureHelpTrailingComma)) {
+                        if (getNonArrayRestType(candidate) && !hasCorrectArity(node, args, checkCandidate, signatureHelpTrailingComma, implicitThisType)) {
                             candidateForArgumentArityError = checkCandidate;
                             continue;
                         }
@@ -28065,7 +28077,7 @@ namespace ts {
                     else {
                         checkCandidate = candidate;
                     }
-                    if (getSignatureApplicabilityError(node, args, checkCandidate, relation, argCheckMode, /*reportErrors*/ false, /*containingMessageChain*/ undefined)) {
+                    if (getSignatureApplicabilityError(node, args, checkCandidate, relation, argCheckMode, /*reportErrors*/ false, /*containingMessageChain*/ undefined, implicitThisType)) {
                         // Give preference to error candidates that have no rest parameters (as they are more specific)
                         (candidatesForArgumentError || (candidatesForArgumentError = [])).push(checkCandidate);
                         continue;
@@ -28076,16 +28088,16 @@ namespace ts {
                         // round of type inference and applicability checking for this particular candidate.
                         argCheckMode = CheckMode.Normal;
                         if (inferenceContext) {
-                            const typeArgumentTypes = inferTypeArguments(node, candidate, args, argCheckMode, inferenceContext);
+                            const typeArgumentTypes = inferTypeArguments(node, candidate, args, argCheckMode, inferenceContext, implicitThisType);
                             checkCandidate = getSignatureInstantiation(candidate, typeArgumentTypes, isInJSFile(candidate.declaration), inferenceContext && inferenceContext.inferredTypeParameters);
                             // If the original signature has a generic rest type, instantiation may produce a
                             // signature with different arity and we need to perform another arity check.
-                            if (getNonArrayRestType(candidate) && !hasCorrectArity(node, args, checkCandidate, signatureHelpTrailingComma)) {
+                            if (getNonArrayRestType(candidate) && !hasCorrectArity(node, args, checkCandidate, signatureHelpTrailingComma, implicitThisType)) {
                                 candidateForArgumentArityError = checkCandidate;
                                 continue;
                             }
                         }
-                        if (getSignatureApplicabilityError(node, args, checkCandidate, relation, argCheckMode, /*reportErrors*/ false, /*containingMessageChain*/ undefined)) {
+                        if (getSignatureApplicabilityError(node, args, checkCandidate, relation, argCheckMode, /*reportErrors*/ false, /*containingMessageChain*/ undefined, implicitThisType)) {
                             // Give preference to error candidates that have no rest parameters (as they are more specific)
                             (candidatesForArgumentError || (candidatesForArgumentError = [])).push(checkCandidate);
                             continue;
@@ -28101,7 +28113,7 @@ namespace ts {
 
         // No signature was applicable. We have already reported the errors for the invalid signature.
         function getCandidateForOverloadFailure(
-            node: CallLikeExpression,
+            node: Node,
             candidates: Signature[],
             args: readonly Expression[],
             hasCandidatesOutArray: boolean,
@@ -28166,7 +28178,7 @@ namespace ts {
             return createSymbolWithType(first(sources), type);
         }
 
-        function pickLongestCandidateSignature(node: CallLikeExpression, candidates: Signature[], args: readonly Expression[]): Signature {
+        function pickLongestCandidateSignature(node: Node, candidates: Signature[], args: readonly Expression[]): Signature {
             // Pick the longest signature. This way we can get a contextual type for cases like:
             //     declare function f(a: { xa: number; xb: number; }, b: number);
             //     f({ |
@@ -28199,7 +28211,7 @@ namespace ts {
             return typeArguments;
         }
 
-        function inferSignatureInstantiationForOverloadFailure(node: CallLikeExpression, typeParameters: readonly TypeParameter[], candidate: Signature, args: readonly Expression[]): Signature {
+        function inferSignatureInstantiationForOverloadFailure(node: Node, typeParameters: readonly TypeParameter[], candidate: Signature, args: readonly Expression[]): Signature {
             const inferenceContext = createInferenceContext(typeParameters, candidate, /*flags*/ isInJSFile(node) ? InferenceFlags.AnyDefault : InferenceFlags.None);
             const typeArgumentTypes = inferTypeArguments(node, candidate, args, CheckMode.SkipContextSensitive | CheckMode.SkipGenericFunctions, inferenceContext);
             return createSignatureInstantiation(candidate, typeArgumentTypes);
@@ -28239,7 +28251,7 @@ namespace ts {
                     const baseTypeNode = getEffectiveBaseTypeNode(getContainingClass(node)!);
                     if (baseTypeNode) {
                         const baseConstructors = getInstantiatedConstructorsForTypeArguments(superType, baseTypeNode.typeArguments, baseTypeNode);
-                        return resolveCall(node, baseConstructors, candidatesOutArray, checkMode, SignatureFlags.None);
+                        return resolveCall(node, baseConstructors, candidatesOutArray, checkMode, SignatureFlags.None, node.typeArguments);
                     }
                 }
                 return resolveUntypedCall(node);
@@ -28333,7 +28345,8 @@ namespace ts {
                 return resolveErrorCall(node);
             }
 
-            return resolveCall(node, callSignatures, candidatesOutArray, checkMode, callChainFlags);
+            forEach(node.typeArguments, checkSourceElement);
+            return resolveCall(node, callSignatures, candidatesOutArray, checkMode, callChainFlags, node.typeArguments);
         }
 
         function isGenericFunctionReturningFunction(signature: Signature) {
@@ -28408,7 +28421,7 @@ namespace ts {
                     return resolveErrorCall(node);
                 }
 
-                return resolveCall(node, constructSignatures, candidatesOutArray, checkMode, SignatureFlags.None);
+                return resolveCall(node, constructSignatures, candidatesOutArray, checkMode, SignatureFlags.None, node.typeArguments);
             }
 
             // If expressionType's apparent type is an object type with no construct signatures but
@@ -28417,7 +28430,7 @@ namespace ts {
             // operation is Any. It is an error to have a Void this type.
             const callSignatures = getSignaturesOfType(expressionType, SignatureKind.Call);
             if (callSignatures.length) {
-                const signature = resolveCall(node, callSignatures, candidatesOutArray, checkMode, SignatureFlags.None);
+                const signature = resolveCall(node, callSignatures, candidatesOutArray, checkMode, SignatureFlags.None, node.typeArguments);
                 if (!noImplicitAny) {
                     if (signature.declaration && !isJSConstructor(signature.declaration) && getReturnTypeOfSignature(signature) !== voidType) {
                         error(node, Diagnostics.Only_a_void_function_can_be_called_with_the_new_keyword);
@@ -28646,7 +28659,8 @@ namespace ts {
                 return resolveErrorCall(node);
             }
 
-            return resolveCall(node, callSignatures, candidatesOutArray, checkMode, SignatureFlags.None);
+            forEach(node.typeArguments, checkSourceElement);
+            return resolveCall(node, callSignatures, candidatesOutArray, checkMode, SignatureFlags.None, node.typeArguments);
         }
 
         /**
@@ -28709,7 +28723,7 @@ namespace ts {
                 return resolveErrorCall(node);
             }
 
-            return resolveCall(node, callSignatures, candidatesOutArray, checkMode, SignatureFlags.None, headMessage);
+            return resolveCall(node, callSignatures, candidatesOutArray, checkMode, SignatureFlags.None, /*typeArguments*/ undefined, headMessage);
         }
 
         function createSignatureForJSXIntrinsic(node: JsxOpeningLikeElement, result: Type): Signature {
@@ -28765,7 +28779,8 @@ namespace ts {
                 return resolveErrorCall(node);
             }
 
-            return resolveCall(node, signatures, candidatesOutArray, checkMode, SignatureFlags.None);
+            forEach(node.typeArguments, checkSourceElement);
+            return resolveCall(node, signatures, candidatesOutArray, checkMode, SignatureFlags.None, node.typeArguments);
         }
 
         /**
@@ -34978,7 +34993,10 @@ namespace ts {
          * then `noIterationTypes` is returned. Otherwise, an `IterationTypes` record is returned
          * for the combined iteration types.
          */
-        function combineIterationTypes(array: (IterationTypes | undefined)[]) {
+        function combineIterationTypes(
+            array: (IterationTypes | undefined)[],
+            combineMethod: (types: readonly Type[]) => Type = getUnionType
+        ) {
             let yieldTypes: Type[] | undefined;
             let returnTypes: Type[] | undefined;
             let nextTypes: Type[] | undefined;
@@ -34995,8 +35013,8 @@ namespace ts {
             }
             if (yieldTypes || returnTypes || nextTypes) {
                 return createIterationTypes(
-                    yieldTypes && getUnionType(yieldTypes),
-                    returnTypes && getUnionType(returnTypes),
+                    yieldTypes && combineMethod(yieldTypes),
+                    returnTypes && combineMethod(returnTypes),
                     nextTypes && getIntersectionType(nextTypes));
             }
             return noIterationTypes;
@@ -35030,50 +35048,143 @@ namespace ts {
          *
          * For a **for-await-of** statement or a `yield*` in an async generator we will look for
          * the `[Symbol.asyncIterator]()` method first, and then the `[Symbol.iterator]()` method.
+         *
+         * When we get an intersection `type` we intersect all asyncIteratorTypes if applicable, otherwise we intersect all iteratorTypes. This differs from the equivalent `[Symbol.iteration]()` call since it doesn't just grab
+         * the first return value from the first candidate, but its results make more sense for iterableTypes.
+         * We also pass the intersection type as the implicitThisType for each constituent type.
+         *
+         * When we get a union `type` we iterate through all unioned types and construct a union of all results.
+         * We don't pass an implicitThisType for unions because we want to evaluate each constituent type as it
+         * would be evaluated if it were not in the union.
+         * e.g.
+         * for (const x of {} as { [Symbol.iterator]<T>(this: T): Generator<keyof T> } & ({ a: 1 } | { b: 2 }))
+         * should get you (<{ a: 1 }>() => Generator<"a">) | (<{ b: 2 }>() => Generator<"b">)
+         * and then we should grab the return types and union them: "a" | "b"
+         * This gives a different result from calling the above object with `[Symbol.iterator]()`,
+         * but its result make more sense for iterableTypes.
+         *
+         * We only get/set from our caches when `type === implicitThisType`.
+         * Intersection/Union caches are set in this function, the base caches are set in `getIterationTypesOfIterableSlow`.
          */
-        function getIterationTypesOfIterable(type: Type, use: IterationUse, errorNode: Node | undefined) {
+        function getIterationTypesOfIterable(
+            type: Type,
+            use: IterationUse,
+            errorNode?: Node,
+            implicitThisType = type,
+            reportNotIterableError = true,
+        ): IterationTypes | undefined {
             if (isTypeAny(type)) {
                 return anyIterationTypes;
             }
 
-            if (!(type.flags & TypeFlags.Union)) {
-                const iterationTypes = getIterationTypesOfIterableWorker(type, use, errorNode);
-                if (iterationTypes === noIterationTypes) {
-                    if (errorNode) {
-                        reportTypeNotIterableError(errorNode, type, !!(use & IterationUse.AllowsAsyncIterablesFlag));
+            const cacheKey = use & IterationUse.AllowsAsyncIterablesFlag
+                ? "iterationTypesOfAsyncIterable"
+                : "iterationTypesOfIterable";
+
+            let shouldCache = type === implicitThisType;
+
+            // For Union/Intersection types, we only use iterationTypesOfAsyncIterable/iterationTypesOfIterable
+            let iterationTypes = shouldCache && type.flags & TypeFlags.UnionOrIntersection ? getCachedIterationTypes(type, cacheKey) : undefined;
+
+            if (!iterationTypes) {
+                if (type.flags & TypeFlags.Intersection) {
+                    let allIterationTypes: IterationTypes[] | undefined;
+                    let optimizedUse = use;
+                    let optimizedCacheKey: typeof cacheKey = cacheKey;
+
+                    if ((optimizedUse & IterationUse.AllowsSyncOrAsyncIterablesFlag) === IterationUse.AllowsSyncOrAsyncIterablesFlag) {
+                        optimizedUse ^= IterationUse.AllowsSyncIterablesFlag;
+                        for (const constituent of (type as IntersectionType).types) {
+                            allIterationTypes = append(allIterationTypes, getIterationTypesOfIterable(constituent, optimizedUse, errorNode, implicitThisType, /*reportNotIterableError*/ false));
+
+                            // If a given constituent was cached downstream, it's okay to cache too. (even noIterationTypes)
+                            shouldCache &&= hasProperty(constituent, "iterationTypesOfAsyncIterable");
+                        }
+                        optimizedUse = use ^ IterationUse.AllowsAsyncIterablesFlag;
+                        optimizedCacheKey = "iterationTypesOfIterable";
                     }
-                    return undefined;
+
+                    if (allIterationTypes === undefined) {
+                        for (const constituent of (type as IntersectionType).types) {
+                            allIterationTypes = append(allIterationTypes, getIterationTypesOfIterable(constituent, optimizedUse, errorNode, implicitThisType, /*reportNotIterableError*/ false));
+
+                            // If a given constituent was cached downstream, it's okay to cache too. (even noIterationTypes)
+                            shouldCache &&= hasProperty(constituent, optimizedCacheKey);
+                        }
+                    }
+
+                    iterationTypes = allIterationTypes ? combineIterationTypes(allIterationTypes, getIntersectionType) : noIterationTypes;
+                    if (shouldCache) setCachedIterationTypes(type, cacheKey, iterationTypes);
                 }
-                return iterationTypes;
-            }
+                else if (type.flags & TypeFlags.Union) {
+                    let allIterationTypes: IterationTypes[] | undefined;
 
-            const cacheKey = use & IterationUse.AllowsAsyncIterablesFlag ? "iterationTypesOfAsyncIterable" : "iterationTypesOfIterable";
-            const cachedTypes = getCachedIterationTypes(type, cacheKey);
-            if (cachedTypes) return cachedTypes === noIterationTypes ? undefined : cachedTypes;
+                    for (const constituent of (type as UnionType).types) {
+                        const iterationTypes = getIterationTypesOfIterable(constituent, use, errorNode, constituent, /*reportNotIterableError*/ false);
+                        if (iterationTypes === undefined) {
+                            allIterationTypes = undefined;
+                            break;
+                        }
+                        else {
+                            allIterationTypes = append(allIterationTypes, iterationTypes);
 
-            let allIterationTypes: IterationTypes[] | undefined;
-            for (const constituent of (type as UnionType).types) {
-                const iterationTypes = getIterationTypesOfIterableWorker(constituent, use, errorNode);
-                if (iterationTypes === noIterationTypes) {
-                    if (errorNode) {
-                        reportTypeNotIterableError(errorNode, type, !!(use & IterationUse.AllowsAsyncIterablesFlag));
+                            // If a given constituent was cached downstream, it's okay to cache too. (even noIterationTypes)
+                            shouldCache &&= hasProperty(constituent, cacheKey);
+                        }
                     }
-                    setCachedIterationTypes(type, cacheKey, noIterationTypes);
-                    return undefined;
+
+                    iterationTypes = allIterationTypes ? combineIterationTypes(allIterationTypes, getUnionType) : noIterationTypes;
+                    if (shouldCache) setCachedIterationTypes(type, cacheKey, iterationTypes);
                 }
                 else {
-                    allIterationTypes = append(allIterationTypes, iterationTypes);
+                    if (use & IterationUse.AllowsAsyncIterablesFlag) {
+                        iterationTypes = getIterationTypesOfIterableBase(type, asyncIterationTypesResolver, errorNode, implicitThisType, shouldCache);
+
+                        if (iterationTypes === noIterationTypes && (use & IterationUse.AllowsSyncIterablesFlag)) {
+                            if (shouldCache &&= hasProperty(type, "iterationTypesOfAsyncIterable")) {
+                                iterationTypes = getCachedIterationTypes(type, "iterationTypesOfAsyncedSyncIterable");
+                            }
+
+                            if (!iterationTypes) {
+                                iterationTypes = getAsyncFromSyncIterationTypes(
+                                    getIterationTypesOfIterableBase(
+                                        type,
+                                        syncIterationTypesResolver,
+                                        errorNode,
+                                        implicitThisType,
+                                        shouldCache
+                                    ),
+                                    errorNode
+                                );
+
+                                // Only cache iterationTypes if "iterationTypesOfIterable" was cached by `getIterationTypesOfIterableSlow`
+                                if (shouldCache &&= hasProperty(type, "iterationTypesOfIterable")) {
+                                    setCachedIterationTypes(type, "iterationTypesOfAsyncedSyncIterable", iterationTypes);
+                                }
+                            }
+                        }
+                    }
+                    else if (use & IterationUse.AllowsSyncIterablesFlag) {
+                        iterationTypes = getIterationTypesOfIterableBase(type, syncIterationTypesResolver, errorNode, implicitThisType, shouldCache);
+                    }
+                    else {
+                        iterationTypes = noIterationTypes;
+                    }
                 }
             }
 
-            const iterationTypes = allIterationTypes ? combineIterationTypes(allIterationTypes) : noIterationTypes;
-            setCachedIterationTypes(type, cacheKey, iterationTypes);
-            return iterationTypes === noIterationTypes ? undefined : iterationTypes;
+            if (iterationTypes === noIterationTypes) {
+                if (shouldCache && hasProperty(type, cacheKey) && reportNotIterableError && errorNode) {
+                    reportTypeNotIterableError(errorNode, type, !!(use & IterationUse.AllowsAsyncIterablesFlag));
+                }
+                return undefined;
+            }
+
+            return iterationTypes;
         }
 
         function getAsyncFromSyncIterationTypes(iterationTypes: IterationTypes, errorNode: Node | undefined) {
-            if (iterationTypes === noIterationTypes) return noIterationTypes;
-            if (iterationTypes === anyIterationTypes) return anyIterationTypes;
+            if (iterationTypes === noIterationTypes || iterationTypes === anyIterationTypes) return iterationTypes;
             const { yieldType, returnType, nextType } = iterationTypes;
             return createIterationTypes(
                 getAwaitedType(yieldType, errorNode) || anyType,
@@ -35081,69 +35192,16 @@ namespace ts {
                 nextType);
         }
 
-        /**
-         * Gets the *yield*, *return*, and *next* types from a non-union type.
-         *
-         * If we are unable to find the *yield*, *return*, and *next* types, `noIterationTypes` is
-         * returned to indicate to the caller that it should report an error. Otherwise, an
-         * `IterationTypes` record is returned.
-         *
-         * NOTE: You probably don't want to call this directly and should be calling
-         * `getIterationTypesOfIterable` instead.
-         */
-        function getIterationTypesOfIterableWorker(type: Type, use: IterationUse, errorNode: Node | undefined) {
-            if (isTypeAny(type)) {
-                return anyIterationTypes;
-            }
-
-            if (use & IterationUse.AllowsAsyncIterablesFlag) {
-                const iterationTypes =
-                    getIterationTypesOfIterableCached(type, asyncIterationTypesResolver) ||
-                    getIterationTypesOfIterableFast(type, asyncIterationTypesResolver);
-                if (iterationTypes) {
-                    return iterationTypes;
-                }
-            }
-
-            if (use & IterationUse.AllowsSyncIterablesFlag) {
-                const iterationTypes =
-                    getIterationTypesOfIterableCached(type, syncIterationTypesResolver) ||
-                    getIterationTypesOfIterableFast(type, syncIterationTypesResolver);
-                if (iterationTypes) {
-                    if (use & IterationUse.AllowsAsyncIterablesFlag) {
-                        // for a sync iterable in an async context, only use the cached types if they are valid.
-                        if (iterationTypes !== noIterationTypes) {
-                            return setCachedIterationTypes(type, "iterationTypesOfAsyncIterable", getAsyncFromSyncIterationTypes(iterationTypes, errorNode));
-                        }
-                    }
-                    else {
-                        return iterationTypes;
-                    }
-                }
-            }
-
-            if (use & IterationUse.AllowsAsyncIterablesFlag) {
-                const iterationTypes = getIterationTypesOfIterableSlow(type, asyncIterationTypesResolver, errorNode);
-                if (iterationTypes !== noIterationTypes) {
-                    return iterationTypes;
-                }
-            }
-
-            if (use & IterationUse.AllowsSyncIterablesFlag) {
-                const iterationTypes = getIterationTypesOfIterableSlow(type, syncIterationTypesResolver, errorNode);
-                if (iterationTypes !== noIterationTypes) {
-                    if (use & IterationUse.AllowsAsyncIterablesFlag) {
-                        return setCachedIterationTypes(type, "iterationTypesOfAsyncIterable", iterationTypes
-                            ? getAsyncFromSyncIterationTypes(iterationTypes, errorNode)
-                            : noIterationTypes);
-                    }
-                    else {
-                        return iterationTypes;
-                    }
-                }
-            }
-
-            return noIterationTypes;
+        function getIterationTypesOfIterableBase(
+            type: Type,
+            resolver: IterationTypesResolver,
+            errorNode: Node | undefined,
+            implicitThisType: Type,
+            shouldCache: boolean,
+        ) {
+            return shouldCache && getIterationTypesOfIterableCached(type, resolver) ||
+                getIterationTypesOfIterableFast(type, resolver) ||
+                getIterationTypesOfIterableSlow(type, resolver, errorNode, implicitThisType);
         }
 
         /**
@@ -35212,7 +35270,12 @@ namespace ts {
          * NOTE: You probably don't want to call this directly and should be calling
          * `getIterationTypesOfIterable` instead.
          */
-        function getIterationTypesOfIterableSlow(type: Type, resolver: IterationTypesResolver, errorNode: Node | undefined) {
+        function getIterationTypesOfIterableSlow(
+            type: Type,
+            resolver: IterationTypesResolver,
+            errorNode: Node | undefined,
+            implicitThisType = type,
+        ) {
             const method = getPropertyOfType(type, getPropertyNameForKnownSymbolName(resolver.iteratorSymbolName));
             const methodType = method && !(method.flags & SymbolFlags.Optional) ? getTypeOfSymbol(method) : undefined;
             if (isTypeAny(methodType)) {
@@ -35220,13 +35283,24 @@ namespace ts {
             }
 
             const signatures = methodType ? getSignaturesOfType(methodType, SignatureKind.Call) : undefined;
+
             if (!some(signatures)) {
                 return setCachedIterationTypes(type, resolver.iterableCacheKey, noIterationTypes);
             }
 
-            const iteratorType = getIntersectionType(map(signatures, getReturnTypeOfSignature));
-            const iterationTypes = getIterationTypesOfIterator(iteratorType, resolver, errorNode) ?? noIterationTypes;
-            return setCachedIterationTypes(type, resolver.iterableCacheKey, iterationTypes);
+            const resolvedSignature = resolveCall(errorNode, signatures, /*candidatesOutArray*/ undefined, CheckMode.Normal, SignatureFlags.None, /*typeArguments*/ undefined, /*fallbackError*/ undefined, implicitThisType);
+
+            if (resolvedSignature === anySignature) {
+                // Don't cache this because this signals an error from resolveCall
+                return anyIterationTypes;
+            }
+
+            const iterationTypes = getIterationTypesOfIterator(getReturnTypeOfSignature(resolvedSignature), resolver, errorNode) || noIterationTypes;
+            const implicitEquals = type === implicitThisType;
+
+            return every(signatures, signature => (implicitEquals || !signature.thisParameter || getTypeOfSymbol(signature.thisParameter) === voidType) && !signature.parameters.length)
+                ? setCachedIterationTypes(type, resolver.iterableCacheKey, iterationTypes)
+                : iterationTypes;
         }
 
         function reportTypeNotIterableError(errorNode: Node, type: Type, allowAsyncIterables: boolean): void {
