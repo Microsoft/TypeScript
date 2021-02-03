@@ -13352,7 +13352,7 @@ namespace ts {
                             }
                         }
                         count++;
-                        if (isTypeRelatedTo(source, target, strictSubtypeRelation) && (
+                        if (isTypeSubtypeOf(source, target) && (!isTypeSubtypeOf(target, source) || isTypeRelatedTo(source, target, strictSubtypeRelation)) && (
                             !(getObjectFlags(getTargetType(source)) & ObjectFlags.Class) ||
                             !(getObjectFlags(getTargetType(target)) & ObjectFlags.Class) ||
                             isTypeDerivedFrom(source, target))) {
@@ -16504,6 +16504,11 @@ namespace ts {
                 isTypeAny(getReturnTypeOfSignature(s));
         }
 
+        function isStrictSignature(sig: Signature) {
+            const kind = sig.declaration ? sig.declaration.kind : SyntaxKind.Unknown;
+            return kind !== SyntaxKind.MethodDeclaration && kind !== SyntaxKind.MethodSignature && kind !== SyntaxKind.Constructor;
+        }
+
         /**
          * See signatureRelatedTo, compareSignaturesIdentical
          */
@@ -16547,9 +16552,7 @@ namespace ts {
                 return Ternary.False;
             }
 
-            const kind = target.declaration ? target.declaration.kind : SyntaxKind.Unknown;
-            const strictVariance = !(checkMode & SignatureCheckMode.Callback) && strictFunctionTypes && kind !== SyntaxKind.MethodDeclaration &&
-                kind !== SyntaxKind.MethodSignature && kind !== SyntaxKind.Constructor;
+            const strictVariance = !(checkMode & SignatureCheckMode.Callback) && (checkMode & SignatureCheckMode.StrictArity || strictFunctionTypes && isStrictSignature(target));
             let result = Ternary.True;
 
             const sourceThisType = getThisTypeOfSignature(source);
