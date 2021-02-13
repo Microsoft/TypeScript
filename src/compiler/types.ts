@@ -2433,7 +2433,6 @@ namespace ts {
         readonly name: Identifier;
     }
 
-    /* @internal */
     export interface ImportMetaProperty extends MetaProperty {
         readonly keywordToken: SyntaxKind.ImportKeyword;
         readonly name: Identifier & { readonly escapedText: __String & "meta" };
@@ -7330,6 +7329,7 @@ namespace ts {
         createVoidZero(): VoidExpression;
         createExportDefault(expression: Expression): ExportAssignment;
         createExternalModuleExport(exportName: Identifier): ExportDeclaration;
+        createImportCall(argumentsList: readonly Expression[]): ImportCall;
 
         /* @internal */ createTypeCheck(value: Expression, tag: TypeOfTag): Expression;
         /* @internal */ createMethodCall(object: Expression, methodName: string | Identifier, argumentsList: readonly Expression[]): CallExpression;

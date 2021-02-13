@@ -1302,6 +1302,12 @@ declare namespace ts {
         readonly keywordToken: SyntaxKind.NewKeyword | SyntaxKind.ImportKeyword;
         readonly name: Identifier;
     }
+    export interface ImportMetaProperty extends MetaProperty {
+        readonly keywordToken: SyntaxKind.ImportKeyword;
+        readonly name: Identifier & {
+            readonly escapedText: __String & "meta";
+        };
+    }
     export interface JsxElement extends PrimaryExpression {
         readonly kind: SyntaxKind.JsxElement;
         readonly openingElement: JsxOpeningElement;
@@ -3588,6 +3594,7 @@ declare namespace ts {
         createVoidZero(): VoidExpression;
         createExportDefault(expression: Expression): ExportAssignment;
         createExternalModuleExport(exportName: Identifier): ExportDeclaration;
+        createImportCall(argumentsList: readonly Expression[]): ImportCall;
         restoreOuterExpressions(outerExpression: Expression | undefined, innerExpression: Expression, kinds?: OuterExpressionKinds): Expression;
     }
     export interface CoreTransformationContext {
@@ -4418,11 +4425,13 @@ declare namespace ts {
     function isAsExpression(node: Node): node is AsExpression;
     function isNonNullExpression(node: Node): node is NonNullExpression;
     function isMetaProperty(node: Node): node is MetaProperty;
+    function isImportMeta(n: Node): n is ImportMetaProperty;
     function isSyntheticExpression(node: Node): node is SyntheticExpression;
     function isPartiallyEmittedExpression(node: Node): node is PartiallyEmittedExpression;
     function isCommaListExpression(node: Node): node is CommaListExpression;
     function isTemplateSpan(node: Node): node is TemplateSpan;
     function isSemicolonClassElement(node: Node): node is SemicolonClassElement;
+    function isImportCall(n: Node): n is ImportCall;
     function isBlock(node: Node): node is Block;
     function isVariableStatement(node: Node): node is VariableStatement;
     function isEmptyStatement(node: Node): node is EmptyStatement;
