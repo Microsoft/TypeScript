@@ -140,7 +140,7 @@ namespace ts {
      * @param host The emit host object used to interact with the file system.
      * @param options Compiler options to surface in the `TransformationContext`.
      * @param nodes An array of nodes to transform.
-     * @param transforms An array of `TransformerFactory` callbacks.
+     * @param transformers An array of `TransformerFactory` callbacks.
      * @param allowDtsFiles A value indicating whether to allow the transformation of .d.ts files.
      */
     export function transformNodes<T extends Node>(resolver: EmitResolver | undefined, host: EmitHost | undefined, factory: NodeFactory, options: CompilerOptions, nodes: readonly T[], transformers: readonly TransformerFactory<T>[], allowDtsFiles: boolean): TransformationResult<T> {
@@ -155,7 +155,7 @@ namespace ts {
         let lexicalEnvironmentFlagsStack: LexicalEnvironmentFlags[] = [];
         let lexicalEnvironmentStackOffset = 0;
         let lexicalEnvironmentSuspended = false;
-        let emitHelpers: EmitHelper[] | undefined;
+        let emitHelperRequests: EmitHelperRequest[] | undefined;
         let onSubstituteNode: TransformationContext["onSubstituteNode"] = noEmitSubstitution;
         let onEmitNode: TransformationContext["onEmitNode"] = noEmitNotification;
         let state = TransformationState.Uninitialized;
@@ -180,6 +180,7 @@ namespace ts {
             addInitializationStatement,
             requestEmitHelper,
             readEmitHelpers,
+            readEmitHelperRequests,
             enableSubstitution,
             enableEmitNotification,
             isSubstitutionEnabled,
@@ -469,23 +470,31 @@ namespace ts {
             return lexicalEnvironmentFlags;
         }
 
-        function requestEmitHelper(helper: EmitHelper): void {
+        function requestEmitHelper(helper: EmitHelper, directlyUsed = true): void {
             Debug.assert(state > TransformationState.Uninitialized, "Cannot modify the transformation context during initialization.");
             Debug.assert(state < TransformationState.Completed, "Cannot modify the transformation context after transformation has completed.");
             Debug.assert(!helper.scoped, "Cannot request a scoped emit helper.");
             if (helper.dependencies) {
                 for (const h of helper.dependencies) {
-                    requestEmitHelper(h);
+                    requestEmitHelper(h, /*directlyUsed*/ false);
                 }
             }
-            emitHelpers = append(emitHelpers, helper);
+            emitHelperRequests = append(emitHelperRequests, { helper, directlyUsed });
+        }
+
+        function readEmitHelperRequests(): EmitHelperRequest[] | undefined {
+            Debug.assert(state > TransformationState.Uninitialized, "Cannot modify the transformation context during initialization.");
+            Debug.assert(state < TransformationState.Completed, "Cannot modify the transformation context after transformation has completed.");
+            const helperRequests = emitHelperRequests;
+            emitHelperRequests = undefined;
+            return helperRequests;
         }
 
         function readEmitHelpers(): EmitHelper[] | undefined {
             Debug.assert(state > TransformationState.Uninitialized, "Cannot modify the transformation context during initialization.");
             Debug.assert(state < TransformationState.Completed, "Cannot modify the transformation context after transformation has completed.");
-            const helpers = emitHelpers;
-            emitHelpers = undefined;
+            const helpers = emitHelperRequests?.map(({helper}) => helper);
+            emitHelperRequests = undefined;
             return helpers;
         }
 
@@ -503,7 +512,7 @@ namespace ts {
                 lexicalEnvironmentFunctionDeclarationsStack = undefined!;
                 onSubstituteNode = undefined!;
                 onEmitNode = undefined!;
-                emitHelpers = undefined;
+                emitHelperRequests = undefined;
 
                 // Prevent further use of the transformation result.
                 state = TransformationState.Disposed;
@@ -530,6 +539,7 @@ namespace ts {
         onEmitNode: noop,
         onSubstituteNode: notImplemented,
         readEmitHelpers: notImplemented,
+        readEmitHelperRequests: notImplemented,
         requestEmitHelper: noop,
         resumeLexicalEnvironment: noop,
         startLexicalEnvironment: noop,

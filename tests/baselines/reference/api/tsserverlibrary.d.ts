@@ -1872,7 +1872,7 @@ declare namespace ts {
         Label = 12,
         Condition = 96
     }
-    export type FlowNode = FlowStart | FlowLabel | FlowAssignment | FlowCall | FlowCondition | FlowSwitchClause | FlowArrayMutation | FlowCall | FlowReduceLabel;
+    export type FlowNode = FlowStart | FlowLabel | FlowAssignment | FlowCondition | FlowSwitchClause | FlowArrayMutation | FlowCall | FlowReduceLabel;
     export interface FlowNodeBase {
         flags: FlowFlags;
         id?: number;
@@ -4332,7 +4332,7 @@ declare namespace ts {
     /**
      * Gets the EmitHelpers of a node.
      */
-    function getEmitHelpers(node: Node): EmitHelper[] | undefined;
+    function getEmitHelpers(node: Node, directlyUsedOnly?: boolean): EmitHelper[] | undefined;
     /**
      * Moves matching emit helpers from a source node to a target node.
      */

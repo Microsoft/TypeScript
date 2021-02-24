@@ -3291,7 +3291,6 @@ namespace ts {
         | FlowStart
         | FlowLabel
         | FlowAssignment
-        | FlowCall
         | FlowCondition
         | FlowSwitchClause
         | FlowArrayMutation
@@ -6531,7 +6530,7 @@ namespace ts {
         constantValue?: string | number;         // The constant value of an expression
         externalHelpersModuleName?: Identifier;  // The local name for an imported helpers module
         externalHelpers?: boolean;
-        helpers?: EmitHelper[];                  // Emit helpers for the node
+        helperRequests?: EmitHelperRequest[];    // Emit helper requests for the node
         startsOnNewLine?: boolean;               // If the node should begin on a new line
     }
 
@@ -6576,6 +6575,12 @@ namespace ts {
         readonly text: string | ((node: EmitHelperUniqueNameCallback) => string);  // ES3-compatible raw script text, or a function yielding such a string
         readonly priority?: number;                                     // Helpers with a higher priority are emitted earlier than other helpers on the node.
         readonly dependencies?: EmitHelper[]
+    }
+
+    /*@internal*/
+    export interface EmitHelperRequest {
+        readonly helper: EmitHelper;
+        readonly directlyUsed: boolean;
     }
 
     export interface UnscopedEmitHelper extends EmitHelper {
@@ -7501,6 +7506,8 @@ namespace ts {
         /*@internal*/ getEmitResolver(): EmitResolver;
         /*@internal*/ getEmitHost(): EmitHost;
         /*@internal*/ getEmitHelperFactory(): EmitHelperFactory;
+
+        /*@internal*/ readEmitHelperRequests(): EmitHelperRequest[] | undefined;
 
         /** Records a request for a non-scoped emit helper in the current context. */
         requestEmitHelper(helper: EmitHelper): void;
