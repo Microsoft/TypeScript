@@ -1,0 +1,146 @@
+=== tests/cases/conformance/expressions/typeGuards/typeGuardTypeOfUndefined2.ts ===
+function test1(a: { b: number } | { b: null }) {
+>test1 : (a: {    b: number;} | {    b: null;}) => void
+>a : { b: number; } | { b: null; }
+>b : number
+>b : null
+>null : null
+
+    if (typeof a.b === "undefined") {
+>typeof a.b === "undefined" : boolean
+>typeof a.b : "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function"
+>a.b : number | null
+>a : { b: number; } | { b: null; }
+>b : number | null
+>"undefined" : "undefined"
+
+        a; // never
+>a : never
+    }
+    else {
+        a; // { b: number } | { b: null }
+>a : { b: number; } | { b: null; }
+    }
+  }
+  
+  function test2(a: { b: number } | { b: null }) {
+>test2 : (a: {    b: number;} | {    b: null;}) => void
+>a : { b: number; } | { b: null; }
+>b : number
+>b : null
+>null : null
+
+    if (typeof a.b !== "undefined") {
+>typeof a.b !== "undefined" : boolean
+>typeof a.b : "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function"
+>a.b : number | null
+>a : { b: number; } | { b: null; }
+>b : number | null
+>"undefined" : "undefined"
+
+        a; // { b: number } | { b: null }
+>a : { b: number; } | { b: null; }
+    }
+    else {
+        a; // never
+>a : never
+    }
+  }
+  
+  function test3(a: { b: number } | { b: undefined }) {
+>test3 : (a: {    b: number;} | {    b: undefined;}) => void
+>a : { b: number; } | { b: undefined; }
+>b : number
+>b : undefined
+
+    if (typeof a?.b === "undefined") {
+>typeof a?.b === "undefined" : boolean
+>typeof a?.b : "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function"
+>a?.b : number | undefined
+>a : { b: number; } | { b: undefined; }
+>b : number | undefined
+>"undefined" : "undefined"
+
+      a; // { b: undefined }
+>a : { b: undefined; }
+    }
+    else {
+      a; // { b: number }
+>a : { b: number; }
+    }
+  }
+  
+  function test4(a?: { b: number } | { b: undefined }) {
+>test4 : (a?: { b: number; } | { b: undefined; } | undefined) => void
+>a : { b: number; } | { b: undefined; } | undefined
+>b : number
+>b : undefined
+
+    if (typeof a?.b === "undefined") {
+>typeof a?.b === "undefined" : boolean
+>typeof a?.b : "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function"
+>a?.b : number | undefined
+>a : { b: number; } | { b: undefined; } | undefined
+>b : number | undefined
+>"undefined" : "undefined"
+
+      a; // { b: undefined } | undefined
+>a : { b: undefined; } | undefined
+    }
+    else {
+      a; // { b: number }
+>a : { b: number; }
+    }
+  }
+  
+  function test5(a?: { b: number } | { b: undefined } | { b: null } | null) {
+>test5 : (a?: { b: number; } | { b: undefined; } | { b: null; } | null | undefined) => void
+>a : { b: number; } | { b: undefined; } | { b: null; } | null | undefined
+>b : number
+>b : undefined
+>b : null
+>null : null
+>null : null
+
+    if (typeof a?.b === "undefined") {
+>typeof a?.b === "undefined" : boolean
+>typeof a?.b : "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function"
+>a?.b : number | null | undefined
+>a : { b: number; } | { b: undefined; } | { b: null; } | null | undefined
+>b : number | null | undefined
+>"undefined" : "undefined"
+
+      a; // { b: undefined } | null | undefined
+>a : { b: undefined; } | null | undefined
+    }
+    else {
+      a; // { b: number } | { b: null }
+>a : { b: number; } | { b: null; }
+    }
+  }
+  
+  function test6(a?: { b: number } | { b: undefined } | { b: null } | null) {
+>test6 : (a?: { b: number; } | { b: undefined; } | { b: null; } | null | undefined) => void
+>a : { b: number; } | { b: undefined; } | { b: null; } | null | undefined
+>b : number
+>b : undefined
+>b : null
+>null : null
+>null : null
+
+    if (typeof a?.b !== "undefined") {
+>typeof a?.b !== "undefined" : boolean
+>typeof a?.b : "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function"
+>a?.b : number | null | undefined
+>a : { b: number; } | { b: undefined; } | { b: null; } | null | undefined
+>b : number | null | undefined
+>"undefined" : "undefined"
+
+      a; // { b: number } | { b: null }
+>a : { b: number; } | { b: null; }
+    }
+    else {
+      a; // { b: undefined } | null | undefined
+>a : { b: undefined; } | null | undefined
+    }
+  }
