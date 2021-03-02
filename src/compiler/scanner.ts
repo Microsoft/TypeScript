@@ -1748,6 +1748,9 @@ namespace ts {
                     case CharacterCodes.slash:
                         // Single-line comment
                         if (text.charCodeAt(pos + 1) === CharacterCodes.slash) {
+                            if (text.charCodeAt(pos + 2) === CharacterCodes.slash) {
+                                tokenFlags |= TokenFlags.PrecedingJSDocComment;
+                            }
                             pos += 2;
 
                             while (pos < end) {
@@ -1773,10 +1776,10 @@ namespace ts {
                         }
                         // Multi-line comment
                         if (text.charCodeAt(pos + 1) === CharacterCodes.asterisk) {
-                            pos += 2;
-                            if (text.charCodeAt(pos) === CharacterCodes.asterisk && text.charCodeAt(pos + 1) !== CharacterCodes.slash) {
+                            if (text.charCodeAt(pos + 2) === CharacterCodes.asterisk && text.charCodeAt(pos + 3) !== CharacterCodes.slash) {
                                 tokenFlags |= TokenFlags.PrecedingJSDocComment;
                             }
+                            pos += 2;
 
                             let commentClosed = false;
                             let lastLineStart = tokenPos;
