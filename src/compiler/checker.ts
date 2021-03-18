@@ -61,7 +61,8 @@ namespace ts {
         GeneratorYield,
     }
 
-    const enum TypeFacts {
+    /** @internal */
+    export const enum TypeFacts {
         None = 0,
         TypeofEQString = 1 << 0,      // typeof x === "string"
         TypeofEQNumber = 1 << 1,      // typeof x === "number"
@@ -74,7 +75,7 @@ namespace ts {
         TypeofNEString = 1 << 8,      // typeof x !== "string"
         TypeofNENumber = 1 << 9,      // typeof x !== "number"
         TypeofNEBigInt = 1 << 10,     // typeof x !== "bigint"
-        TypeofNEBoolean = 1 << 11,     // typeof x !== "boolean"
+        TypeofNEBoolean = 1 << 11,    // typeof x !== "boolean"
         TypeofNESymbol = 1 << 12,     // typeof x !== "symbol"
         TypeofNEObject = 1 << 13,     // typeof x !== "object"
         TypeofNEFunction = 1 << 14,   // typeof x !== "function"
@@ -91,6 +92,7 @@ namespace ts {
         // The following members encode facts about particular kinds of types for use in the getTypeFacts function.
         // The presence of a particular fact means that the given test is true for some (and possibly all) values
         // of that kind of type.
+        NegativeTypeofFacts = TypeofNEString | TypeofNENumber | TypeofNEBigInt | TypeofNEBoolean | TypeofNESymbol | TypeofNEObject | TypeofNEFunction | TypeofNEHostObject,
         BaseStringStrictFacts = TypeofEQString | TypeofNENumber | TypeofNEBigInt | TypeofNEBoolean | TypeofNESymbol | TypeofNEObject | TypeofNEFunction | TypeofNEHostObject | NEUndefined | NENull | NEUndefinedOrNull,
         BaseStringFacts = BaseStringStrictFacts | EQUndefined | EQNull | EQUndefinedOrNull | Falsy,
         StringStrictFacts = BaseStringStrictFacts | Truthy | Falsy,
@@ -21721,10 +21723,17 @@ namespace ts {
             return declaredType;
         }
 
-        function getTypeFactsOfTypes(types: Type[]): TypeFacts {
+        function getTypeFactsOfTypes(types: Type[], isUnion: boolean): TypeFacts {
             let result: TypeFacts = TypeFacts.None;
             for (const t of types) {
                 result |= getTypeFacts(t);
+            }
+            if (!isUnion) {
+                // Get the set of positive facts for the intersection by masking with the negative set shifted left,
+                // then shift those present positive facts into the negative fact value range, and unset any of those
+                // bits (by negating that mask and then intersecting it with the original value)
+                const positiveFacts = result & (TypeFacts.NegativeTypeofFacts >> 8);
+                result &= ~(positiveFacts << 8);
             }
             return result;
         }
@@ -21801,7 +21810,7 @@ namespace ts {
                     strictNullChecks ? TypeFacts.NonEmptyStringStrictFacts : TypeFacts.NonEmptyStringFacts;
             }
             if (flags & TypeFlags.UnionOrIntersection) {
-                return getTypeFactsOfTypes((<UnionOrIntersectionType>type).types);
+                return getTypeFactsOfTypes((<UnionOrIntersectionType>type).types, !!(flags & TypeFlags.Union));
             }
             return TypeFacts.All;
         }
