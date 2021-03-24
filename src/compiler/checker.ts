@@ -1401,6 +1401,18 @@ namespace ts {
             }
         }
 
+        /**
+         * Attempts to return the `SymbolLinks` for `symbol`, if one already exists.
+         * Does not allocate a symbol id or a `SymbolLinks` if it doesn't already exists.
+         */
+        function tryGetSymbolLinks(symbol: Symbol): SymbolLinks | undefined {
+            if (symbol.flags & SymbolFlags.Transient) return <TransientSymbol>symbol;
+            return symbol.id ? symbolLinks[symbol.id] : undefined;
+        }
+
+        /**
+         * Gets or creates a `SymbolLinks` for `symbol`.
+         */
         function getSymbolLinks(symbol: Symbol): SymbolLinks {
             if (symbol.flags & SymbolFlags.Transient) return <TransientSymbol>symbol;
             const id = getSymbolId(symbol);
@@ -7972,11 +7984,11 @@ namespace ts {
         function hasType(target: TypeSystemEntity, propertyName: TypeSystemPropertyName): boolean {
             switch (propertyName) {
                 case TypeSystemPropertyName.Type:
-                    return !!getSymbolLinks(<Symbol>target).type;
+                    return !!tryGetSymbolLinks(<Symbol>target)?.type;
                 case TypeSystemPropertyName.EnumTagType:
                     return !!(getNodeLinks(target as JSDocEnumTag).resolvedEnumType);
                 case TypeSystemPropertyName.DeclaredType:
-                    return !!getSymbolLinks(<Symbol>target).declaredType;
+                    return !!tryGetSymbolLinks(<Symbol>target)?.declaredType;
                 case TypeSystemPropertyName.ResolvedBaseConstructorType:
                     return !!(<InterfaceType>target).resolvedBaseConstructorType;
                 case TypeSystemPropertyName.ResolvedReturnType:
@@ -8842,6 +8854,14 @@ namespace ts {
                 }
             }
             return links.type;
+        }
+
+        function isOptionalProperty(prop: Symbol) {
+            if (prop.flags & SymbolFlags.Optional) return true;
+            // We don't use `getTypeOfSymbol` here as we may be in the middle of resolving the type for `prop` and
+            // we shouldn't re-enter to check for `void`.
+            const type = tryGetSymbolLinks(prop)?.type;
+            return !!(type && forEachType(type, acceptsVoid));
         }
 
         function getTypeOfVariableOrParameterOrPropertyWorker(symbol: Symbol) {
@@ -18705,7 +18725,7 @@ namespace ts {
                     return Ternary.False;
                 }
                 // When checking for comparability, be more lenient with optional properties.
-                if (!skipOptional && sourceProp.flags & SymbolFlags.Optional && !(targetProp.flags & SymbolFlags.Optional)) {
+                if (!skipOptional && sourceProp.flags & SymbolFlags.Optional && !isOptionalProperty(targetProp)) {
                     // TypeScript 1.0 spec (April 2014): 3.8.3
                     // S is a subtype of a type T, and T is a supertype of S if ...
                     // S' and T are object types and, for each member M in T..
@@ -20552,7 +20572,7 @@ namespace ts {
                 if (isStaticPrivateIdentifierProperty(targetProp)) {
                     continue;
                 }
-                if (requireOptionalProperties || !(targetProp.flags & SymbolFlags.Optional || getCheckFlags(targetProp) & CheckFlags.Partial)) {
+                if (requireOptionalProperties || !((getCheckFlags(targetProp) & CheckFlags.Partial) || isOptionalProperty(targetProp))) {
                     const sourceProp = getPropertyOfType(source, targetProp.escapedName);
                     if (!sourceProp) {
                         yield targetProp;
