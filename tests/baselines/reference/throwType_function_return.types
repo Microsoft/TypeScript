@@ -1,0 +1,45 @@
+=== tests/cases/compiler/throwType_function_return.ts ===
+function checkedDivide<T extends number>(x: T): T extends 0 ? throw 'Cannot divided by 0' : number {
+>checkedDivide : <T extends number>(x: T) => T extends 0 ? throw 'Cannot divided by 0' : number
+>x : T
+
+    if (x === 0) throw new Error('')
+>x === 0 : boolean
+>x : T
+>0 : 0
+>new Error('') : Error
+>Error : ErrorConstructor
+>'' : ""
+
+    return 5 / x
+>5 / x : number
+>5 : 5
+>x : T
+}
+checkedDivide(0)
+>checkedDivide(0) : never
+>checkedDivide : <T extends number>(x: T) => T extends 0 ? never : number
+>0 : 0
+
+checkedDivide(1)
+>checkedDivide(1) : number
+>checkedDivide : <T extends number>(x: T) => T extends 0 ? never : number
+>1 : 1
+
+const theAnswerToEverything = <T>(x: T): T extends 42 ? T : throw "Wrong" => x
+>theAnswerToEverything : <T>(x: T) => T extends 42 ? T : never
+><T>(x: T): T extends 42 ? T : throw "Wrong" => x : <T>(x: T) => T extends 42 ? T : never
+>x : T
+>x : T
+
+theAnswerToEverything(42 as const)
+>theAnswerToEverything(42 as const) : 42
+>theAnswerToEverything : <T>(x: T) => T extends 42 ? T : never
+>42 as const : 42
+>42 : 42
+
+theAnswerToEverything('')
+>theAnswerToEverything('') : never
+>theAnswerToEverything : <T>(x: T) => T extends 42 ? T : never
+>'' : ""
+

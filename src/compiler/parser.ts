@@ -3563,6 +3563,7 @@ namespace ts {
                 case SyntaxKind.ReadonlyKeyword:
                 case SyntaxKind.SymbolKeyword:
                 case SyntaxKind.UniqueKeyword:
+                case SyntaxKind.ThrowKeyword:
                 case SyntaxKind.VoidKeyword:
                 case SyntaxKind.UndefinedKeyword:
                 case SyntaxKind.NullKeyword:
@@ -3645,7 +3646,7 @@ namespace ts {
             return type;
         }
 
-        function parseTypeOperator(operator: SyntaxKind.KeyOfKeyword | SyntaxKind.UniqueKeyword | SyntaxKind.ReadonlyKeyword) {
+        function parseTypeOperator(operator: SyntaxKind.KeyOfKeyword | SyntaxKind.UniqueKeyword | SyntaxKind.ReadonlyKeyword | SyntaxKind.ThrowKeyword) {
             const pos = getNodePos();
             parseExpected(operator);
             return finishNode(factory.createTypeOperatorNode(operator, parseTypeOperatorOrHigher()), pos);
@@ -3675,6 +3676,7 @@ namespace ts {
                 case SyntaxKind.KeyOfKeyword:
                 case SyntaxKind.UniqueKeyword:
                 case SyntaxKind.ReadonlyKeyword:
+                case SyntaxKind.ThrowKeyword:
                     return parseTypeOperator(operator);
                 case SyntaxKind.InferKeyword:
                     return parseInferType();

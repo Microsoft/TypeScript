@@ -3308,6 +3308,10 @@
         "category": "Error",
         "code": 2808
     },
+    "Type instantiated results in a throw type saying: {0}": {
+        "category": "Error",
+        "code": 2809
+    },
 
     "Import declaration '{0}' is using private name '{1}'.": {
         "category": "Error",

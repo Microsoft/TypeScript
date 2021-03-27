@@ -262,14 +262,16 @@ namespace ts {
         Uppercase,
         Lowercase,
         Capitalize,
-        Uncapitalize
+        Uncapitalize,
+        TypeToString
     }
 
     const intrinsicTypeKinds: ReadonlyESMap<string, IntrinsicTypeKind> = new Map(getEntries({
         Uppercase: IntrinsicTypeKind.Uppercase,
         Lowercase: IntrinsicTypeKind.Lowercase,
         Capitalize: IntrinsicTypeKind.Capitalize,
-        Uncapitalize: IntrinsicTypeKind.Uncapitalize
+        Uncapitalize: IntrinsicTypeKind.Uncapitalize,
+        TypeToString: IntrinsicTypeKind.TypeToString
     }));
 
     function SymbolLinks(this: SymbolLinks) {
@@ -1088,6 +1090,83 @@ namespace ts {
             return diagnostic;
         }
 
+        function checkThrowType(location: Node, type: Type) {
+            if (isThrowType(type)) errorByThrowType(location, type.value);
+        }
+        function errorByThrowType(location: Node, type: Type) {
+            if (isThrowType(type)) type = type.value;
+
+            let message = "";
+            const diagnostic = getDiagnosticFromThrowType(type);
+            if (diagnostic) {
+                const [base, ...args] = diagnostic;
+                message = formatMessage(/*_dummy*/0, base, ...map(args, getTypeNameForErrorDisplay));
+            }
+            else message = getMessageFromThrowType(type);
+
+            const category = getCategoryFromThrowType(type);
+            appendDiagnosticWithCategory(category, location, Diagnostics.Type_instantiated_results_in_a_throw_type_saying_Colon_0, "\n    " + message);
+        }
+        function isThrowType(type: Type): type is ThrowType {
+            return !!(type.flags & TypeFlags.ThrowType);
+        }
+
+        function getMessageFromThrowType(type: Type): string {
+            if (isThrowType(type)) type = type.value;
+            if (type.flags & TypeFlags.StringLiteral) return (<StringLiteralType>type).value;
+            const message = getTypeOfPropertyOfType(type, <__String>"message");
+            if (message) {
+                if (message.flags & TypeFlags.StringLiteral) return (<StringLiteralType>message).value;
+            }
+            return getTypeNameForErrorDisplay(type);
+        }
+        // function getTypeFromThrowType(type: Type): Type {
+        //     if (type.flags & TypeFlags.ThrowType) type = (<ThrowType>type).value;
+        //     return getTypeOfPropertyOfType(type, <__String>"type") || errorType;
+        // }
+        function getDiagnosticFromThrowType(type: Type): readonly [DiagnosticMessage, ...Type[]] | undefined {
+            if (isThrowType(type)) type = type.value;
+            const diag = getTypeOfPropertyOfType(type, <__String>"diagnostic");
+            if (!diag) return undefined;
+            const message = <StringLiteralType>getTupleElementType(diag, 0);
+            if (!message || !(message.flags & TypeFlags.StringLiteral)) return undefined;
+            if (!Diagnostics.hasOwnProperty(message.value)) return undefined;
+            // cause error() only accept 4 arguments at most.
+            return [
+                Diagnostics[message.value as keyof typeof Diagnostics],
+                getTupleElementType(diag, 1) || undefinedType,
+                getTupleElementType(diag, 2) || undefinedType,
+                getTupleElementType(diag, 3) || undefinedType,
+                getTupleElementType(diag, 4) || undefinedType,
+            ] as const;
+        }
+        function getCategoryFromThrowType(type: Type): DiagnosticCategory {
+            if (isThrowType(type)) type = type.value;
+            const category = <StringLiteralType>getTypeOfPropertyOfType(type, <__String>"category");
+            if (!category || !(category.flags & TypeFlags.StringLiteral)) return DiagnosticCategory.Error;
+            switch (category.value.toLowerCase()) {
+                case "error": return DiagnosticCategory.Error;
+                case "suggestion": return DiagnosticCategory.Suggestion;
+                case "warning": return DiagnosticCategory.Warning;
+                default: return DiagnosticCategory.Message;
+            }
+        }
+        // function getDeprecatedFromThrowType(type: Type): boolean {
+        //     if (type.flags & TypeFlags.ThrowType) type = (<ThrowType>type).value;
+        //     const dep = getTypeOfPropertyOfType(type, <__String>"deprecated");
+        //     return dep === trueType;
+        // }
+        // function getSuggestionFromThrowType(type: Type): string | undefined {
+        //     if (type.flags & TypeFlags.ThrowType) type = (<ThrowType>type).value;
+        //     const suggestion = <StringLiteralType>getTypeOfPropertyOfType(type, <__String>"suggestion");
+        //     if (!suggestion || !(suggestion.flags & TypeFlags.StringLiteral)) return undefined;
+        //     return suggestion.value;
+        // }
+        // function getMessageChainFromThrowType(type: Type): Type | undefined {
+        //     if (type.flags & TypeFlags.ThrowType) type = (<ThrowType>type).value;
+        //     return getTypeOfPropertyOfType(type, <__String>"next");
+        // }
+
         function addErrorOrSuggestion(isError: boolean, diagnostic: DiagnosticWithLocation) {
             if (isError) {
                 diagnostics.add(diagnostic);
@@ -1096,6 +1175,7 @@ namespace ts {
                 suggestionDiagnostics.add({ ...diagnostic, category: DiagnosticCategory.Suggestion });
             }
         }
+        /** @deprecated use appendDiagnosticWithCategory */
         function errorOrSuggestion(isError: boolean, location: Node, message: DiagnosticMessage | DiagnosticMessageChain, arg0?: string | number, arg1?: string | number, arg2?: string | number, arg3?: string | number): void {
              // Pseudo-synthesized input node
             if (location.pos < 0 || location.end < 0) {
@@ -1108,6 +1188,18 @@ namespace ts {
                 return;
             }
             addErrorOrSuggestion(isError, "message" in message ? createDiagnosticForNode(location, message, arg0, arg1, arg2, arg3) : createDiagnosticForNodeFromMessageChain(location, message)); // eslint-disable-line no-in-operator
+        }
+        function appendDiagnosticWithCategory(category: DiagnosticCategory | undefined, location: Node, message: DiagnosticMessage | DiagnosticMessageChain, arg0?: string | number, arg1?: string | number, arg2?: string | number, arg3?: string | number): void {
+            const diag = "message" in message ? createDiagnosticForNode(location, message, arg0, arg1, arg2, arg3) : createDiagnosticForNodeFromMessageChain(location, message);  // eslint-disable-line no-in-operator
+            diag.category = category ?? diag.category;
+            switch (category) {
+                case DiagnosticCategory.Error:
+                case DiagnosticCategory.Warning:
+                    return diagnostics.add(diag);
+                case DiagnosticCategory.Suggestion:
+                case DiagnosticCategory.Message:
+                    return suggestionDiagnostics.add(diag);
+            }
         }
 
         function errorAndMaybeSuggestAwait(
@@ -4734,6 +4826,9 @@ namespace ts {
                 }
                 if (type.flags & TypeFlags.Substitution) {
                     return typeToTypeNodeHelper((<SubstitutionType>type).baseType, context);
+                }
+                if (type.flags & TypeFlags.ThrowType) {
+                    return typeToTypeNodeHelper(neverType, context);
                 }
 
                 return Debug.fail("Should be unreachable.");
@@ -11726,11 +11821,14 @@ namespace ts {
                 return (<UnionType>type).resolvedReducedType || ((<UnionType>type).resolvedReducedType = getReducedUnionType(<UnionType>type));
             }
             else if (type.flags & TypeFlags.Intersection) {
-                if (!((<IntersectionType>type).objectFlags & ObjectFlags.IsNeverIntersectionComputed)) {
-                    (<IntersectionType>type).objectFlags |= ObjectFlags.IsNeverIntersectionComputed |
-                        (some(getPropertiesOfUnionOrIntersectionType(<IntersectionType>type), isNeverReducedProperty) ? ObjectFlags.IsNeverIntersection : 0);
+                const intersectionType = (<IntersectionType>type);
+                const innerThrowType = find(intersectionType.types, isThrowType);
+                if (innerThrowType) return innerThrowType;
+                if (!(intersectionType.objectFlags & ObjectFlags.IsNeverIntersectionComputed)) {
+                    intersectionType.objectFlags |= ObjectFlags.IsNeverIntersectionComputed |
+                        (some(getPropertiesOfUnionOrIntersectionType(intersectionType), isNeverReducedProperty) ? ObjectFlags.IsNeverIntersection : 0);
                 }
-                return (<IntersectionType>type).objectFlags & ObjectFlags.IsNeverIntersection ? neverType : type;
+                return intersectionType.objectFlags & ObjectFlags.IsNeverIntersection ? neverType : type;
             }
             return type;
         }
@@ -14219,6 +14317,9 @@ namespace ts {
                     case SyntaxKind.ReadonlyKeyword:
                         links.resolvedType = getTypeFromTypeNode(node.type);
                         break;
+                    case SyntaxKind.ThrowKeyword:
+                        links.resolvedType = createThrowType(getTypeFromTypeNode(node.type));
+                        break;
                     default:
                         throw Debug.assertNever(node.operator);
                 }
@@ -14309,18 +14410,21 @@ namespace ts {
         }
 
         function getStringMappingType(symbol: Symbol, type: Type): Type {
-            return type.flags & (TypeFlags.Union | TypeFlags.Never) ? mapType(type, t => getStringMappingType(symbol, t)) :
-                isGenericIndexType(type) ? getStringMappingTypeForGenericType(symbol, type) :
-                type.flags & TypeFlags.StringLiteral ? getLiteralType(applyStringMapping(symbol, (<StringLiteralType>type).value)) :
-                type;
+            if (type.flags & (TypeFlags.Union | TypeFlags.Never)) return mapType(type, t => getStringMappingType(symbol, t));
+            if (isGenericIndexType(type)) return getStringMappingTypeForGenericType(symbol, type);
+            const kind = intrinsicTypeKinds.get(symbol.escapedName as string);
+            if (kind === IntrinsicTypeKind.TypeToString || (type.flags & TypeFlags.StringLiteral)) return getLiteralType(applyStringMapping(kind, (<StringLiteralType>type)));
+            return type;
         }
 
-        function applyStringMapping(symbol: Symbol, str: string) {
-            switch (intrinsicTypeKinds.get(symbol.escapedName as string)) {
+        function applyStringMapping(kind: IntrinsicTypeKind | undefined, type: Type) {
+            const str = kind === IntrinsicTypeKind.TypeToString ? typeToString(type) : (<StringLiteralType>type).value;
+            switch (kind) {
                 case IntrinsicTypeKind.Uppercase: return str.toUpperCase();
                 case IntrinsicTypeKind.Lowercase: return str.toLowerCase();
                 case IntrinsicTypeKind.Capitalize: return str.charAt(0).toUpperCase() + str.slice(1);
                 case IntrinsicTypeKind.Uncapitalize: return str.charAt(0).toLowerCase() + str.slice(1);
+                case IntrinsicTypeKind.TypeToString: return str;
             }
             return str;
         }
@@ -15386,6 +15490,12 @@ namespace ts {
             return type;
         }
 
+        function createThrowType(containingType: Type) {
+            const type = <ThrowType>createType(TypeFlags.ThrowType);
+            type.value = containingType;
+            return type;
+        }
+
         function getESSymbolLikeTypeForNode(node: Node) {
             if (isValidESSymbolDeclaration(node)) {
                 const symbol = getSymbolOfNode(node);
@@ -16058,6 +16168,10 @@ namespace ts {
                     }
                     return sub;
                 }
+            }
+            if (isThrowType(type)) {
+                const errorMessage = instantiateType(type.value, mapper);
+                return createThrowType(errorMessage);
             }
             return type;
         }
@@ -18357,6 +18471,8 @@ namespace ts {
                         // Two conditional types 'T1 extends U1 ? X1 : Y1' and 'T2 extends U2 ? X2 : Y2' are related if
                         // one of T1 and T2 is related to the other, U1 and U2 are identical types, X1 is related to X2,
                         // and Y1 is related to Y2.
+                        // If at least one of X1 or X2 is throw type, they are considered related.
+                        // If at least one of Y1 or Y2 is throw type, they are considered related.
                         const sourceParams = (source as ConditionalType).root.inferTypeParameters;
                         let sourceExtends = (<ConditionalType>source).extendsType;
                         let mapper: TypeMapper | undefined;
@@ -18369,8 +18485,12 @@ namespace ts {
                         }
                         if (isTypeIdenticalTo(sourceExtends, (<ConditionalType>target).extendsType) &&
                             (isRelatedTo((<ConditionalType>source).checkType, (<ConditionalType>target).checkType) || isRelatedTo((<ConditionalType>target).checkType, (<ConditionalType>source).checkType))) {
-                            if (result = isRelatedTo(instantiateType(getTrueTypeFromConditionalType(<ConditionalType>source), mapper), getTrueTypeFromConditionalType(<ConditionalType>target), reportErrors)) {
-                                result &= isRelatedTo(getFalseTypeFromConditionalType(<ConditionalType>source), getFalseTypeFromConditionalType(<ConditionalType>target), reportErrors);
+                            const sourceTrueType = dropThrowTypeInConditionalType(instantiateType(getTrueTypeFromConditionalType(<ConditionalType>source), mapper));
+                            const targetTrueType = dropThrowTypeInConditionalType(getTrueTypeFromConditionalType(<ConditionalType>target));
+                            if (result = (sourceTrueType.flags | targetTrueType.flags) & TypeFlags.ThrowType ? Ternary.True : isRelatedTo(sourceTrueType, targetTrueType, reportErrors)) {
+                                const sourceFalseType = dropThrowTypeInConditionalType(getFalseTypeFromConditionalType(<ConditionalType>source));
+                                const targetFalseType = dropThrowTypeInConditionalType(getFalseTypeFromConditionalType(<ConditionalType>target));
+                                result &= (sourceFalseType.flags | targetFalseType.flags) & TypeFlags.ThrowType ? Ternary.True : isRelatedTo(sourceFalseType, targetFalseType, reportErrors);
                             }
                             if (result) {
                                 resetErrorInfo(saveErrorInfo);
@@ -20494,6 +20614,7 @@ namespace ts {
         // results for union and intersection types for performance reasons.
         function couldContainTypeVariables(type: Type): boolean {
             const objectFlags = getObjectFlags(type);
+            if (isThrowType(type)) return couldContainTypeVariables(type.value);
             if (objectFlags & ObjectFlags.CouldContainTypeVariablesComputed) {
                 return !!(objectFlags & ObjectFlags.CouldContainTypeVariables);
             }
@@ -23842,6 +23963,7 @@ namespace ts {
             checkNestedBlockScopedBinding(node, symbol);
 
             let type = getTypeOfSymbol(localOrExportSymbol);
+            checkThrowType(node, getReducedType(type));
             const assignmentKind = getAssignmentTargetKind(node);
 
             if (assignmentKind) {
@@ -27003,6 +27125,7 @@ namespace ts {
                 }
 
                 propType = isThisPropertyAccessInConstructor(node, prop) ? autoType : isWrite ? getSetAccessorTypeOfSymbol(prop) : getTypeOfSymbol(prop);
+                checkThrowType(node, propType);
             }
 
             return getFlowTypeOfAccessExpression(node, prop, propType, right, checkMode);
@@ -28045,6 +28168,7 @@ namespace ts {
                     const checkArgType = checkMode & CheckMode.SkipContextSensitive ? getRegularTypeOfObjectLiteral(argType) : argType;
                     if (!checkTypeRelatedToAndOptionallyElaborate(checkArgType, paramType, relation, reportErrors ? arg : undefined, arg, headMessage, containingMessageChain, errorOutputContainer)) {
                         Debug.assert(!reportErrors || !!errorOutputContainer.errors, "parameter should have errors when reporting errors");
+                        checkThrowType(arg, paramType);
                         maybeAddMissingAwaitInfo(arg, checkArgType, paramType);
                         return errorOutputContainer.errors || emptyArray;
                     }
@@ -29538,6 +29662,7 @@ namespace ts {
             }
 
             const returnType = getReturnTypeOfSignature(signature);
+            checkThrowType(node, returnType);
             // Treat any call to the global 'Symbol' function that is part of a const variable or readonly property
             // as a fresh unique symbol literal type.
             if (returnType.flags & TypeFlags.ESSymbolLike && isSymbolOrSymbolForCall(node)) {
@@ -33126,6 +33251,7 @@ namespace ts {
             }
             forEach(node.typeArguments, checkSourceElement);
             const type = getTypeFromTypeReference(node);
+            checkThrowType(node, type);
             if (type !== errorType) {
                 if (node.typeArguments && produceDiagnostics) {
                     const typeParameters = getTypeParametersForTypeReference(node);
@@ -36208,9 +36334,23 @@ namespace ts {
         function unwrapReturnType(returnType: Type, functionFlags: FunctionFlags) {
             const isGenerator = !!(functionFlags & FunctionFlags.Generator);
             const isAsync = !!(functionFlags & FunctionFlags.Async);
-            return isGenerator ? getIterationTypeOfGeneratorFunctionReturnType(IterationTypeKind.Return, returnType, isAsync) ?? errorType :
+            const type = isGenerator ? getIterationTypeOfGeneratorFunctionReturnType(IterationTypeKind.Return, returnType, isAsync) ?? errorType :
                 isAsync ? getAwaitedType(returnType) ?? errorType :
                 returnType;
+            return dropThrowTypeInConditionalType(type);
+        }
+        function dropThrowTypeInConditionalType(type: Type): Type {
+            let result = type;
+            while (true) {
+                if (!(result.flags & TypeFlags.Conditional)) return result;
+                const left = getTrueTypeFromConditionalType(<ConditionalType>result);
+                const right = getFalseTypeFromConditionalType(<ConditionalType>result);
+                if (isThrowType(left) !== isThrowType(right)) {
+                    if (isThrowType(left)) result = right;
+                    else result = left;
+                }
+                else return type;
+            }
         }
 
         function isUnwrappedReturnTypeVoidOrAny(func: SignatureDeclaration, returnType: Type): boolean {
