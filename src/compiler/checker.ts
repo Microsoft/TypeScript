@@ -21107,11 +21107,48 @@ namespace ts {
                 return typeVariable;
             }
 
+            function isPromiseForType(promiseType: Type, promisedType: Type) {
+                return getPromisedTypeOfPromise(promiseType) === promisedType;
+            }
+
+            function isUserDefinedPromiseType(type: Type) {
+                return !isReferenceToGlobalPromiseType(type) && !!getPromisedTypeOfPromise(type);
+            }
+
             function inferToMultipleTypes(source: Type, targets: Type[], targetFlags: TypeFlags) {
                 let typeVariableCount = 0;
                 if (targetFlags & TypeFlags.Union) {
                     let nakedTypeVariable: Type | undefined;
+                    let remainderArePromises = false;
                     const sources = source.flags & TypeFlags.Union ? (<UnionType>source).types : [source];
+                    for (const t of targets) {
+                        if (getInferenceInfoForType(t)) {
+                            nakedTypeVariable = t;
+                            typeVariableCount++;
+                        }
+                    }
+
+                    // To better handle inference for `Promise`-like types, we detect a target union of `T | PromiseLike<T>`
+                    // (for any compatible `PromiseLike`). When encountered, we infer all promise-like sources to the promise-like
+                    // targets and all non-promise-like sources to the naked type variable. For example when inferring to
+                    // `T | PromiseLike<T>` from `number | boolean | Promise<string>`, we infer to `PromiseLike<T>` from
+                    // `Promise<string>` and to `T` for `number | boolean`. We allow for multiple promise-like types in target
+                    // to better support JQuery's `PromiseBase` which returns something like
+                    // `PromiseBase<T, U, V...> | PromiseLike<T> | T` in its fulfillment callbacks.
+                    if (typeVariableCount === 1) {
+                        for (const t of targets) {
+                            if (!getInferenceInfoForType(t)) {
+                                if (isPromiseForType(t, nakedTypeVariable!)) {
+                                    remainderArePromises = true;
+                                }
+                                else {
+                                    remainderArePromises = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     const matched = new Array<boolean>(sources.length);
                     let inferenceCircularity = false;
                     // First infer to types that are not naked type variables. For each source type we
@@ -21119,18 +21156,26 @@ namespace ts {
                     // equal priority (i.e. of equal quality) to what we would infer for a naked type
                     // parameter.
                     for (const t of targets) {
-                        if (getInferenceInfoForType(t)) {
-                            nakedTypeVariable = t;
-                            typeVariableCount++;
-                        }
-                        else {
+                        if (!getInferenceInfoForType(t)) {
                             for (let i = 0; i < sources.length; i++) {
-                                const saveInferencePriority = inferencePriority;
-                                inferencePriority = InferencePriority.MaxValue;
-                                inferFromTypes(sources[i], t);
-                                if (inferencePriority === priority) matched[i] = true;
-                                inferenceCircularity = inferenceCircularity || inferencePriority === InferencePriority.Circularity;
-                                inferencePriority = Math.min(inferencePriority, saveInferencePriority);
+                                // When inferring to a union consisting solely of `T` and promise-like constituents,
+                                // we infer only custom promise-like sources to promise-like constituents so that we can
+                                // capture inferences to other type arguments. We skip sources with references to the
+                                // global `Promise<T>` and `PromiseLike<T>` types as we can infer the promised types
+                                // of those directly to the type variable, below.
+                                if (!remainderArePromises || isUserDefinedPromiseType(sources[i])) {
+                                    const saveInferencePriority = inferencePriority;
+                                    inferencePriority = InferencePriority.MaxValue;
+                                    // When inferring to a union of `T | PromiseLike<T>`, we will first
+                                    // infer a promise-like source to a promise-like target, but we will
+                                    // also infer the promised type directly to the type variable.
+                                    inferFromTypes(sources[i], t);
+                                    if (inferencePriority === priority && !remainderArePromises) {
+                                        matched[i] = true;
+                                    }
+                                    inferenceCircularity = inferenceCircularity || inferencePriority === InferencePriority.Circularity;
+                                    inferencePriority = Math.min(inferencePriority, saveInferencePriority);
+                                }
                             }
                         }
                     }
@@ -21149,7 +21194,10 @@ namespace ts {
                     // types from which no inferences have been made so far and infer from that union to the
                     // naked type variable.
                     if (typeVariableCount === 1 && !inferenceCircularity) {
-                        const unmatched = flatMap(sources, (s, i) => matched[i] ? undefined : s);
+                        const unmatched = mapDefined(sources, (s, i) =>
+                            matched[i] ? undefined :
+                            remainderArePromises ? getPromisedTypeOfPromise(s) ?? s :
+                            s);
                         if (unmatched.length) {
                             inferFromTypes(getUnionType(unmatched), nakedTypeVariable!);
                             return;
@@ -33784,6 +33832,11 @@ namespace ts {
             return promisedType && getAwaitedType(promisedType, errorNode, diagnosticMessage, arg0);
         }
 
+        function isReferenceToGlobalPromiseType(type: Type) {
+            return isReferenceToType(type, getGlobalPromiseType(/*reportErrors*/ false))
+                || isReferenceToType(type, getGlobalPromiseLikeType(/*reportErrors*/ false));
+        }
+
         /**
          * Gets the "promised type" of a promise.
          * @param type The type of the promise.
@@ -33809,11 +33862,11 @@ namespace ts {
                 return typeAsPromise.promisedTypeOfPromise;
             }
 
-            if (isReferenceToType(type, getGlobalPromiseType(/*reportErrors*/ false))) {
+            if (isReferenceToGlobalPromiseType(type)) {
                 return typeAsPromise.promisedTypeOfPromise = getTypeArguments(<GenericType>type)[0];
             }
 
-            const thenFunction = getTypeOfPropertyOfType(type, "then" as __String)!; // TODO: GH#18217
+            const thenFunction = getTypeOfPropertyOfType(type, "then" as __String);
             if (isTypeAny(thenFunction)) {
                 return undefined;
             }
