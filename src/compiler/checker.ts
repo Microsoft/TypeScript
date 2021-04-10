@@ -23770,6 +23770,19 @@ namespace ts {
                     }
                 }
             }
+
+            // If the location is a StringLiteral, it might be the argument to an ElementAccessExpression (e.g. like foo["bar"])
+            // Deal it the same way as we would with an Identifier or PropertyAccessExpression.
+            if (location.kind === SyntaxKind.StringLiteral) {
+                const candidateExpression = location.parent;
+                if (isElementAccessExpression(candidateExpression) && !isAssignmentTarget(candidateExpression) && candidateExpression.argumentExpression === location) {
+                    const type = getTypeOfExpression(candidateExpression);
+                    if (getExportSymbolOfValueSymbolIfExported(getNodeLinks(candidateExpression).resolvedSymbol) === symbol) {
+                        return type;
+                    }
+                }
+            }
+
             // The location isn't a reference to the given symbol, meaning we're being asked
             // a hypothetical question of what type the symbol would have if there was a reference
             // to it at the given location. Since we have no control flow information for the
