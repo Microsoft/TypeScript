@@ -64,6 +64,7 @@ namespace ts {
         EqualsEqualsEqualsToken,
         ExclamationEqualsEqualsToken,
         EqualsGreaterThanToken,
+        BarGreaterThanToken,
         PlusToken,
         MinusToken,
         AsteriskToken,
@@ -245,6 +246,7 @@ namespace ts {
         PropertyAccessExpression,
         ElementAccessExpression,
         CallExpression,
+        PipelineApplicationExpression,
         NewExpression,
         TaggedTemplateExpression,
         TypeAssertionExpression,
@@ -494,6 +496,7 @@ namespace ts {
         | SyntaxKind.EqualsEqualsEqualsToken
         | SyntaxKind.ExclamationEqualsEqualsToken
         | SyntaxKind.EqualsGreaterThanToken
+        | SyntaxKind.BarGreaterThanToken
         | SyntaxKind.PlusToken
         | SyntaxKind.MinusToken
         | SyntaxKind.AsteriskToken
@@ -1020,6 +1023,7 @@ namespace ts {
     export type EqualsGreaterThanToken = PunctuationToken<SyntaxKind.EqualsGreaterThanToken>;
     export type PlusToken = PunctuationToken<SyntaxKind.PlusToken>;
     export type MinusToken = PunctuationToken<SyntaxKind.MinusToken>;
+    export type BarGreaterThanToken = PunctuationToken<SyntaxKind.BarGreaterThanToken>;
     export type QuestionDotToken = PunctuationToken<SyntaxKind.QuestionDotToken>;
 
     // Keywords
@@ -1943,6 +1947,11 @@ namespace ts {
         | LogicalOperator
         ;
 
+    export type PipelineOperatorOrHigher
+        = LogicalOperatorOrHigher
+        | SyntaxKind.BarGreaterThanToken
+        ;
+
     // see: https://tc39.github.io/ecma262/#prod-AssignmentOperator
     export type CompoundAssignmentOperator =
         | SyntaxKind.PlusEqualsToken
@@ -1972,6 +1981,7 @@ namespace ts {
     export type AssignmentOperatorOrHigher =
         | SyntaxKind.QuestionQuestionToken
         | LogicalOperatorOrHigher
+        | PipelineOperatorOrHigher
         | AssignmentOperator
         ;
 
@@ -2329,6 +2339,14 @@ namespace ts {
         readonly arguments: NodeArray<Expression>;
     }
 
+    export interface PipelineApplicationExpression extends LeftHandSideExpression, Declaration {
+        readonly kind: SyntaxKind.PipelineApplicationExpression;
+        readonly expression: Expression;
+        readonly typeArguments?: NodeArray<TypeNode>;
+        readonly argument: Expression;
+        readonly barGreaterThanToken: BarGreaterThanToken;
+    }
+
     export interface CallChain extends CallExpression {
         _optionalChainBrand: any;
     }
@@ -2435,6 +2453,7 @@ namespace ts {
         | NewExpression
         | TaggedTemplateExpression
         | Decorator
+        | PipelineApplicationExpression
         | JsxOpeningLikeElement
         ;
 
@@ -6538,6 +6557,8 @@ namespace ts {
         ContainsDynamicImport = 1 << 22,
         ContainsClassFields = 1 << 23,
         ContainsPossibleTopLevelAwait = 1 << 24,
+        // ContainsPartialApplication = 1 << 25, // Reserved.
+        ContainsPipeline = 1 << 26,
 
         // Please leave this as 1 << 29.
         // It is the maximum bit we can set before we outgrow the size of a v8 small integer (SMI) on an x86 system.
@@ -7111,6 +7132,8 @@ namespace ts {
         updateNonNullChain(node: NonNullChain, expression: Expression): NonNullChain;
         createMetaProperty(keywordToken: MetaProperty["keywordToken"], name: Identifier): MetaProperty;
         updateMetaProperty(node: MetaProperty, name: Identifier): MetaProperty;
+        createPipelineApplicationExpression(expression: Expression, typeArguments: readonly TypeNode[] | undefined, argument: Expression): PipelineApplicationExpression;
+        updatePipelineApplicationExpression(node: PipelineApplicationExpression, expression: Expression, typeArguments: readonly TypeNode[] | undefined, argument: Expression): PipelineApplicationExpression;
 
         //
         // Misc
