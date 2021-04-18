@@ -118,7 +118,7 @@ namespace Utils {
                 for (const childName in node) {
                     if (childName === "parent" || childName === "nextContainer" || childName === "modifiers" || childName === "externalModuleIndicator" ||
                         // for now ignore jsdoc comments
-                        childName === "jsDocComment" || childName === "checkJsDirective" || childName === "commonJsModuleIndicator") {
+                        childName === "jsDocComment" || childName === "checkJsDirective" || childName === "commonJsModuleIndicator" || childName === "dummyDeclaration") {
                         continue;
                     }
                     const child = (<any>node)[childName];

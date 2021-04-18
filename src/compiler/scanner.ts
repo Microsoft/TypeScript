@@ -199,6 +199,8 @@ namespace ts {
         "~": SyntaxKind.TildeToken,
         "&&": SyntaxKind.AmpersandAmpersandToken,
         "||": SyntaxKind.BarBarToken,
+        "|>": SyntaxKind.BarGreaterThanToken,
+        "|>>": SyntaxKind.BarGreaterThanGreaterThanToken,
         "?": SyntaxKind.QuestionToken,
         "??": SyntaxKind.QuestionQuestionToken,
         "?.": SyntaxKind.QuestionDotToken,
@@ -220,6 +222,7 @@ namespace ts {
         "&&=": SyntaxKind.AmpersandAmpersandEqualsToken,
         "??=": SyntaxKind.QuestionQuestionEqualsToken,
         "@": SyntaxKind.AtToken,
+        "#": SyntaxKind.HashToken,
         "`": SyntaxKind.BacktickToken
     }));
 
@@ -1992,6 +1995,12 @@ namespace ts {
                         if (text.charCodeAt(pos + 1) === CharacterCodes.equals) {
                             return pos += 2, token = SyntaxKind.BarEqualsToken;
                         }
+                        if (text.charCodeAt(pos + 1) === CharacterCodes.greaterThan) {
+                            if (text.charCodeAt(pos + 2) === CharacterCodes.greaterThan) {
+                                return pos += 3, token = SyntaxKind.BarGreaterThanGreaterThanToken;
+                            }
+                            return pos += 2, token = SyntaxKind.BarGreaterThanToken;
+                        }
                         pos++;
                         return token = SyntaxKind.BarToken;
                     case CharacterCodes.closeBrace:
@@ -2037,12 +2046,20 @@ namespace ts {
                             if (ch === CharacterCodes.backslash) {
                                 tokenValue += scanIdentifierParts();
                             }
+                            return token = SyntaxKind.PrivateIdentifier;
                         }
                         else {
                             tokenValue = "#";
-                            error(Diagnostics.Invalid_character);
+                            if (/*isInsidePipelineHack*/ false) {
+                                error(Diagnostics.Invalid_character /* Hack placeholder token outside pipeline. */);
+                            }
+                            else {
+                                if ((pos >= 2) && (text.charCodeAt(pos - 2) === CharacterCodes.dot)) {
+                                    return token = SyntaxKind.PrivateIdentifier;
+                                }
+                            }
+                            return token = SyntaxKind.Identifier;
                         }
-                        return token = SyntaxKind.PrivateIdentifier;
                     default:
                         const identifierKind = scanIdentifier(ch, languageVersion);
                         if (identifierKind) {

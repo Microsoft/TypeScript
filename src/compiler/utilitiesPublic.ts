@@ -1019,6 +1019,14 @@ namespace ts {
         return skipOuterExpressions(node, OuterExpressionKinds.PartiallyEmittedExpressions);
     }
 
+    export function isPipelineHackExpression(node: Node): node is PipelineHackExpression {
+        return node.kind === SyntaxKind.PipelineHackExpression;
+    }
+
+    export function isPipelineApplicationExpression(node: Node): node is PipelineApplicationExpression {
+        return node.kind === SyntaxKind.PipelineApplicationExpression;
+    }
+
     export function isNonNullChain(node: Node): node is NonNullChain {
         return isNonNullExpression(node) && !!(node.flags & NodeFlags.OptionalChain);
     }
@@ -1478,6 +1486,8 @@ namespace ts {
             case SyntaxKind.ElementAccessExpression:
             case SyntaxKind.NewExpression:
             case SyntaxKind.CallExpression:
+            case SyntaxKind.PipelineHackExpression:
+            case SyntaxKind.PipelineApplicationExpression:
             case SyntaxKind.JsxElement:
             case SyntaxKind.JsxSelfClosingElement:
             case SyntaxKind.JsxFragment:

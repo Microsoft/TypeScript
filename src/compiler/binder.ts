@@ -823,6 +823,9 @@ namespace ts {
                 case SyntaxKind.CallExpression:
                     bindCallExpressionFlow(<CallExpression>node);
                     break;
+                case SyntaxKind.PipelineHackExpression:
+                    bindPipelineHackExpressionFlow(<PipelineHackExpression>node);
+                    break;
                 case SyntaxKind.NonNullExpression:
                     bindNonNullExpressionFlow(<NonNullExpression>node);
                     break;
@@ -1791,6 +1794,42 @@ namespace ts {
             }
         }
 
+        function bindPipelineHackExpressionFlow(node: PipelineHackExpression) {
+            if (!blockScopeContainer.locals) {
+                blockScopeContainer.locals = createSymbolTable();
+                addToContainerChain(blockScopeContainer);
+            }
+            // const bindingName = InternalSymbolName.HackPipelineReference;
+            // const newSymbol = bindAnonymousDeclaration(node.dummyDeclaration, SymbolFlags.BlockScopedVariable, bindingName);
+            declareSymbol(blockScopeContainer.locals, /*parent*/ undefined, node.dummyDeclaration, SymbolFlags.BlockScopedVariable, SymbolFlags.None);
+            // const hashDeclaration = setTextRange(factory.createBindingElement(undefined, undefined, '#', node.arguments[0]), { pos: node.pos, end: node.pos });
+            // setTextRange(hashDeclaration.name!, { pos: node.pos, end: node.pos });
+            // (hashDeclaration as any).parent = node;
+            // declareSymbol(blockScopeContainer.locals, /*parent*/ undefined, hashDeclaration, SymbolFlags.BlockScopedVariable, SymbolFlags.BlockScopedVariableExcludes);
+
+
+            // bindBlockScopedDeclaration(hashDeclaration, SymbolFlags.BlockScopedVariable, SymbolFlags.BlockScopedVariableExcludes);
+            // // const obp = factory.createObjectBindingPattern([hashDeclaration]);
+            // setParent(hashDeclaration, obp);
+            // // // const result = createSymbol(SymbolFlags.BlockScopedVariable, '#' as __String);
+            // // // result.declarations = [hashDeclaration];
+            // // // result.parent = node;
+            // setParent(obp, node);
+            // // const syn = factory.createSyntheticExpression(ObjectBindinPattern, false, hashDeclaration)
+
+            // If the target of the call expression is a function expression or arrow function we have
+            // an immediately invoked function expression (IIFE). Initialize the flowNode property to
+            // the current control flow (which includes evaluation of the IIFE arguments).
+            bind(node.argument);
+            bind(node.expression);
+            // if (node.expression.kind === SyntaxKind.PropertyAccessExpression) {
+            //     const propertyAccess = <PropertyAccessExpression>node.expression;
+            //     if (isIdentifier(propertyAccess.name) && isNarrowableOperand(propertyAccess.expression) && isPushOrUnshiftIdentifier(propertyAccess.name)) {
+            //         currentFlow = createFlowMutation(FlowFlags.ArrayMutation, currentFlow, node);
+            //     }
+            // }
+        }
+
         function getContainerFlags(node: Node): ContainerFlags {
             switch (node.kind) {
                 case SyntaxKind.ClassExpression:
@@ -1846,7 +1885,8 @@ namespace ts {
                 case SyntaxKind.ForInStatement:
                 case SyntaxKind.ForOfStatement:
                 case SyntaxKind.CaseBlock:
-                    return ContainerFlags.IsBlockScopedContainer;
+                case SyntaxKind.PipelineHackExpression:
+                    return ContainerFlags.IsBlockScopedContainer | ContainerFlags.HasLocals;
 
                 case SyntaxKind.Block:
                     // do not treat blocks directly inside a function as a block-scoped-container.
@@ -1929,6 +1969,7 @@ namespace ts {
                 case SyntaxKind.JSDocCallbackTag:
                 case SyntaxKind.TypeAliasDeclaration:
                 case SyntaxKind.MappedType:
+                case SyntaxKind.PipelineHackExpression:
                     // All the children of these container types are never visible through another
                     // symbol (i.e. through another symbol's 'exports' or 'members').  Instead,
                     // they're only accessed 'lexically' (i.e. from code that exists underneath
@@ -2654,6 +2695,8 @@ namespace ts {
                 case SyntaxKind.FunctionExpression:
                 case SyntaxKind.ArrowFunction:
                     return bindFunctionExpression(<FunctionExpression>node);
+                // case SyntaxKind.PipelineExpression:
+                //     return bindPipelineExpression(<PipelineExpression>node);
 
                 case SyntaxKind.CallExpression:
                     const assignmentKind = getAssignmentDeclarationKind(node as CallExpression);
@@ -3364,6 +3407,11 @@ namespace ts {
             const bindingName = node.name ? node.name.escapedText : InternalSymbolName.Function;
             return bindAnonymousDeclaration(node, SymbolFlags.Function, bindingName);
         }
+
+        // function bindPipelineExpression(node: PipelineExpression) {
+            // const bindingName = InternalSymbolName.HackPipelineReference;
+            // bindAnonymousDeclaration(node.dummyDeclaration, SymbolFlags.BlockScopedVariable, bindingName);
+        // }
 
         function bindPropertyOrMethodOrAccessor(node: Declaration, symbolFlags: SymbolFlags, symbolExcludes: SymbolFlags) {
             if (!file.isDeclarationFile && !(node.flags & NodeFlags.Ambient) && isAsyncFunction(node)) {

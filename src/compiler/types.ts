@@ -64,6 +64,8 @@ namespace ts {
         EqualsEqualsEqualsToken,
         ExclamationEqualsEqualsToken,
         EqualsGreaterThanToken,
+        BarGreaterThanToken,
+        BarGreaterThanGreaterThanToken,
         PlusToken,
         MinusToken,
         AsteriskToken,
@@ -86,6 +88,7 @@ namespace ts {
         ColonToken,
         AtToken,
         QuestionQuestionToken,
+        HashToken,
         /** Only the JSDoc scanner produces BacktickToken. The normal scanner produces NoSubstitutionTemplateLiteral and related kinds. */
         BacktickToken,
         // Assignments
@@ -245,6 +248,8 @@ namespace ts {
         PropertyAccessExpression,
         ElementAccessExpression,
         CallExpression,
+        PipelineHackExpression,
+        PipelineApplicationExpression,
         NewExpression,
         TaggedTemplateExpression,
         TypeAssertionExpression,
@@ -494,6 +499,8 @@ namespace ts {
         | SyntaxKind.EqualsEqualsEqualsToken
         | SyntaxKind.ExclamationEqualsEqualsToken
         | SyntaxKind.EqualsGreaterThanToken
+        | SyntaxKind.BarGreaterThanToken
+        | SyntaxKind.BarGreaterThanGreaterThanToken
         | SyntaxKind.PlusToken
         | SyntaxKind.MinusToken
         | SyntaxKind.AsteriskToken
@@ -530,6 +537,7 @@ namespace ts {
         | SyntaxKind.AmpersandEqualsToken
         | SyntaxKind.BarEqualsToken
         | SyntaxKind.CaretEqualsToken
+        | SyntaxKind.HashToken
         ;
 
     export type KeywordSyntaxKind =
@@ -1020,7 +1028,10 @@ namespace ts {
     export type EqualsGreaterThanToken = PunctuationToken<SyntaxKind.EqualsGreaterThanToken>;
     export type PlusToken = PunctuationToken<SyntaxKind.PlusToken>;
     export type MinusToken = PunctuationToken<SyntaxKind.MinusToken>;
+    export type BarGreaterThanToken = PunctuationToken<SyntaxKind.BarGreaterThanToken>;
+    export type BarGreaterThanGreaterThanToken = PunctuationToken<SyntaxKind.BarGreaterThanGreaterThanToken>;
     export type QuestionDotToken = PunctuationToken<SyntaxKind.QuestionDotToken>;
+    export type HashToken = PunctuationToken<SyntaxKind.HashToken>;
 
     // Keywords
     export interface KeywordToken<TKind extends KeywordSyntaxKind> extends Token<TKind> {
@@ -1943,6 +1954,12 @@ namespace ts {
         | LogicalOperator
         ;
 
+    export type PipelineOperatorOrHigher
+        = LogicalOperatorOrHigher
+        | SyntaxKind.BarGreaterThanToken
+        | SyntaxKind.BarGreaterThanGreaterThanToken
+        ;
+
     // see: https://tc39.github.io/ecma262/#prod-AssignmentOperator
     export type CompoundAssignmentOperator =
         | SyntaxKind.PlusEqualsToken
@@ -1972,6 +1989,7 @@ namespace ts {
     export type AssignmentOperatorOrHigher =
         | SyntaxKind.QuestionQuestionToken
         | LogicalOperatorOrHigher
+        | PipelineOperatorOrHigher
         | AssignmentOperator
         ;
 
@@ -2329,6 +2347,22 @@ namespace ts {
         readonly arguments: NodeArray<Expression>;
     }
 
+    export interface PipelineHackExpression extends LeftHandSideExpression, Declaration {
+        readonly kind: SyntaxKind.PipelineHackExpression;
+        readonly expression: Expression;
+        readonly argument: Expression;
+        readonly barGreaterThanToken: BarGreaterThanToken;
+        readonly dummyDeclaration: Declaration;
+    }
+
+    export interface PipelineApplicationExpression extends LeftHandSideExpression, Declaration {
+        readonly kind: SyntaxKind.PipelineApplicationExpression;
+        readonly expression: Expression;
+        readonly typeArguments?: NodeArray<TypeNode>;
+        readonly argument: Expression;
+        readonly barGreaterThanToken: BarGreaterThanToken;
+    }
+
     export interface CallChain extends CallExpression {
         _optionalChainBrand: any;
     }
@@ -2435,6 +2469,7 @@ namespace ts {
         | NewExpression
         | TaggedTemplateExpression
         | Decorator
+        | PipelineApplicationExpression
         | JsxOpeningLikeElement
         ;
 
@@ -4901,6 +4936,7 @@ namespace ts {
         ExportEquals = "export=", // Export assignment symbol
         Default = "default", // Default export symbol (technically not wholly internal, but included here for usability)
         This = "this",
+        HackPipelineReference = "#",
     }
 
     /**
@@ -6538,6 +6574,8 @@ namespace ts {
         ContainsDynamicImport = 1 << 22,
         ContainsClassFields = 1 << 23,
         ContainsPossibleTopLevelAwait = 1 << 24,
+        // ContainsPartialApplication = 1 << 25, // Reserved.
+        ContainsPipeline = 1 << 26,
 
         // Please leave this as 1 << 29.
         // It is the maximum bit we can set before we outgrow the size of a v8 small integer (SMI) on an x86 system.
@@ -7111,6 +7149,10 @@ namespace ts {
         updateNonNullChain(node: NonNullChain, expression: Expression): NonNullChain;
         createMetaProperty(keywordToken: MetaProperty["keywordToken"], name: Identifier): MetaProperty;
         updateMetaProperty(node: MetaProperty, name: Identifier): MetaProperty;
+        createPipelineHackExpression(expression: Expression, argument: Expression): PipelineHackExpression;
+        updatePipelineHackExpression(node: PipelineHackExpression, expression: Expression, argument: Expression): PipelineHackExpression;
+        createPipelineApplicationExpression(expression: Expression, typeArguments: readonly TypeNode[] | undefined, argument: Expression): PipelineApplicationExpression;
+        updatePipelineApplicationExpression(node: PipelineApplicationExpression, expression: Expression, typeArguments: readonly TypeNode[] | undefined, argument: Expression): PipelineApplicationExpression;
 
         //
         // Misc

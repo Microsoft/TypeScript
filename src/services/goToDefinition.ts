@@ -324,7 +324,8 @@ namespace ts.GoToDefinition {
             ...FindAllReferences.toContextSpan(
                 textSpan,
                 sourceFile,
-                FindAllReferences.getContextNode(declaration)
+                FindAllReferences.getContextNode(declaration),
+                /*forceContext*/isIdentifier(name) && name.escapedText === "#"
             ),
             isLocal: !checker.isDeclarationVisible(declaration)
         };

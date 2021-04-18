@@ -237,6 +237,15 @@ namespace ts {
                     visitNode(cbNode, (<CallExpression>node).questionDotToken) ||
                     visitNodes(cbNode, cbNodes, (<CallExpression>node).typeArguments) ||
                     visitNodes(cbNode, cbNodes, (<CallExpression>node).arguments);
+            case SyntaxKind.PipelineHackExpression:
+                return visitNode(cbNode, (<PipelineHackExpression>node).argument) ||
+                    visitNode(cbNode, (<PipelineHackExpression>node).barGreaterThanToken) ||
+                    visitNode(cbNode, (<PipelineHackExpression>node).expression);
+            case SyntaxKind.PipelineApplicationExpression:
+                return visitNode(cbNode, (<PipelineApplicationExpression>node).argument) ||
+                    visitNode(cbNode, (<PipelineApplicationExpression>node).barGreaterThanToken) ||
+                    visitNode(cbNode, (<PipelineApplicationExpression>node).expression) ||
+                    visitNodes(cbNode, cbNodes, (<PipelineApplicationExpression>node).typeArguments) ;
             case SyntaxKind.TaggedTemplateExpression:
                 return visitNode(cbNode, (<TaggedTemplateExpression>node).tag) ||
                     visitNode(cbNode, (<TaggedTemplateExpression>node).questionDotToken) ||
@@ -4025,7 +4034,7 @@ namespace ts {
             // binary expression here, so we pass in the 'lowest' precedence here so that it matches
             // and consumes anything.
             const pos = getNodePos();
-            const expr = parseBinaryExpressionOrHigher(OperatorPrecedence.Lowest);
+            const expr = parseBinaryExpressionOrHigher(/*precedence*/ 1);
 
             // To avoid a look-ahead, we did not handle the case of an arrow function with a single un-parenthesized
             // parameter ('x => ...') above. We handle it here by checking if the parsed expression was a single
@@ -4430,7 +4439,38 @@ namespace ts {
             return node;
         }
 
-        function parseConditionalExpressionRest(leftOperand: Expression, pos: number): Expression {
+        function parsePipelineHackExpression(leftOperand: Expression): Expression {
+            return finishNode(
+                factory.createPipelineHackExpression(
+                    parseBinaryExpressionOrHigher(/*precedence*/ 1),
+                    leftOperand
+                ),
+                leftOperand.pos
+            );
+        }
+
+        function parsePipelineApplicationExpression(leftOperand: Expression): Expression {
+            return finishNode(
+                factory.createPipelineApplicationExpression(
+                    parseBinaryExpressionOrHigher(/*precedence*/ 1),
+                    /*typeArguments*/ undefined,
+                    leftOperand
+                ),
+                leftOperand.pos
+            );
+        }
+
+        function parseConditionalExpressionRest(startLeftOperand: Expression, pos: number): Expression {
+            let leftOperand = startLeftOperand;
+            while (token() === SyntaxKind.BarGreaterThanToken || token() === SyntaxKind.BarGreaterThanGreaterThanToken) {
+                if (parseOptionalToken(SyntaxKind.BarGreaterThanToken)) {
+                    leftOperand = parsePipelineHackExpression(leftOperand);
+                }
+                if (parseOptionalToken(SyntaxKind.BarGreaterThanGreaterThanToken)) {
+                    leftOperand = parsePipelineApplicationExpression(leftOperand);
+                }
+            }
+
             // Note: we are passed in an expression which was produced from parseBinaryExpressionOrHigher.
             const questionToken = parseOptionalToken(SyntaxKind.QuestionToken);
             if (!questionToken) {

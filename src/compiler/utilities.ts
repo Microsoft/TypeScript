@@ -1860,6 +1860,8 @@ namespace ts {
             case SyntaxKind.ElementAccessExpression:
             case SyntaxKind.CallExpression:
             case SyntaxKind.NewExpression:
+            case SyntaxKind.PipelineHackExpression:
+            case SyntaxKind.PipelineApplicationExpression:
             case SyntaxKind.TaggedTemplateExpression:
             case SyntaxKind.AsExpression:
             case SyntaxKind.TypeAssertionExpression:
@@ -3639,6 +3641,9 @@ namespace ts {
 
     export function getBinaryOperatorPrecedence(kind: SyntaxKind): OperatorPrecedence {
         switch (kind) {
+            case SyntaxKind.BarGreaterThanToken:
+            case SyntaxKind.BarGreaterThanGreaterThanToken:
+                return 1;
             case SyntaxKind.QuestionQuestionToken:
                 return OperatorPrecedence.Coalesce;
             case SyntaxKind.BarBarToken:
