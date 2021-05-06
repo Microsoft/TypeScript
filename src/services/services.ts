@@ -1310,9 +1310,11 @@ namespace ts {
                 getCurrentDirectory: () => currentDirectory,
                 onUnRecoverableConfigFileDiagnostic: noop,
             };
+            log(`rootFileNames: ${rootFileNames}`);
 
             // If the program is already up-to-date, we can reuse it
             if (isProgramUptoDate(program, rootFileNames, newSettings, (_path, fileName) => host.getScriptVersion(fileName), fileExists, hasInvalidatedResolution, hasChangedAutomaticTypeDirectiveNames, getParsedCommandLine, projectReferences)) {
+                log(`Program is upto date`);
                 return;
             }
 

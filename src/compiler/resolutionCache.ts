@@ -197,6 +197,7 @@ namespace ts {
         const rootDir = rootDirForResolution && removeTrailingDirectorySeparator(getNormalizedAbsolutePath(rootDirForResolution, getCurrentDirectory()));
         const rootPath = (rootDir && resolutionHost.toPath(rootDir)) as Path; // TODO: GH#18217
         const rootSplitLength = rootPath !== undefined ? rootPath.split(directorySeparator).length : 0;
+        resolutionHost.writeLog(`ResolutionCache:: Creating resolution cache with root: ${rootDir}`);
 
         // TypeRoot watches for the types that get added as part of getAutomaticTypeDirectiveNames
         const typeRootsWatches = new Map<string, FileWatcher>();
@@ -206,7 +207,10 @@ namespace ts {
             finishRecordingFilesWithChangedResolutions,
             // perDirectoryResolvedModuleNames and perDirectoryResolvedTypeReferenceDirectives could be non empty if there was exception during program update
             // (between startCachingPerDirectoryResolution and finishCachingPerDirectoryResolution)
-            startCachingPerDirectoryResolution: clearPerDirectoryResolutions,
+            startCachingPerDirectoryResolution: () => {
+                clearPerDirectoryResolutions();
+                printResolutions(`startCachingPerDirectoryResolution`);
+            },
             finishCachingPerDirectoryResolution,
             resolveModuleNames,
             getResolvedModuleWithFailedLookupLocationsFromCache,
@@ -257,6 +261,68 @@ namespace ts {
             hasChangedAutomaticTypeDirectiveNames = false;
         }
 
+        function printResolutionOfCache<T extends ResolutionWithFailedLookupLocations, R extends ResolutionWithResolvedFileName>(
+            caption: string,
+           cache: ESMap<Path, ESMap<string, T>>,
+            getResolutionWithResolvedFileName: GetResolutionWithResolvedFileName<T, R>,
+            invalidatedOnly?: boolean
+        ) {
+            resolutionHost.writeLog(`ResolutionCache:: ${caption}:: ${JSON.stringify(
+                mapDefined(
+                    arrayFrom(
+                        cache.entries(),
+                        ([file, resolutions]) => ({
+                            file,
+                            resolutions: arrayFrom(
+                                mapDefinedIterator(
+                                    resolutions.entries(),
+                                    entry => invalidatedOnly ?
+                                        entry[1].isInvalidated ? entry : undefined :
+                                        entry
+                                ),
+                                ([name, resolution]) => ({
+                                    name,
+                                    resolution: getResolutionWithResolvedFileName(resolution) && getResolutionWithResolvedFileName(resolution)?.resolvedFileName,
+                                    isInvalidated: resolution.isInvalidated,
+                                })
+                            )
+                        })
+                    ),
+                    entry => entry.resolutions.length ? entry : undefined
+                ),
+                undefined,
+                " "
+            )}`);
+        }
+
+        function printResolutions(caption: string, invalidatedOnly?: boolean) {
+            printResolutionOfCache(`${caption} modules`, resolvedModuleNames, getResolvedModule, invalidatedOnly);
+            printResolutionOfCache(`${caption} typeRefs`, resolvedTypeReferenceDirectives, getResolvedTypeReferenceDirective, invalidatedOnly);
+            resolutionHost.writeLog(`ResolutionCache:: ${caption} resolutionsWithFailedLookups:: ${JSON.stringify(
+                invalidatedOnly ?
+                    resolutionsWithFailedLookups.filter(r => r.isInvalidated) :
+                    resolutionsWithFailedLookups,
+                undefined,
+                " "
+            )}`);
+            resolutionHost.writeLog(`ResolutionCache:: ${caption} resolvedFileToResolution:: ${JSON.stringify(
+                mapDefined(
+                    arrayFrom(
+                        resolvedFileToResolution.entries(),
+                        ([file, resolutions]) => ({
+                            file,
+                            resolutions: invalidatedOnly ?
+                                resolutions.filter(resolution => resolution.isInvalidated) :
+                                resolutions
+                        })
+                    ),
+                    entry => entry.resolutions.length ? entry : undefined
+                ),
+                undefined,
+                " "
+            )}`);
+        }
+
         function startRecordingFilesWithChangedResolutions() {
             filesWithChangedSetOfUnresolvedImports = [];
         }
@@ -281,10 +347,15 @@ namespace ts {
             // Ensure pending resolutions are applied
             invalidateResolutionsOfFailedLookupLocations();
             if (forceAllFilesAsInvalidated) {
+                resolutionHost.writeLog(`ResolutionCache:: createHasInvalidatedResolution:: forceAllFilesAsInvalidated: true`);
                 // Any file asked would have invalidated resolution
                 filesWithInvalidatedResolutions = undefined;
                 return returnTrue;
             }
+            resolutionHost.writeLog(`ResolutionCache:: createHasInvalidatedResolution:: ${JSON.stringify({
+                filesWithInvalidatedResolutions: filesWithInvalidatedResolutions && arrayFrom(filesWithInvalidatedResolutions?.keys()),
+                filesWithInvalidatedNonRelativeUnresolvedImports: filesWithInvalidatedNonRelativeUnresolvedImports && arrayFrom(filesWithInvalidatedNonRelativeUnresolvedImports?.keys())
+            }, undefined, " ")}`);
             const collected = filesWithInvalidatedResolutions;
             filesWithInvalidatedResolutions = undefined;
             return path => (!!collected && collected.has(path)) ||
@@ -308,6 +379,15 @@ namespace ts {
                 }
             });
             hasChangedAutomaticTypeDirectiveNames = false;
+            printResolutions(`finishCachingPerDirectoryResolution`);
+            resolutionHost.writeLog(`ResolutionCache:: directoryWatchers:: ${JSON.stringify(
+                arrayFrom(
+                    directoryWatchesOfFailedLookups.keys(),
+                    dir => ({ dir, nonRecursive: directoryWatchesOfFailedLookups.get(dir)!.nonRecursive })
+                ),
+                undefined,
+                " "
+            )}`);
         }
 
         function resolveModuleName(moduleName: string, containingFile: string, compilerOptions: CompilerOptions, host: ModuleResolutionHost, redirectedReference?: ResolvedProjectReference): CachedResolvedModuleWithFailedLookupLocations {
@@ -400,6 +480,7 @@ namespace ts {
                     else {
                         resolution = loader(name, containingFile, compilerOptions, resolutionHost.getCompilerHost?.() || resolutionHost, redirectedReference);
                         perDirectoryResolution.set(name, resolution);
+                        resolutionHost.writeLog(`ResolutionCache:: resolveNamesWithLocalCache:: ${name} new resolution in file ${containingFile}:: ${getResolutionWithResolvedFileName(resolution)?.resolvedFileName}`);
                     }
                     resolutionsInFile.set(name, resolution);
                     watchFailedLookupLocationsOfExternalModuleResolutions(name, resolution, path, getResolutionWithResolvedFileName);
@@ -722,11 +803,13 @@ namespace ts {
             const resolvedProjectReference = program.getResolvedProjectReferenceByPath(filePath);
             if (!resolvedProjectReference) { return; }
 
+            resolutionHost.writeLog(`ResolutionCache:: Removing resolutions for removeResolutionsFromProjectReferenceRedirects ${filePath}`);
             // filePath is for the projectReference and the containing file is from this project reference, invalidate the resolution
             resolvedProjectReference.commandLine.fileNames.forEach(f => removeResolutionsOfFile(resolutionHost.toPath(f)));
         }
 
         function removeResolutionsOfFile(filePath: Path) {
+            resolutionHost.writeLog(`ResolutionCache:: Removing resolutions for ${filePath}`);
             removeResolutionsOfFileFromCache(resolvedModuleNames, filePath, getResolvedModule);
             removeResolutionsOfFileFromCache(resolvedTypeReferenceDirectives, filePath, getResolvedTypeReferenceDirective);
         }
@@ -747,12 +830,14 @@ namespace ts {
         }
 
         function invalidateResolutionOfFile(filePath: Path) {
+            resolutionHost.writeLog(`ResolutionCache:: invalidateResolutionOfFile:: ${filePath}`);
             removeResolutionsOfFile(filePath);
             // Resolution is invalidated if the resulting file name is same as the deleted file path
             const prevHasChangedAutomaticTypeDirectiveNames = hasChangedAutomaticTypeDirectiveNames;
             if (invalidateResolutions(resolvedFileToResolution.get(filePath), returnTrue) &&
                 hasChangedAutomaticTypeDirectiveNames &&
                 !prevHasChangedAutomaticTypeDirectiveNames) {
+                resolutionHost.writeLog(`ResolutionCache:: onChangedAutomaticTypeDirectiveNames because of invalidateResolutionOfFile ${filePath}`);
                 resolutionHost.onChangedAutomaticTypeDirectiveNames();
             }
         }
@@ -767,6 +852,7 @@ namespace ts {
                 // Watching directory is created
                 // Invalidate any resolution has failed lookup in this directory
                 isInDirectoryChecks.push(fileOrDirectoryPath);
+                resolutionHost.writeLog(`ResolutionCache:: Adding to isInDirectoryChecks:: ${fileOrDirectoryPath}`);
             }
             else {
                 // If something to do with folder/file starting with "." in node_modules folder, skip it
@@ -776,6 +862,7 @@ namespace ts {
 
                 // prevent saving an open file from over-eagerly triggering invalidation
                 if (resolutionHost.fileIsOpen(fileOrDirectoryPath)) {
+                    resolutionHost.writeLog(`ResolutionCache:: Open file, ignoring:: ${fileOrDirectoryPath}`);
                     return false;
                 }
 
@@ -787,23 +874,28 @@ namespace ts {
                     // Invalidate any resolution from this directory
                     failedLookupChecks.push(fileOrDirectoryPath);
                     startsWithPathChecks.push(fileOrDirectoryPath);
+                    resolutionHost.writeLog(`ResolutionCache:: failedLookupChecks and startsWithPathChecks:: ${fileOrDirectoryPath}`);
                 }
                 else {
                     if (!isPathWithDefaultFailedLookupExtension(fileOrDirectoryPath) && !customFailedLookupPaths.has(fileOrDirectoryPath)) {
+                        resolutionHost.writeLog(`ResolutionCache:: ignoring because of extension:: ${fileOrDirectoryPath}`);
                         return false;
                     }
                     // Ignore emits from the program
                     if (isEmittedFileOfProgram(resolutionHost.getCurrentProgram(), fileOrDirectoryPath)) {
+                        resolutionHost.writeLog(`ResolutionCache:: ignoring emitted file:: ${fileOrDirectoryPath}`);
                         return false;
                     }
                     // Resolution need to be invalidated if failed lookup location is same as the file or directory getting created
                     failedLookupChecks.push(fileOrDirectoryPath);
+                    resolutionHost.writeLog(`ResolutionCache:: failedLookupChecks:: ${fileOrDirectoryPath}`);
                 }
             }
             resolutionHost.scheduleInvalidateResolutionsOfFailedLookupLocations();
         }
 
         function invalidateResolutionsOfFailedLookupLocations() {
+            resolutionHost.writeLog(`ResolutionCache:: invalidateResolutionsOfFailedLookupLocations:: ${JSON.stringify({ failedLookupChecks, startsWithPathChecks, isInDirectoryChecks }, undefined, " ")}`);
             if (!failedLookupChecks.length && !startsWithPathChecks.length && !isInDirectoryChecks.length) {
                 return false;
             }
@@ -849,6 +941,7 @@ namespace ts {
                 // We could potentially store more data here about whether it was/would be really be used or not
                 // and with that determine to trigger compilation but for now this is enough
                 hasChangedAutomaticTypeDirectiveNames = true;
+                resolutionHost.writeLog(`ResolutionCache:: onChangedAutomaticTypeDirectiveNames because of TypeRoot watch`);
                 resolutionHost.onChangedAutomaticTypeDirectiveNames();
 
                 // Since directory watchers invoked are flaky, the failed lookup location events might not be triggered
