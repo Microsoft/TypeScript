@@ -116,7 +116,9 @@ namespace ts {
             }
 
             append(statements, visitNode(currentModuleInfo.externalHelpersImportDeclaration, sourceElementVisitor, isStatement));
-            addRange(statements, visitNodes(node.statements, sourceElementVisitor, isStatement, statementOffset));
+            // hoist import declarations first, then transform others.
+            addRange(statements, visitNodes(node.statements, importDeclarationOnlyVisitor, isStatement, statementOffset));
+            addRange(statements, visitNodes(node.statements, sourceElementIgnoreImportDeclarationVisitor, isStatement, statementOffset));
             addExportEqualsIfNeeded(statements, /*emitAsReturn*/ false);
             insertStatementsAfterStandardPrologue(statements, endLexicalEnvironment());
 
@@ -442,7 +444,9 @@ namespace ts {
             if (moduleKind === ModuleKind.AMD) {
                 addRange(statements, mapDefined(currentModuleInfo.externalImports, getAMDImportExpressionForImport));
             }
-            addRange(statements, visitNodes(node.statements, sourceElementVisitor, isStatement, statementOffset));
+            // hoist import declarations first, then transform others.
+            addRange(statements, visitNodes(node.statements, importDeclarationOnlyVisitor, isStatement, statementOffset));
+            addRange(statements, visitNodes(node.statements, sourceElementIgnoreImportDeclarationVisitor, isStatement, statementOffset));
 
             // Append the 'export =' statement if provided.
             addExportEqualsIfNeeded(statements, /*emitAsReturn*/ true);
@@ -500,15 +504,17 @@ namespace ts {
         // Top-Level Source Element Visitors
         //
 
-        /**
-         * Visits a node at the top level of the source file.
-         *
-         * @param node The node to visit.
-         */
-        function sourceElementVisitor(node: Node): VisitResult<Node> {
+        function importDeclarationOnlyVisitor(node: Node): VisitResult<Node> {
+            if (node.kind === SyntaxKind.ImportDeclaration) {
+                return visitImportDeclaration(node as ImportDeclaration);
+            }
+            return undefined;
+        }
+
+        function sourceElementIgnoreImportDeclarationVisitor(node: Node): VisitResult<Node> {
             switch (node.kind) {
                 case SyntaxKind.ImportDeclaration:
-                    return visitImportDeclaration(<ImportDeclaration>node);
+                    return undefined;
 
                 case SyntaxKind.ImportEqualsDeclaration:
                     return visitImportEqualsDeclaration(<ImportEqualsDeclaration>node);
@@ -537,6 +543,18 @@ namespace ts {
                 default:
                     return visitEachChild(node, moduleExpressionElementVisitor, context);
             }
+        }
+
+        /**
+         * Visits a node at the top level of the source file.
+         *
+         * @param node The node to visit.
+         */
+        function sourceElementVisitor(node: Node): VisitResult<Node> {
+            if (node.kind === SyntaxKind.ImportDeclaration) {
+                return importDeclarationOnlyVisitor(node);
+            }
+            return sourceElementIgnoreImportDeclarationVisitor(node);
         }
 
         function moduleExpressionElementVisitor(node: Expression): VisitResult<Expression> {
