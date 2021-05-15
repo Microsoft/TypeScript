@@ -476,6 +476,7 @@ namespace ts {
             // Compound nodes
             createImmediatelyInvokedFunctionExpression,
             createImmediatelyInvokedArrowFunction,
+            createImportCall,
             createVoidZero,
             createExportDefault,
             createExternalModuleExport,
@@ -5315,6 +5316,10 @@ namespace ts {
                     createExportSpecifier(/*propertyName*/ undefined, exportName)
                 ])
             );
+        }
+
+        function createImportCall(argumentsList: readonly Expression[]) {
+            return <ImportCall>createCallExpression(<ImportExpression>createToken(SyntaxKind.ImportKeyword), /*type*/ undefined, argumentsList);
         }
 
         //
