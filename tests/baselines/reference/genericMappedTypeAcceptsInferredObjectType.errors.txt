@@ -1,0 +1,72 @@
+tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts(22,14): error TS2345: Argument of type '{ foo: T["foo"]; }' is not assignable to parameter of type 'GenericMap<T>'.
+tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts(28,31): error TS2345: Argument of type '{ foo: T["foo"]; }' is not assignable to parameter of type 'GenericMap<ExtendedConstraint>'.
+  Property 'bar' is missing in type '{ foo: T["foo"]; }' but required in type 'GenericMap<ExtendedConstraint>'.
+tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts(29,31): error TS2345: Argument of type '{ bar: T["bar"]; }' is not assignable to parameter of type 'GenericMap<ExtendedConstraint>'.
+  Property 'foo' is missing in type '{ bar: T["bar"]; }' but required in type 'GenericMap<ExtendedConstraint>'.
+tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts(31,14): error TS2345: Argument of type '{ foo: T["foo"]; bar: T["bar"]; }' is not assignable to parameter of type 'GenericMap<T>'.
+tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts(33,14): error TS2345: Argument of type '{ foo: T["foo"]; }' is not assignable to parameter of type 'OptionalGenericMap<T>'.
+tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts(34,14): error TS2345: Argument of type '{ bar: T["bar"]; }' is not assignable to parameter of type 'OptionalGenericMap<T>'.
+tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts(39,2): error TS2322: Type '{ [x: string]: T[K]; }' is not assignable to type '{ [k in keyof T]?: T[k]; }'.
+
+
+==== tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts (7 errors) ====
+    interface Constraint {
+    	foo: string
+    }
+    
+    interface ExtendedConstraint extends Constraint {
+    	bar: string
+    }
+    
+    type GenericMap<T> = {
+    	[P in keyof T]: T[P]
+    }
+    
+    type OptionalGenericMap<T> = {
+    	[P in keyof T]?: T[P]
+    }
+    
+    const required = <T>(x: GenericMap<T>) => x
+    const optional = <T>(x: OptionalGenericMap<T>) => x
+    
+    const withinConstraint = <T extends Constraint>(foo: T['foo']) => {
+    	required<Constraint>({ foo }) // no error as { foo: T['foo'] } <: GenericMap<Constraint>
+    	required<T>({ foo }) // error as { foo: T['foo'] } /<: GenericMap<T> because other properties may be missing
+    	            ~~~~~~~
+!!! error TS2345: Argument of type '{ foo: T["foo"]; }' is not assignable to parameter of type 'GenericMap<T>'.
+    	optional<T>({}) // no error as {} <: OptionalGenericMap<Constraint>
+    	optional<T>({ foo }) // no error as { foo: T['foo'] } <: OptionalGenericMap<T>
+    }
+    
+    const withinExtendedConstraint = <T extends ExtendedConstraint>(foo: T['foo'], bar: T['bar']) => {
+    	required<ExtendedConstraint>({ foo }) // error as { foo: T['foo'] } /<: GenericMap<ExtendedConstraint> because bar is missing
+    	                             ~~~~~~~
+!!! error TS2345: Argument of type '{ foo: T["foo"]; }' is not assignable to parameter of type 'GenericMap<ExtendedConstraint>'.
+!!! error TS2345:   Property 'bar' is missing in type '{ foo: T["foo"]; }' but required in type 'GenericMap<ExtendedConstraint>'.
+!!! related TS2728 tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts:6:2: 'bar' is declared here.
+    	required<ExtendedConstraint>({ bar }) // error as { bar: T['bar'] } /<: GenericMap<ExtendedConstraint> because foo is missing
+    	                             ~~~~~~~
+!!! error TS2345: Argument of type '{ bar: T["bar"]; }' is not assignable to parameter of type 'GenericMap<ExtendedConstraint>'.
+!!! error TS2345:   Property 'foo' is missing in type '{ bar: T["bar"]; }' but required in type 'GenericMap<ExtendedConstraint>'.
+!!! related TS2728 tests/cases/compiler/genericMappedTypeAcceptsInferredObjectType.ts:2:2: 'foo' is declared here.
+    	required<ExtendedConstraint>({ foo, bar }) // no error as { foo: T['foo'], bar: T['bar'] } <: GenericMap<ExtendedConstraint>
+    	required<T>({ foo, bar }) // error as { foo: T['foo'], bar: T['bar'] } /<: GenericMap<T> because other properties may be missing
+    	            ~~~~~~~~~~~~
+!!! error TS2345: Argument of type '{ foo: T["foo"]; bar: T["bar"]; }' is not assignable to parameter of type 'GenericMap<T>'.
+    	optional<T>({}) // no error as {} <: OptionalGenericMap<T>
+    	optional<T>({ foo }) // no error as { foo: T['foo'] } <: OptionalGenericMap<T>
+    	            ~~~~~~~
+!!! error TS2345: Argument of type '{ foo: T["foo"]; }' is not assignable to parameter of type 'OptionalGenericMap<T>'.
+    	optional<T>({ bar }) // no error as { bar: T['bar'] } <: OptionalGenericMap<T>
+    	            ~~~~~~~
+!!! error TS2345: Argument of type '{ bar: T["bar"]; }' is not assignable to parameter of type 'OptionalGenericMap<T>'.
+    	optional<T>({ foo, bar }) // no error as { foo: T['foo'], bar: T['bar'] } <: OptionalGenericMap<T>
+    }
+    
+    function shouldReject<T, K extends keyof T>(key: K, v: T[K]): {[k in keyof T]?: T[k]} {
+    	return { [key]: v }
+    	~~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type '{ [x: string]: T[K]; }' is not assignable to type '{ [k in keyof T]?: T[k]; }'.
+        // Type '{ [x: string]: T[K]; }' is not assignable to type '{ [k in keyof T]?: T[k] | undefined; }'.(2322)
+    }
+    

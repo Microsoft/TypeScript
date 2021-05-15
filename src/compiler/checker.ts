@@ -18491,9 +18491,11 @@ namespace ts {
                     const template = getTemplateTypeFromMappedType(target);
                     const modifiers = getMappedTypeModifiers(target);
                     if (!(modifiers & MappedTypeModifiers.ExcludeOptional)) {
-                        if (template.flags & TypeFlags.IndexedAccess && (<IndexedAccessType>template).objectType === source &&
-                            (<IndexedAccessType>template).indexType === getTypeParameterFromMappedType(target)) {
-                            return Ternary.True;
+                        if (template.flags & TypeFlags.IndexedAccess && (<IndexedAccessType>template).indexType === getTypeParameterFromMappedType(target)) {
+                            const objectType = (<IndexedAccessType>template).objectType;
+                            if (objectType === source) return Ternary.True;
+                            const objectTypeConstraint = getConstraintOfType(objectType);
+                            if (objectTypeConstraint && isTypeAssignableTo(source, objectTypeConstraint) && target.declaration.questionToken?.kind === SyntaxKind.QuestionToken) return Ternary.True;
                         }
                         if (!isGenericMappedType(source)) {
                             const targetConstraint = getConstraintTypeFromMappedType(target);
