@@ -406,8 +406,10 @@ namespace ts {
             const lineStart = getPositionOfLineAndCharacter(file, i, 0);
             const lineEnd = i < lastLineInFile ? getPositionOfLineAndCharacter(file, i + 1, 0) : file.text.length;
             let lineContent = file.text.slice(lineStart, lineEnd);
-            lineContent = lineContent.replace(/\s+$/g, "");  // trim from end
-            lineContent = lineContent.replace(/\t/g, " ");   // convert tabs to single spaces
+            // Trim from end and replace leading tabs (if any) to single spaces.
+            lineContent = lineContent.replace(/\s+$/g, "");
+            // Using gy flags to repeatedly match \t at lastIndex (default 0) and replace it until it runs out of \t at lastIndex
+            lineContent = lineContent.replace(/\t/gy, " ");
 
             // Output the gutter and the actual contents of the line.
             context += indent + formatColorAndReset(padLeft(i + 1 + "", gutterWidth), gutterStyleSequence) + gutterSeparator;
