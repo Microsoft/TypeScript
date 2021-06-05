@@ -2901,6 +2901,7 @@ declare namespace ts {
         composite?: boolean;
         incremental?: boolean;
         tsBuildInfoFile?: string;
+        persistResolutions?: string;
         removeComments?: boolean;
         rootDir?: string;
         rootDirs?: string[];
@@ -3130,11 +3131,11 @@ declare namespace ts {
         useCaseSensitiveFileNames(): boolean;
         getNewLine(): string;
         readDirectory?(rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number): string[];
-        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedModule | undefined)[];
+        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedModuleWithFailedLookupLocations[] | (ResolvedModule | undefined)[];
         /**
          * This method is a companion for 'resolveModuleNames' and is used to resolve 'types' references to actual type declaration files
          */
-        resolveTypeReferenceDirectives?(typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedTypeReferenceDirective | undefined)[];
+        resolveTypeReferenceDirectives?(typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedTypeReferenceDirectiveWithFailedLookupLocations[] | (ResolvedTypeReferenceDirective | undefined)[];
         getEnvironmentVariable?(name: string): string | undefined;
         createHash?(data: string): string;
         getParsedCommandLine?(fileName: string): ParsedCommandLine | undefined;
@@ -5090,6 +5091,11 @@ declare namespace ts {
         readFile(fileName: string): string | undefined;
     }
     function readBuilderProgram(compilerOptions: CompilerOptions, host: ReadBuildProgramHost): EmitAndSemanticDiagnosticsBuilderProgram | undefined;
+    interface CleanPersistedProgramOfTsBuildInfoHost {
+        readFile(fileName: string): string | undefined;
+        writeFile: WriteFileCallback;
+    }
+    function cleanPersistedProgramOfTsBuildInfo(compilerOptions: CompilerOptions, host: CleanPersistedProgramOfTsBuildInfoHost): EmitResult;
     function createIncrementalCompilerHost(options: CompilerOptions, system?: System): CompilerHost;
     interface IncrementalProgramOptions<T extends BuilderProgram> {
         rootNames: readonly string[];
@@ -5150,9 +5156,9 @@ declare namespace ts {
         /** If provided is used to get the environment variable */
         getEnvironmentVariable?(name: string): string | undefined;
         /** If provided, used to resolve the module names, otherwise typescript's default module resolution */
-        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedModule | undefined)[];
+        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedModuleWithFailedLookupLocations[] | (ResolvedModule | undefined)[];
         /** If provided, used to resolve type reference directives, otherwise typescript's default resolution */
-        resolveTypeReferenceDirectives?(typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedTypeReferenceDirective | undefined)[];
+        resolveTypeReferenceDirectives?(typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedTypeReferenceDirectiveWithFailedLookupLocations[] | (ResolvedTypeReferenceDirective | undefined)[];
     }
     interface WatchCompilerHost<T extends BuilderProgram> extends ProgramHost<T>, WatchHost {
         /** Instead of using output d.ts file from project reference, use its source file */
@@ -5256,8 +5262,10 @@ declare namespace ts {
     interface SolutionBuilder<T extends BuilderProgram> {
         build(project?: string, cancellationToken?: CancellationToken, writeFile?: WriteFileCallback, getCustomTransformers?: (project: string) => CustomTransformers): ExitStatus;
         clean(project?: string): ExitStatus;
+        cleanPersistedProgram(project?: string): ExitStatus;
         buildReferences(project: string, cancellationToken?: CancellationToken, writeFile?: WriteFileCallback, getCustomTransformers?: (project: string) => CustomTransformers): ExitStatus;
         cleanReferences(project?: string): ExitStatus;
+        cleanPersistedProgramOfReferences(project?: string): ExitStatus;
         getNextInvalidatedProject(cancellationToken?: CancellationToken): InvalidatedProject<T> | undefined;
     }
     /**
@@ -5534,9 +5542,8 @@ declare namespace ts {
         realpath?(path: string): string;
         fileExists?(path: string): boolean;
         getTypeRootsVersion?(): number;
-        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedModule | undefined)[];
-        getResolvedModuleWithFailedLookupLocationsFromCache?(modulename: string, containingFile: string): ResolvedModuleWithFailedLookupLocations | undefined;
-        resolveTypeReferenceDirectives?(typeDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedTypeReferenceDirective | undefined)[];
+        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedModuleWithFailedLookupLocations[] | (ResolvedModule | undefined)[];
+        resolveTypeReferenceDirectives?(typeDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedTypeReferenceDirectiveWithFailedLookupLocations[] | (ResolvedTypeReferenceDirective | undefined)[];
         getDirectories?(directoryName: string): string[];
         /**
          * Gets a set of custom transformers to use during emit.
@@ -9475,10 +9482,6 @@ declare namespace ts.server.protocol {
     }
 }
 declare namespace ts.server {
-    interface ScriptInfoVersion {
-        svc: number;
-        text: number;
-    }
     function isDynamicFileName(fileName: NormalizedPath): boolean;
     class ScriptInfo {
         private readonly host;
@@ -9493,7 +9496,7 @@ declare namespace ts.server {
         private formatSettings;
         private preferences;
         private textStorage;
-        constructor(host: ServerHost, fileName: NormalizedPath, scriptKind: ScriptKind, hasMixedContent: boolean, path: Path, initialVersion?: ScriptInfoVersion);
+        constructor(host: ServerHost, fileName: NormalizedPath, scriptKind: ScriptKind, hasMixedContent: boolean, path: Path);
         isScriptOpen(): boolean;
         open(newText: string): void;
         close(fileExists?: boolean): void;
@@ -9641,9 +9644,8 @@ declare namespace ts.server {
         readFile(fileName: string): string | undefined;
         writeFile(fileName: string, content: string): void;
         fileExists(file: string): boolean;
-        resolveModuleNames(moduleNames: string[], containingFile: string, reusedNames?: string[], redirectedReference?: ResolvedProjectReference): (ResolvedModuleFull | undefined)[];
-        getResolvedModuleWithFailedLookupLocationsFromCache(moduleName: string, containingFile: string): ResolvedModuleWithFailedLookupLocations | undefined;
-        resolveTypeReferenceDirectives(typeDirectiveNames: string[], containingFile: string, redirectedReference?: ResolvedProjectReference): (ResolvedTypeReferenceDirective | undefined)[];
+        resolveModuleNames(moduleNames: string[], containingFile: string, reusedNames?: string[], redirectedReference?: ResolvedProjectReference): ResolvedModuleWithFailedLookupLocations[];
+        resolveTypeReferenceDirectives(typeDirectiveNames: string[], containingFile: string, redirectedReference?: ResolvedProjectReference): ResolvedTypeReferenceDirectiveWithFailedLookupLocations[];
         directoryExists(path: string): boolean;
         getDirectories(path: string): string[];
         log(s: string): void;
@@ -9954,12 +9956,6 @@ declare namespace ts.server {
     }
     export class ProjectService {
         private readonly scriptInfoInNodeModulesWatchers;
-        /**
-         * Contains all the deleted script info's version information so that
-         * it does not reset when creating script info again
-         * (and could have potentially collided with version where contents mismatch)
-         */
-        private readonly filenameToScriptInfoVersion;
         private readonly allJsFilesForOpenFileTelemetry;
         /**
          * maps external project file name to list of config files that were the part of this project

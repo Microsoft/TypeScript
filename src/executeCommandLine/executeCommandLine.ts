@@ -307,6 +307,10 @@ namespace ts {
                 reportDiagnostic,
                 configParseResult.options
             );
+            if (commandLineOptions.cleanPersistedProgram) {
+                configParseResult.errors.forEach(reportDiagnostic);
+                return cleanPersistedProgram(sys, configParseResult.options, reportDiagnostic);
+            }
             if (isWatchSet(configParseResult.options)) {
                 if (reportWatchModeWithoutSysSupport(sys, reportDiagnostic)) return;
                 return createWatchOfConfigFile(
@@ -347,6 +351,9 @@ namespace ts {
                 reportDiagnostic,
                 commandLineOptions
             );
+            if (commandLineOptions.cleanPersistedProgram) {
+                return cleanPersistedProgram(sys, commandLineOptions, reportDiagnostic);
+            }
             if (isWatchSet(commandLineOptions)) {
                 if (reportWatchModeWithoutSysSupport(sys, reportDiagnostic)) return;
                 return createWatchOfFilesAndCompilerOptions(
@@ -478,6 +485,19 @@ namespace ts {
             return sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
         }
 
+        if (buildOptions.cleanPersistedProgram) {
+            const buildHost = createSolutionBuilderHost(
+                sys,
+                /*createProgram*/ undefined,
+                reportDiagnostic,
+                createBuilderStatusReporter(sys, shouldBePretty(sys, buildOptions)),
+                createReportErrorSummary(sys, buildOptions)
+            );
+            updateSolutionBuilderHost(sys, cb, buildHost);
+            const builder = createSolutionBuilder(buildHost, projects, buildOptions);
+            return sys.exit(builder.cleanPersistedProgram());
+        }
+
         if (buildOptions.watch) {
             if (reportWatchModeWithoutSysSupport(sys, reportDiagnostic)) return;
             const buildHost = createSolutionBuilderWithWatchHost(
@@ -513,6 +533,17 @@ namespace ts {
             undefined;
     }
 
+    function cleanPersistedProgram(sys: System, options: CompilerOptions, reportDiagnostic: DiagnosticReporter) {
+        const diagnostics = cleanPersistedProgramOfTsBuildInfoAndReportError(
+            options,
+            sys,
+            reportDiagnostic,
+            s => sys.write(s + sys.newLine),
+            createReportErrorSummary(sys, options)
+        );
+        return sys.exit(diagnostics ? ExitStatus.DiagnosticsPresent_OutputsGenerated : ExitStatus.Success);
+    }
+
     function performCompilation(
         sys: System,
         cb: ExecuteCommandLineCallbacks,
@@ -526,14 +557,13 @@ namespace ts {
         changeCompilerHostLikeToUseCache(host, fileName => toPath(fileName, currentDirectory, getCanonicalFileName));
         enableStatisticsAndTracing(sys, options, /*isBuildMode*/ false);
 
-        const programOptions: CreateProgramOptions = {
+        const program = createProgram({
             rootNames: fileNames,
             options,
             projectReferences,
             host,
             configFileParsingDiagnostics: getConfigFileParsingDiagnostics(config)
-        };
-        const program = createProgram(programOptions);
+        });
         const exitStatus = emitFilesAndReportErrorsAndGetExitStatus(
             program,
             reportDiagnostic,

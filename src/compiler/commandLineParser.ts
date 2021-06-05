@@ -280,6 +280,13 @@ namespace ts {
             isCommandLineOnly: true,
             description: Diagnostics.The_locale_used_when_displaying_messages_to_the_user_e_g_en_us
         },
+        {
+            name: "cleanPersistedProgram",
+            type: "boolean",
+            isCommandLineOnly: true,
+            category: Diagnostics.Modules,
+            description: Diagnostics.Clean_persisted_program_information_in_tsbuildinfo_file,
+        },
     ];
 
     /* @internal */
@@ -966,6 +973,13 @@ namespace ts {
             // We are not doing a full typecheck, we are not resolving the whole context,
             // so pass --noResolve to avoid reporting missing file errors.
             transpileOptionValue: true
+        },
+        {
+            name: "persistResolutions",
+            type: "boolean",
+            affectsModuleResolution: true,
+            category: Diagnostics.Modules,
+            description: Diagnostics.Save_module_and_type_reference_directive_resolution_information_in_tsbuildinfo_file,
         },
         {
             name: "stripInternal",

@@ -123,7 +123,7 @@ namespace ts.GoToDefinition {
         const typeReferenceDirective = findReferenceInPosition(sourceFile.typeReferenceDirectives, position);
         if (typeReferenceDirective) {
             const reference = program.getResolvedTypeReferenceDirectives().get(typeReferenceDirective.fileName);
-            const file = reference && program.getSourceFile(reference.resolvedFileName!); // TODO:GH#18217
+            const file = reference?.resolvedTypeReferenceDirective && program.getSourceFile(reference.resolvedTypeReferenceDirective.resolvedFileName!); // TODO:GH#18217
             return file && { reference: typeReferenceDirective, fileName: file.fileName, file, unverified: false };
         }
 
@@ -136,7 +136,7 @@ namespace ts.GoToDefinition {
         if (sourceFile.resolvedModules?.size) {
             const node = getTokenAtPosition(sourceFile, position);
             if (isModuleSpecifierLike(node) && isExternalModuleNameRelative(node.text) && sourceFile.resolvedModules.has(node.text)) {
-                const verifiedFileName = sourceFile.resolvedModules.get(node.text)?.resolvedFileName;
+                const verifiedFileName = sourceFile.resolvedModules.get(node.text)?.resolvedModule?.resolvedFileName;
                 const fileName = verifiedFileName || resolvePath(getDirectoryPath(sourceFile.fileName), node.text);
                 return {
                     file: program.getSourceFile(fileName),

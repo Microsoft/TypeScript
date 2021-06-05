@@ -74,6 +74,24 @@ namespace ts {
          * true if semantic diagnostics are ReusableDiagnostic instead of Diagnostic
          */
         hasReusableDiagnostic?: true;
+        persistedProgramState?: PersistedProgramState;
+    }
+
+    export interface PersistedProgramState {
+        files: readonly SourceFileOfProgramFromBuildInfo[];
+        rootFileNames: readonly string[];
+        filesByName: ESMap<Path, SourceFileOfProgramFromBuildInfo | Path | typeof missingSourceOfProjectReferenceRedirect | typeof missingFile>;
+        fileIncludeReasons: MultiMap<Path, FileIncludeReason>;
+        sourceFileFromExternalLibraryPath: Set<Path> | undefined;
+        sourceFileFromProjectReferencePath: Set<Path> | undefined;
+        redirectTargetsMap: MultiMap<Path, string>;
+        sourceFileToPackageName: ESMap<Path, string>;
+        projectReferences: readonly ProjectReference[] | undefined;
+        resolvedProjectReferences: readonly (ResolvedProjectReferenceOfProgramFromBuildInfo | undefined)[] | undefined;
+        automaticTypeDirectiveNames: string[] | undefined;
+        resolvedTypeReferenceDirectives: ESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations>;
+        fileProcessingDiagnostics: FilePreprocessingDiagnostic[] | undefined;
+        useSourceOfProjectReferenceRedirect: boolean;
     }
 
     export const enum BuilderFileEmit {
@@ -159,6 +177,20 @@ namespace ts {
          * true if program has been emitted
          */
         programEmitComplete?: true;
+        persistedProgramState?: PersistedProgramState;
+    }
+
+    let diagnosticKeyMap: Map<keyof typeof Diagnostics> | undefined;
+    function ensureDiagnosticKeyMap(): Map<keyof typeof Diagnostics> {
+        if (!diagnosticKeyMap) {
+            diagnosticKeyMap = new Map();
+            for (const propName in Diagnostics) {
+                if (Diagnostics.hasOwnProperty(propName)) {
+                    diagnosticKeyMap.set(Diagnostics[propName as keyof typeof Diagnostics].key, propName as keyof typeof Diagnostics);
+                }
+            }
+        }
+        return diagnosticKeyMap;
     }
 
     function hasSameKeys(map1: ReadonlyCollection<string> | undefined, map2: ReadonlyCollection<string> | undefined): boolean {
@@ -257,13 +289,22 @@ namespace ts {
             state.seenAffectedFiles = state.seenAffectedFiles || new Set();
         }
 
-        state.buildInfoEmitPending = !!state.changedFilesSet.size;
+        if (oldState && newProgram.structureIsReused === StructureIsReused.Completely) {
+            state.persistedProgramState = oldState.persistedProgramState;
+        }
+
+        state.buildInfoEmitPending = !!state.changedFilesSet.size || !!compilerOptions.persistResolutions && newProgram.structureIsReused !== StructureIsReused.Completely;
         return state;
+    }
+
+    export function getToPathForBuildInfoFilePath(options: CompilerOptions, currentDirectory: string, getCanonicalFileName: GetCanonicalFileName) {
+        const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(getTsBuildInfoEmitOutputFilePath(options)!, currentDirectory));
+        return (path: string) => toPath(path, buildInfoDirectory, getCanonicalFileName);
     }
 
     function convertToDiagnostics(diagnostics: readonly ReusableDiagnostic[], newProgram: Program, getCanonicalFileName: GetCanonicalFileName): readonly Diagnostic[] {
         if (!diagnostics.length) return emptyArray;
-        const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(getTsBuildInfoEmitOutputFilePath(newProgram.getCompilerOptions())!, newProgram.getCurrentDirectory()));
+        const toPath = getToPathForBuildInfoFilePath(newProgram.getCompilerOptions(), newProgram.getCurrentDirectory(), getCanonicalFileName);
         return diagnostics.map(diagnostic => {
             const result: Diagnostic = convertToDiagnosticRelatedInformation(diagnostic, newProgram, toPath);
             result.reportsUnnecessary = diagnostic.reportsUnnecessary;
@@ -278,10 +319,6 @@ namespace ts {
                 undefined;
             return result;
         });
-
-        function toPath(path: string) {
-            return ts.toPath(path, buildInfoDirectory, getCanonicalFileName);
-        }
     }
 
     function convertToDiagnosticRelatedInformation(diagnostic: ReusableDiagnosticRelatedInformation, newProgram: Program, toPath: (path: string) => Path): DiagnosticRelatedInformation {
@@ -297,7 +334,81 @@ namespace ts {
      */
     function releaseCache(state: BuilderProgramState) {
         BuilderState.releaseCache(state);
+        createPersistedProgramInfo(state);
         state.program = undefined;
+    }
+
+    function createPersistedProgramInfo(state: BuilderProgramState) {
+        if (!state.program || !state.compilerOptions.persistResolutions || state.persistedProgramState) return;
+        const filesByName = mapEntries(state.program.getFilesByNameMap(), (key, value) => [key, value ? value.path : value as SourceFileOfProgramFromBuildInfo | Path | typeof missingSourceOfProjectReferenceRedirect | typeof missingFile]);
+        let sourceFileFromExternalLibraryPath: Set<Path> | undefined;
+        let sourceFileFromProjectReferencePath: Set<Path> | undefined;
+        const files = mapToReadonlyArray(state.program.getSourceFiles(), toSourceFileOfProgramFromBuildInfo);
+        state.persistedProgramState = {
+            files,
+            rootFileNames: state.program.getRootFileNames(),
+            filesByName,
+            fileIncludeReasons: state.program.getFileIncludeReasons(),
+            sourceFileFromExternalLibraryPath,
+            sourceFileFromProjectReferencePath,
+            redirectTargetsMap: state.program.redirectTargetsMap,
+            sourceFileToPackageName: state.program.sourceFileToPackageName,
+            projectReferences: state.program.getProjectReferences(),
+            resolvedProjectReferences: state.program.getResolvedProjectReferences()?.map(toResolvedProjectReferenceOfProgramFromBuildInfo),
+            resolvedTypeReferenceDirectives: state.program.getResolvedTypeReferenceDirectives(),
+            automaticTypeDirectiveNames: state.program.getAutomaticTypeDirectiveNames(),
+            fileProcessingDiagnostics: state.program.getFileProcessingDiagnostics(),
+            useSourceOfProjectReferenceRedirect: state.program.useSourceOfProjectReferenceRedirect,
+        };
+
+        function toSourceFileOfProgramFromBuildInfo(sourceFile: SourceFile): SourceFileOfProgramFromBuildInfo {
+            if (state.program!.isSourceFileFromExternalLibraryPath(sourceFile.path)) (sourceFileFromExternalLibraryPath ||= new Set()).add(sourceFile.path);
+            if (sourceFile.resolvedPath !== sourceFile.path && state.program!.isSourceFileFromExternalLibraryPath(sourceFile.path)) (sourceFileFromExternalLibraryPath ||= new Set()).add(sourceFile.path);
+            const file: SourceFileOfProgramFromBuildInfo = {
+                fileName: sourceFile.fileName,
+                originalFileName: sourceFile.originalFileName,
+                path: sourceFile.path,
+                resolvedPath: sourceFile.resolvedPath,
+                flags: sourceFile.flags,
+                version: sourceFile.version,
+                typeReferenceDirectives: mapToReadonlyArray(sourceFile.typeReferenceDirectives, toFileReference),
+                libReferenceDirectives: mapToReadonlyArray(sourceFile.libReferenceDirectives, toFileReference),
+                referencedFiles: mapToReadonlyArray(sourceFile.referencedFiles, toFileReference),
+                imports: mapToReadonlyArray(sourceFile.imports, toStringLiteralLikeOfProgramFromBuildInfo),
+                moduleAugmentations: mapToReadonlyArray(sourceFile.moduleAugmentations, toModuleNameOfProgramFromBuildInfo),
+                ambientModuleNames: sourceFile.ambientModuleNames,
+                hasNoDefaultLib: sourceFile.hasNoDefaultLib,
+                resolvedModules: sourceFile.resolvedModules,
+                resolvedTypeReferenceDirectiveNames: sourceFile.resolvedTypeReferenceDirectiveNames,
+                redirectInfo: sourceFile.redirectInfo && { redirectTarget: { path: sourceFile.redirectInfo.redirectTarget.path } }
+            };
+
+            if (state.program!.getFilesByNameMap().get(file.path) === sourceFile) filesByName.set(file.path, file);
+            if (state.program!.getFilesByNameMap().get(file.resolvedPath) === sourceFile) filesByName.set(file.resolvedPath, file);
+            return file;
+        }
+        function toResolvedProjectReferenceOfProgramFromBuildInfo(ref: ResolvedProjectReference | undefined): ResolvedProjectReferenceOfProgramFromBuildInfo | undefined {
+            return ref && {
+                commandLine: {
+                    fileNames: ref.commandLine.fileNames,
+                    options: ref.commandLine.options,
+                    projectReferences: ref.commandLine.projectReferences
+                },
+                sourceFile: { version: ref.sourceFile.version, path: ref.sourceFile.path },
+                references: ref.references?.map(toResolvedProjectReferenceOfProgramFromBuildInfo)
+            };
+        }
+        function toStringLiteralLikeOfProgramFromBuildInfo(name: StringLiteralLike): StringLiteralLikeOfProgramFromBuildInfo {
+            return { kind: name.kind, text: name.text };
+        }
+
+        function toModuleNameOfProgramFromBuildInfo(name: StringLiteralLike | Identifier): ModuleNameOfProgramFromBuildInfo {
+            return isIdentifier(name) ? { kind: name.kind, escapedText: name.escapedText } : toStringLiteralLikeOfProgramFromBuildInfo(name);
+        }
+
+        function toFileReference(f: FileReference) {
+            return f.fileName;
+        }
     }
 
     /**
@@ -706,6 +817,7 @@ namespace ts {
     }
 
     export type ProgramBuildInfoFileId = number & { __programBuildInfoFileIdBrand: any };
+    export type ProgramBuildInfoAbsoluteFileId = number & { __programBuildInfoAbsoluteFileIdBrand: any };
     export type ProgramBuildInfoFileIdListId = number & { __programBuildInfoFileIdListIdBrand: any };
     export type ProgramBuildInfoDiagnostic = ProgramBuildInfoFileId | [fileId: ProgramBuildInfoFileId, diagnostics: readonly ReusableDiagnostic[]];
     export type ProgramBuilderInfoFilePendingEmit = [fileId: ProgramBuildInfoFileId, emitKind: BuilderFileEmit];
@@ -723,6 +835,104 @@ namespace ts {
      * ProgramBuildInfoFileInfo is string if FileInfo.version === FileInfo.signature && !FileInfo.affectsGlobalScope otherwise encoded FileInfo
      */
     export type ProgramBuildInfoFileInfo = string | ProgramBuildInfoBuilderStateFileInfo;
+    export interface ResolutionWithFailedLookupLocations {
+        serializationIndex?: PersistedProgramResolutionId;
+    }
+    export interface ResolvedModuleWithFailedLookupLocations extends ResolutionWithFailedLookupLocations { }
+    export interface ResolvedTypeReferenceDirectiveWithFailedLookupLocations extends ResolutionWithFailedLookupLocations { }
+    export type PersistedProgramResolvedModuleFull = Omit<ResolvedModuleFull, "resolvedFileName" | "isExternalLibraryImport" | "originalPath"> & {
+        resolvedFileName: ProgramBuildInfoAbsoluteFileId;
+        isExternalLibraryImport?: true;
+        readonly originalPath?: ProgramBuildInfoAbsoluteFileId;
+    };
+    export interface PersistedProgramResolvedModuleWithFailedLookupLocations {
+        readonly resolvedModule: PersistedProgramResolvedModuleFull | undefined;
+        failedLookupLocations?: readonly ProgramBuildInfoAbsoluteFileId[];
+    }
+    export type PersistedProgramResolvedTypeReferenceDirective = Omit<ResolvedTypeReferenceDirective, "resolvedFileName" | "isExternalLibraryImport"> & {
+        resolvedFileName: ProgramBuildInfoAbsoluteFileId | undefined;
+        isExternalLibraryImport?: true;
+    };
+    export interface PersistedProgramResolvedTypeReferenceDirectiveWithFailedLookupLocations {
+        resolvedTypeReferenceDirective: PersistedProgramResolvedTypeReferenceDirective | undefined;
+        failedLookupLocations?: readonly ProgramBuildInfoAbsoluteFileId[];
+    }
+    export type PersistedProgramResolution = PersistedProgramResolvedModuleWithFailedLookupLocations & PersistedProgramResolvedTypeReferenceDirectiveWithFailedLookupLocations;
+    export type PersistedProgramResolutionId = number & { __persistedProgramResolutionIdBrand: any };
+    export type PersistedProgramResolutionEntry = [name: string, resolutionId: PersistedProgramResolutionId];
+    export interface PersistedProgramSourceFile {
+        fileName: ProgramBuildInfoAbsoluteFileId;
+        originalFileName: ProgramBuildInfoAbsoluteFileId;
+        path: ProgramBuildInfoFileId;
+        resolvedPath: ProgramBuildInfoFileId;
+        // This currently is set to sourceFile.flags & NodeFlags.PermanentlySetIncrementalFlags but cant be set in type
+        // Change this if it changes in reusing program
+        flags: NodeFlags;
+        version: string;
+
+        typeReferenceDirectives?: readonly string[];
+        libReferenceDirectives?: readonly string[];
+        referencedFiles?: readonly string[];
+        imports?: readonly StringLiteralLikeOfProgramFromBuildInfo[];
+        moduleAugmentations?: readonly ModuleNameOfProgramFromBuildInfo[];
+        ambientModuleNames?: readonly string[];
+        hasNoDefaultLib?: true;
+
+        resolvedModules?: readonly PersistedProgramResolutionEntry[];
+        resolvedTypeReferenceDirectiveNames?: readonly PersistedProgramResolutionEntry[];
+        redirectInfo?: { readonly redirectTarget: { readonly path: ProgramBuildInfoFileId; }; };
+
+        includeReasons: readonly PersistedProgramFileIncludeReason[];
+        isSourceFileFromExternalLibraryPath?: true;
+        isSourceFileFromProjectReference?: true;
+        redirectTargets?: readonly ProgramBuildInfoAbsoluteFileId[];
+        packageName?: string;
+    }
+    /** If key and value are same, just use ProgramBuildInfoFileId otherwise pair of key followed by value */
+    export type PersistedProgramFileByNameEntry = ProgramBuildInfoFileId | [fileId: ProgramBuildInfoFileId, file: ProgramBuildInfoFileId | typeof missingSourceOfProjectReferenceRedirect | typeof missingFile];
+    export type PersistedProgramReferencedFile = Omit<ReferencedFile, "file"> & {
+        file: ProgramBuildInfoFileId;
+    };
+    export type PersistedProgramFileIncludeReason =
+        RootFile |
+        LibFile |
+        ProjectReferenceFile |
+        PersistedProgramReferencedFile |
+        AutomaticTypeDirectiveFile;
+    export type PersistedProgramFilePreprocessingReferencedDiagnostic = Omit<FilePreprocessingReferencedDiagnostic, "reason" | "diagnostic"> & {
+        reason: PersistedProgramReferencedFile;
+        diagnostic: keyof typeof Diagnostics;
+    };
+    export type PersistedProgramFilePreprocessingFileExplainingDiagnostic = Omit<FilePreprocessingFileExplainingDiagnostic, "file" | "fileProcessingReason" | "diagnostic"> & {
+        file?: ProgramBuildInfoFileId;
+        fileProcessingReason: PersistedProgramFileIncludeReason;
+        diagnostic: keyof typeof Diagnostics;
+    };
+    export type PersistedProgramFilePreprocessingDiagnostic = PersistedProgramFilePreprocessingReferencedDiagnostic | PersistedProgramFilePreprocessingFileExplainingDiagnostic;
+    export type PersistedProgramProjectReference = Omit<ProjectReference, "path"> & {
+        path: ProgramBuildInfoAbsoluteFileId;
+    };
+    export interface PersistedProgramResolvedProjectReference {
+        commandLine: {
+            fileNames: readonly ProgramBuildInfoAbsoluteFileId[] | undefined;
+            options: CompilerOptions;
+            projectReferences: readonly PersistedProgramProjectReference[] | undefined;
+        };
+        sourceFile: { version: string; path: ProgramBuildInfoFileId; };
+        references: readonly (PersistedProgramResolvedProjectReference | undefined)[] | undefined;
+    }
+    export interface PersistedProgram {
+        files: readonly PersistedProgramSourceFile[] | undefined;
+        rootFileNames: readonly ProgramBuildInfoAbsoluteFileId[] | undefined;
+        filesByName: readonly PersistedProgramFileByNameEntry[] | undefined;
+        projectReferences: readonly PersistedProgramProjectReference[] | undefined;
+        resolvedProjectReferences: readonly (PersistedProgramResolvedProjectReference | undefined)[] | undefined;
+        automaticTypeDirectiveNames: string[] | undefined;
+        resolvedTypeReferenceDirectives: readonly PersistedProgramResolutionEntry[] | undefined;
+        fileProcessingDiagnostics: readonly PersistedProgramFilePreprocessingDiagnostic[] | undefined;
+        resolutions: readonly PersistedProgramResolution[] | undefined;
+        useSourceOfProjectReferenceRedirect: true | undefined;
+    }
     export interface ProgramBuildInfo {
         fileNames: readonly string[];
         fileInfos: readonly ProgramBuildInfoFileInfo[];
@@ -732,19 +942,23 @@ namespace ts {
         exportedModulesMap?: ProgramBuildInfoReferencedMap;
         semanticDiagnosticsPerFile?: ProgramBuildInfoDiagnostic[];
         affectedFilesPendingEmit?: ProgramBuilderInfoFilePendingEmit[];
+        peristedProgram?: PersistedProgram;
     }
 
     /**
      * Gets the program information to be emitted in buildInfo so that we can use it to create new program
      */
     function getProgramBuildInfo(state: Readonly<ReusableBuilderProgramState>, getCanonicalFileName: GetCanonicalFileName): ProgramBuildInfo | undefined {
-        if (outFile(state.compilerOptions)) return undefined;
-        const currentDirectory = Debug.checkDefined(state.program).getCurrentDirectory();
+        if (outFileWithoutPersistResolutions(state.compilerOptions)) return undefined;
+        const program = Debug.checkDefined(state.program);
+        const currentDirectory = program.getCurrentDirectory();
         const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(getTsBuildInfoEmitOutputFilePath(state.compilerOptions)!, currentDirectory));
         const fileNames: string[] = [];
-        const fileNameToFileId = new Map<string, ProgramBuildInfoFileId>();
+        const fileNameToFileId = new Map<string, ProgramBuildInfoFileId & ProgramBuildInfoAbsoluteFileId>();
         let fileIdsList: (readonly ProgramBuildInfoFileId[])[] | undefined;
         let fileNamesToFileIdListId: ESMap<string, ProgramBuildInfoFileIdListId> | undefined;
+        let resolutions: (ResolvedModuleWithFailedLookupLocations | ResolvedTypeReferenceDirectiveWithFailedLookupLocations)[] | undefined;
+        let programFilesByName: ESMap<Path, SourceFile | typeof missingSourceOfProjectReferenceRedirect | typeof missingFile>;
         const fileInfos = arrayFrom(state.fileInfos.entries(), ([key, value]): ProgramBuildInfoFileInfo => {
             // Ensure fileId
             const fileId = toFileId(key);
@@ -808,15 +1022,41 @@ namespace ts {
             }
         }
 
+        let peristedProgram: PersistedProgram | undefined;
+        if (state.compilerOptions.persistResolutions) {
+            // persist program
+            programFilesByName = new Map(program.getFilesByNameMap());
+            const files = mapToReadonlyArrayOrUndefined(program.getSourceFiles(), toPersistedProgramSourceFile);
+            let filesByName: PersistedProgramFileByNameEntry[] | undefined;
+            for (const key of arrayFrom(programFilesByName.keys()).sort(compareStringsCaseSensitive)) {
+                const value = program.getFilesByNameMap().get(key)!;
+                const keyId = toFileId(key);
+                const valueId = value ? toFileId(value.path) : value;
+                (filesByName ||= []).push(keyId === valueId ? keyId : [keyId, valueId]);
+            }
+            peristedProgram = {
+                files,
+                rootFileNames: mapToReadonlyArrayOrUndefined(program.getRootFileNames(), toAbsoluteFileId),
+                filesByName,
+                projectReferences: program.getProjectReferences()?.map(toPersistedProgramProjectReference),
+                resolvedProjectReferences: program.getResolvedProjectReferences()?.map(toPersistedProgramResolvedProjectReference),
+                resolvedTypeReferenceDirectives: toPersistedProgramResolutionMap(program.getResolvedTypeReferenceDirectives()),
+                automaticTypeDirectiveNames: program.getAutomaticTypeDirectiveNames()?.length ? program.getAutomaticTypeDirectiveNames() : undefined,
+                fileProcessingDiagnostics: mapToReadonlyArrayOrUndefined(program.getFileProcessingDiagnostics(), toPersistedProgramFilePreprocessingDiagnostic),
+                resolutions: mapToReadonlyArrayOrUndefined(resolutions, toPersistedProgramResolution),
+                useSourceOfProjectReferenceRedirect: program.useSourceOfProjectReferenceRedirect ? true : undefined
+            };
+        }
         return {
             fileNames,
             fileInfos,
-            options: convertToProgramBuildInfoCompilerOptions(state.compilerOptions, relativeToBuildInfoEnsuringAbsolutePath),
+            options: convertToProgramBuildInfoCompilerOptions(state.compilerOptions, relativeToBuildInfoEnsuringAbsolutePath, !state.compilerOptions.persistResolutions),
             fileIdsList,
             referencedMap,
             exportedModulesMap,
             semanticDiagnosticsPerFile,
             affectedFilesPendingEmit,
+            peristedProgram,
         };
 
         function relativeToBuildInfoEnsuringAbsolutePath(path: string) {
@@ -827,13 +1067,21 @@ namespace ts {
             return ensurePathIsNonModuleName(getRelativePathFromDirectory(buildInfoDirectory, path, getCanonicalFileName));
         }
 
-        function toFileId(path: Path): ProgramBuildInfoFileId {
+        function toFileAndAbsoluteFileId(path: string): ProgramBuildInfoFileId & ProgramBuildInfoAbsoluteFileId {
             let fileId = fileNameToFileId.get(path);
             if (fileId === undefined) {
                 fileNames.push(relativeToBuildInfo(path));
-                fileNameToFileId.set(path, fileId = fileNames.length as ProgramBuildInfoFileId);
+                fileNameToFileId.set(path, fileId = fileNames.length as ProgramBuildInfoFileId & ProgramBuildInfoAbsoluteFileId);
             }
             return fileId;
+        }
+
+        function toFileId(path: Path): ProgramBuildInfoFileId {
+            return toFileAndAbsoluteFileId(path);
+        }
+
+        function toAbsoluteFileId(path: string): ProgramBuildInfoAbsoluteFileId {
+            return toFileAndAbsoluteFileId(getNormalizedAbsolutePath(path, currentDirectory));
         }
 
         function toFileIdListId(set: ReadonlySet<Path>): ProgramBuildInfoFileIdListId {
@@ -846,16 +1094,141 @@ namespace ts {
             }
             return fileIdListId;
         }
+
+        function toPersistedProgramSourceFile(sourceFile: SourceFile): PersistedProgramSourceFile {
+            if (programFilesByName.get(sourceFile.path) === sourceFile) programFilesByName.delete(sourceFile.path);
+            if (programFilesByName.get(sourceFile.resolvedPath) === sourceFile) programFilesByName.delete(sourceFile.resolvedPath);
+            return {
+                fileName: toAbsoluteFileId(sourceFile.fileName),
+                originalFileName: toAbsoluteFileId(sourceFile.originalFileName),
+                path: toFileId(sourceFile.path),
+                resolvedPath: toFileId(sourceFile.resolvedPath),
+                version: sourceFile.version,
+                flags: sourceFile.flags & NodeFlags.PermanentlySetIncrementalFlags,
+                typeReferenceDirectives: mapToReadonlyArrayOrUndefined(sourceFile.typeReferenceDirectives, toPersistedProgramFileReference),
+                libReferenceDirectives: mapToReadonlyArrayOrUndefined(sourceFile.libReferenceDirectives, toPersistedProgramFileReference),
+                referencedFiles: mapToReadonlyArrayOrUndefined(sourceFile.referencedFiles, toPersistedProgramFileReference),
+                imports: mapToReadonlyArrayOrUndefined(sourceFile.imports, toStringLiteralLikeOfProgramFromBuildInfo),
+                moduleAugmentations: mapToReadonlyArrayOrUndefined(sourceFile.moduleAugmentations, toModuleNameOfProgramFromBuildInfo),
+                ambientModuleNames: sourceFile.ambientModuleNames.length ? sourceFile.ambientModuleNames : undefined,
+                hasNoDefaultLib: sourceFile.hasNoDefaultLib ? true : undefined,
+                redirectInfo: sourceFile.redirectInfo && { redirectTarget: { path: toFileId(sourceFile.redirectInfo.redirectTarget.path) } },
+                resolvedModules: toPersistedProgramResolutionMap(sourceFile.resolvedModules),
+                resolvedTypeReferenceDirectiveNames: toPersistedProgramResolutionMap(sourceFile.resolvedTypeReferenceDirectiveNames),
+                redirectTargets: mapToReadonlyArrayOrUndefined(program.redirectTargetsMap.get(sourceFile.path), toAbsoluteFileId),
+                includeReasons: program.getFileIncludeReasons().get(sourceFile.path)!.map(toPersistedProgramFileIncludeReason),
+                isSourceFileFromExternalLibraryPath: program.isSourceFileFromExternalLibraryPath(sourceFile.path) ? true : undefined,
+                isSourceFileFromProjectReference: sourceFile.path !== sourceFile.resolvedPath && program.isSourceFileFromProjectReference(sourceFile) ? true : undefined,
+                packageName: program.sourceFileToPackageName.get(sourceFile.path),
+            };
+        }
+
+        function toPersistedProgramReferencedFile(reason: ReferencedFile): PersistedProgramReferencedFile {
+            return { ...reason, file: toFileId(reason.file) };
+        }
+
+        function toPersistedProgramFileIncludeReason(reason: FileIncludeReason): PersistedProgramFileIncludeReason {
+            return isReferencedFile(reason) ? toPersistedProgramReferencedFile(reason) : reason;
+        }
+
+        function toPersistedProgramFilePreprocessingDiagnostic(d: FilePreprocessingDiagnostic): PersistedProgramFilePreprocessingDiagnostic {
+            switch (d.kind) {
+                case FilePreprocessingDiagnosticsKind.FilePreprocessingFileExplainingDiagnostic:
+                    return {
+                        ...d,
+                        diagnostic: ensureDiagnosticKeyMap().get(d.diagnostic.key)!,
+                        file: d.file && toFileId(d.file),
+                        fileProcessingReason: toPersistedProgramFileIncludeReason(d.fileProcessingReason),
+                    };
+                case FilePreprocessingDiagnosticsKind.FilePreprocessingReferencedDiagnostic:
+                    return {
+                        ...d,
+                        diagnostic: ensureDiagnosticKeyMap().get(d.diagnostic.key)!,
+                        reason: toPersistedProgramReferencedFile(d.reason),
+                    };
+                default:
+                    Debug.assertNever(d);
+            }
+        }
+
+        function toPersistedProgramResolvedProjectReference(ref: ResolvedProjectReference | undefined): PersistedProgramResolvedProjectReference | undefined {
+            return ref && {
+                commandLine: {
+                    fileNames: mapToReadonlyArrayOrUndefined(ref.commandLine.fileNames, toAbsoluteFileId),
+                    options: convertToProgramBuildInfoCompilerOptions(ref.commandLine.options, relativeToBuildInfoEnsuringAbsolutePath, /*filterOptions*/ false)!,
+                    projectReferences: mapToReadonlyArrayOrUndefined(ref.commandLine.projectReferences, toPersistedProgramProjectReference)
+                },
+                sourceFile: { version: ref.sourceFile.version, path: toFileId(ref.sourceFile.path) },
+                references: mapToReadonlyArrayOrUndefined(ref.references, toPersistedProgramResolvedProjectReference)
+            };
+        }
+
+        function toPersistedProgramProjectReference(ref: ProjectReference): PersistedProgramProjectReference {
+            return { ...ref, path: toAbsoluteFileId(ref.path) };
+        }
+
+        function isResolvedModule(r: ResolvedModuleWithFailedLookupLocations | ResolvedTypeReferenceDirectiveWithFailedLookupLocations): r is ResolvedModuleWithFailedLookupLocations {
+            return !!(r as ResolvedModuleWithFailedLookupLocations).resolvedModule;
+        }
+
+        function toPersistedProgramResolution(r: ResolvedModuleWithFailedLookupLocations | ResolvedTypeReferenceDirectiveWithFailedLookupLocations): PersistedProgramResolution {
+            const resolvedModule = isResolvedModule(r) ? r.resolvedModule : undefined;
+            const resolvedTypeReferenceDirective = isResolvedModule(r) ? undefined : r.resolvedTypeReferenceDirective;
+            // Reset serializing index
+            r.serializationIndex = undefined;
+            return {
+                resolvedModule: resolvedModule && {
+                    ...resolvedModule,
+                    resolvedFileName: toAbsoluteFileId(resolvedModule.resolvedFileName),
+                    isExternalLibraryImport: resolvedModule.isExternalLibraryImport ? true : undefined,
+                    originalPath: resolvedModule.originalPath ? toAbsoluteFileId(resolvedModule.originalPath) : undefined,
+                },
+                resolvedTypeReferenceDirective: resolvedTypeReferenceDirective && {
+                    ...resolvedTypeReferenceDirective,
+                    resolvedFileName: resolvedTypeReferenceDirective.resolvedFileName ? toAbsoluteFileId(resolvedTypeReferenceDirective.resolvedFileName) : undefined,
+                    isExternalLibraryImport: resolvedTypeReferenceDirective.isExternalLibraryImport ? true : undefined,
+                },
+                failedLookupLocations: mapToReadonlyArrayOrUndefined(r.failedLookupLocations, toAbsoluteFileId),
+            };
+        }
+
+        function toPersistedProgramResolutionMap(resolutionMap: ESMap<string, ResolvedModuleWithFailedLookupLocations | ResolvedTypeReferenceDirectiveWithFailedLookupLocations> | undefined): readonly PersistedProgramResolutionEntry[] | undefined {
+            let result: PersistedProgramResolutionEntry[] | undefined;
+            resolutionMap?.forEach((resolution, key) => {
+                if (resolution.serializationIndex === undefined) {
+                    (resolutions ||= []).push(resolution);
+                    resolution.serializationIndex = resolutions.length as PersistedProgramResolutionId;
+                }
+                (result ||= []).push([key, resolution.serializationIndex]);
+            });
+            return result;
+        }
+
+        function toStringLiteralLikeOfProgramFromBuildInfo(name: StringLiteralLike): StringLiteralLikeOfProgramFromBuildInfo {
+            return { kind: name.kind, text: name.text };
+        }
+
+        function toModuleNameOfProgramFromBuildInfo(name: StringLiteralLike | Identifier): ModuleNameOfProgramFromBuildInfo {
+            return isIdentifier(name) ? { kind: name.kind, escapedText: name.escapedText } : toStringLiteralLikeOfProgramFromBuildInfo(name);
+        }
+
+        function toPersistedProgramFileReference(f: FileReference) {
+            return f.fileName;
+        }
     }
 
-    function convertToProgramBuildInfoCompilerOptions(options: CompilerOptions, relativeToBuildInfo: (path: string) => string) {
+    function mapToReadonlyArrayOrUndefined<T, U>(array: readonly T[] | undefined, map: (value: T) => U): readonly U[] | undefined {
+        return array?.length ? array.map(map) : undefined;
+    }
+
+    function convertToProgramBuildInfoCompilerOptions(options: CompilerOptions, relativeToBuildInfo: (path: string) => string, filterOptions: boolean) {
         let result: CompilerOptions | undefined;
         const { optionsNameMap } = getOptionsNameMap();
 
         for (const name of getOwnKeys(options).sort(compareStringsCaseSensitive)) {
             const optionKey = name.toLowerCase();
             const optionInfo = optionsNameMap.get(optionKey);
-            if (optionInfo?.affectsEmit || optionInfo?.affectsSemanticDiagnostics ||
+            if (!filterOptions || optionInfo?.affectsEmit || optionInfo?.affectsSemanticDiagnostics ||
                 // We need to store `strict`, even though it won't be examined directly, so that the
                 // flags it controls (e.g. `strictNullChecks`) will be retrieved correctly from the buildinfo
                 optionKey === "strict" ||
@@ -868,6 +1241,7 @@ namespace ts {
                 );
             }
         }
+        if (!filterOptions && result?.configFilePath) result.configFilePath = relativeToBuildInfo(result.configFilePath);
         return result;
     }
 
@@ -941,7 +1315,7 @@ namespace ts {
                 rootNames: newProgramOrRootNames,
                 options: hostOrOptions as CompilerOptions,
                 host: oldProgramOrHost as CompilerHost,
-                oldProgram: oldProgram && oldProgram.getProgramOrUndefined(),
+                oldProgram: oldProgram?.getProgramOrProgramFromBuildInfoOrUndefined(),
                 configFileParsingDiagnostics,
                 projectReferences
             });
@@ -989,9 +1363,11 @@ namespace ts {
         builderProgram.getState = getState;
         builderProgram.backupState = () => {
             Debug.assert(backupState === undefined);
+            Debug.checkDefined(state.program);
             backupState = cloneBuilderProgramState(state);
         };
         builderProgram.restoreState = () => {
+            Debug.assert(backupState!.program === state.program);
             state = Debug.checkDefined(backupState);
             backupState = undefined;
         };
@@ -1250,12 +1626,45 @@ namespace ts {
                 { version: fileInfo.version, signature: fileInfo.signature === false ? undefined : fileInfo.version, affectsGlobalScope: fileInfo.affectsGlobalScope };
     }
 
-    export function createBuildProgramUsingProgramBuildInfo(program: ProgramBuildInfo, buildInfoPath: string, host: ReadBuildProgramHost): EmitAndSemanticDiagnosticsBuilderProgram {
+    function getProgramBuildInfoIdDecoder(program: ProgramBuildInfo, buildInfoPath: string, host: ReadBuildProgramHost) {
         const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(buildInfoPath, host.getCurrentDirectory()));
         const getCanonicalFileName = createGetCanonicalFileName(host.useCaseSensitiveFileNames());
+        const filePaths: (Path | undefined)[] = [];
+        let fileAbsolutePaths: (string | undefined)[] | undefined;
+        let filePathsSetList: (Set<Path> | undefined)[] | undefined;
+        return {
+            toAbsolutePath,
+            toFilePath,
+            toFileAbsolutePath,
+            toFilePathsSet,
+        };
 
-        const filePaths = program.fileNames.map(toPath);
-        const filePathsSetList = program.fileIdsList?.map(fileIds => new Set(fileIds.map(toFilePath)));
+        function toPath(path: string) {
+            return ts.toPath(path, buildInfoDirectory, getCanonicalFileName);
+        }
+
+        function toAbsolutePath(path: string) {
+            return getNormalizedAbsolutePath(path, buildInfoDirectory);
+        }
+
+        function toFilePath(fileId: ProgramBuildInfoFileId): Path {
+            const result = filePaths[fileId - 1];
+            return result !== undefined ? result : filePaths[fileId - 1] = toPath(program.fileNames[fileId - 1]);
+        }
+
+        function toFileAbsolutePath(fileId: ProgramBuildInfoAbsoluteFileId): string {
+            const result = fileAbsolutePaths?.[fileId - 1];
+            return result !== undefined ? result : (fileAbsolutePaths ||= [])[fileId - 1] = toAbsolutePath(program.fileNames[fileId - 1]);
+        }
+
+        function toFilePathsSet(fileIdsListId: ProgramBuildInfoFileIdListId): Set<Path> {
+            const result = filePathsSetList?.[fileIdsListId - 1];
+            return result !== undefined ? result : (filePathsSetList ||= [])[fileIdsListId - 1] = new Set(program.fileIdsList![fileIdsListId - 1].map(toFilePath));
+        }
+    }
+
+    export function createBuildProgramUsingProgramBuildInfo(program: ProgramBuildInfo, buildInfoPath: string, host: ReadBuildProgramHost): EmitAndSemanticDiagnosticsBuilderProgram {
+        const { toAbsolutePath, toFilePath, toFilePathsSet } = getProgramBuildInfoIdDecoder(program, buildInfoPath, host);
         const fileInfos = new Map<Path, BuilderState.FileInfo>();
         program.fileInfos.forEach((fileInfo, index) => fileInfos.set(toFilePath(index + 1 as ProgramBuildInfoFileId), toBuilderStateFileInfo(fileInfo)));
         const state: ReusableBuilderProgramState = {
@@ -1269,12 +1678,14 @@ namespace ts {
             affectedFilesPendingEmitKind: program.affectedFilesPendingEmit && arrayToMap(program.affectedFilesPendingEmit, value => toFilePath(value[0]), value => value[1]),
             affectedFilesPendingEmitIndex: program.affectedFilesPendingEmit && 0,
         };
+        let programFromBuildInfo: ProgramFromBuildInfo | false | undefined;
         return {
             getState: () => state,
             backupState: noop,
             restoreState: noop,
             getProgram: notImplemented,
             getProgramOrUndefined: returnUndefined,
+            getProgramOrProgramFromBuildInfoOrUndefined,
             releaseProgram: noop,
             getCompilerOptions: () => state.compilerOptions,
             getSourceFile: notImplemented,
@@ -1294,20 +1705,19 @@ namespace ts {
             close: noop,
         };
 
-        function toPath(path: string) {
-            return ts.toPath(path, buildInfoDirectory, getCanonicalFileName);
-        }
+        function getProgramOrProgramFromBuildInfoOrUndefined() {
+            if (programFromBuildInfo === undefined) {
+                const result = createProgramFromBuildInfo(program, buildInfoPath, host, state.compilerOptions);
+                if (result) {
+                    state.persistedProgramState = result.persistedProgramState;
+                    programFromBuildInfo = result.program;
+                }
+                else {
+                    programFromBuildInfo = false;
+                }
+            }
 
-        function toAbsolutePath(path: string) {
-            return getNormalizedAbsolutePath(path, buildInfoDirectory);
-        }
-
-        function toFilePath(fileId: ProgramBuildInfoFileId) {
-            return filePaths[fileId - 1];
-        }
-
-        function toFilePathsSet(fileIdsListId: ProgramBuildInfoFileIdListId) {
-            return filePathsSetList![fileIdsListId - 1];
+            return programFromBuildInfo || undefined;
         }
 
         function toMapOfReferencedSet(referenceMap: ProgramBuildInfoReferencedMap | undefined): ReadonlyESMap<Path, BuilderState.ReferencedSet> | undefined {
@@ -1315,13 +1725,192 @@ namespace ts {
         }
     }
 
-    export function createRedirectedBuilderProgram(getState: () => { program: Program | undefined; compilerOptions: CompilerOptions; }, configFileParsingDiagnostics: readonly Diagnostic[]): BuilderProgram {
+    function mapToReadonlyArray<T, U>(array: readonly T[] | undefined, map: (value: T) => U): readonly U[] {
+        return array?.length ? array.map(map) : emptyArray;
+    }
+
+    export function createProgramFromBuildInfo(
+        program: ProgramBuildInfo,
+        buildInfoPath: string,
+        host: ReadBuildProgramHost,
+        compilerOptions?: CompilerOptions
+    ): { program: ProgramFromBuildInfo; persistedProgramState: PersistedProgramState; } | undefined {
+        if (!program.peristedProgram) return undefined;
+        const { toAbsolutePath, toFilePath, toFileAbsolutePath } = getProgramBuildInfoIdDecoder(program, buildInfoPath, host);
+
+        compilerOptions ||= program.options ? convertToOptionsWithAbsolutePaths(program.options, toAbsolutePath) : {};
+        const filesByName = new Map<Path, SourceFileOfProgramFromBuildInfo | Path | typeof missingSourceOfProjectReferenceRedirect | typeof missingFile>();
+        const fileIncludeReasons = createMultiMap<Path, FileIncludeReason>();
+        let sourceFileFromExternalLibraryPath: Set<Path> | undefined;
+        let sourceFileFromProjectReferencePath: Set<Path> | undefined;
+        const redirectTargetsMap = createMultiMap<Path, string>();
+        const sourceFileToPackageName = new Map<Path, string>();
+        program.peristedProgram.filesByName?.forEach(entry => {
+            if (isArray(entry)) {
+                filesByName.set(toFilePath(entry[0]), entry[1] ? toFilePath(entry[1]) : entry[1] as typeof missingSourceOfProjectReferenceRedirect | typeof missingFile);
+            }
+            else {
+                const path = toFilePath(entry);
+                filesByName.set(path, path);
+            }
+        });
+        const resolutions = mapToReadonlyArray(program.peristedProgram.resolutions, toResolution);
+        const files = mapToReadonlyArray(program.peristedProgram.files, toSourceFileOfProgramFromBuildInfo);
+        const persistedProgramState: PersistedProgramState = {
+            files,
+            rootFileNames: mapToReadonlyArray(program.peristedProgram.rootFileNames, toFileAbsolutePath),
+            filesByName,
+            fileIncludeReasons,
+            sourceFileFromExternalLibraryPath,
+            sourceFileFromProjectReferencePath,
+            redirectTargetsMap,
+            sourceFileToPackageName,
+            projectReferences: program.peristedProgram.projectReferences?.map(toProjectReference),
+            resolvedProjectReferences: program.peristedProgram.resolvedProjectReferences?.map(toResolvedProjectReference),
+            automaticTypeDirectiveNames: program.peristedProgram.automaticTypeDirectiveNames,
+            resolvedTypeReferenceDirectives: toResolutionMap(program.peristedProgram.resolvedTypeReferenceDirectives) || new Map(),
+            fileProcessingDiagnostics: map(program.peristedProgram.fileProcessingDiagnostics, toFileProcessingDiagnostic),
+            useSourceOfProjectReferenceRedirect: !!program.peristedProgram.useSourceOfProjectReferenceRedirect,
+        };
+        return {
+            program: createProgramFromPersistedProgramState(persistedProgramState, compilerOptions),
+            persistedProgramState
+        };
+
+        function toSourceFileOfProgramFromBuildInfo(file: PersistedProgramSourceFile): SourceFileOfProgramFromBuildInfo {
+            const path = toFilePath(file.path);
+            const resolvedPath = toFilePath(file.resolvedPath);
+
+            fileIncludeReasons.set(path, file.includeReasons.map(toFileIncludeReason));
+            if (file.isSourceFileFromExternalLibraryPath) (sourceFileFromExternalLibraryPath ||= new Set()).add(path);
+            if (file.isSourceFileFromProjectReference) (sourceFileFromProjectReferencePath ||= new Set()).add(path);
+            if (file.redirectTargets) redirectTargetsMap.set(path, file.redirectTargets.map(toFileAbsolutePath));
+            if (file.packageName) sourceFileToPackageName.set(path, file.packageName);
+
+            const sourceFile: SourceFileOfProgramFromBuildInfo = {
+                fileName: toFileAbsolutePath(file.fileName),
+                originalFileName: toFileAbsolutePath(file.originalFileName),
+                path,
+                resolvedPath,
+                flags: file.flags,
+                version: file.version,
+                typeReferenceDirectives: file.typeReferenceDirectives || emptyArray,
+                libReferenceDirectives: file.libReferenceDirectives || emptyArray,
+                referencedFiles: file.referencedFiles || emptyArray,
+                imports: file.imports || emptyArray,
+                moduleAugmentations: file.moduleAugmentations || emptyArray,
+                ambientModuleNames: file.ambientModuleNames || emptyArray,
+                hasNoDefaultLib: file.hasNoDefaultLib || false,
+                resolvedModules: toResolutionMap(file.resolvedModules),
+                resolvedTypeReferenceDirectiveNames: toResolutionMap(file.resolvedTypeReferenceDirectiveNames),
+                redirectInfo: file.redirectInfo && { redirectTarget: { path: toFilePath(file.redirectInfo.redirectTarget.path) } }
+            };
+
+            if (!filesByName.has(path)) filesByName.set(path, sourceFile);
+            if (!filesByName.has(resolvedPath)) filesByName.set(resolvedPath, sourceFile);
+            return sourceFile;
+        }
+
+        function toReferencedFile(reason: PersistedProgramReferencedFile): ReferencedFile {
+            return { ...reason, file: toFilePath(reason.file) };
+        }
+
+        function toFileIncludeReason(reason: PersistedProgramFileIncludeReason): FileIncludeReason {
+            return isReferencedFile(reason) ? toReferencedFile(reason) : reason;
+        }
+
+        function toResolutionMap(resolutionMap: readonly PersistedProgramResolutionEntry[] | undefined) {
+            return resolutionMap && arrayToMap(resolutionMap, value => value[0], value => resolutions[value[1] - 1]);
+        }
+
+        function toResolution({ resolvedModule, resolvedTypeReferenceDirective, failedLookupLocations }: PersistedProgramResolution): ResolvedModuleWithFailedLookupLocations & ResolvedTypeReferenceDirectiveWithFailedLookupLocations {
+            return {
+                resolvedModule: resolvedModule && {
+                    ...resolvedModule,
+                    resolvedFileName: toFileAbsolutePath(resolvedModule.resolvedFileName),
+                    originalPath: resolvedModule.originalPath && toFileAbsolutePath(resolvedModule.originalPath),
+                },
+                resolvedTypeReferenceDirective: resolvedTypeReferenceDirective && {
+                    ...resolvedTypeReferenceDirective,
+                    resolvedFileName: resolvedTypeReferenceDirective.resolvedFileName && toFileAbsolutePath(resolvedTypeReferenceDirective.resolvedFileName),
+                },
+                failedLookupLocations: failedLookupLocations ? failedLookupLocations.map(toFileAbsolutePath) : []
+            };
+        }
+
+        function toProjectReference(ref: PersistedProgramProjectReference): ProjectReference {
+            return { ...ref, path: toFileAbsolutePath(ref.path) };
+        }
+
+        function toResolvedProjectReference(ref: PersistedProgramResolvedProjectReference | undefined): ResolvedProjectReferenceOfProgramFromBuildInfo | undefined {
+            return ref && {
+                commandLine: {
+                    fileNames: ref.commandLine.fileNames?.map(toFileAbsolutePath) || [],
+                    options: convertToOptionsWithAbsolutePaths(ref.commandLine.options, toAbsolutePath),
+                    projectReferences: ref.commandLine.projectReferences?.map(toProjectReference)
+                },
+                sourceFile: { version: ref.sourceFile.version, path: toFilePath(ref.sourceFile.path) },
+                references: ref.references?.map(toResolvedProjectReference)
+            };
+        }
+
+        function toFileProcessingDiagnostic(d: PersistedProgramFilePreprocessingDiagnostic): FilePreprocessingDiagnostic {
+            switch (d.kind) {
+                case FilePreprocessingDiagnosticsKind.FilePreprocessingFileExplainingDiagnostic:
+                    return {
+                        ...d,
+                        diagnostic: Diagnostics[d.diagnostic],
+                        file: d.file ? toFilePath(d.file) : undefined,
+                        fileProcessingReason: toFileIncludeReason(d.fileProcessingReason),
+                    };
+                case FilePreprocessingDiagnosticsKind.FilePreprocessingReferencedDiagnostic:
+                    return {
+                        ...d,
+                        diagnostic: Diagnostics[d.diagnostic],
+                        reason: toReferencedFile(d.reason),
+                    };
+                default:
+                    Debug.assertNever(d);
+            }
+        }
+    }
+
+    function createProgramFromPersistedProgramState(persistedProgramState: PersistedProgramState, compilerOptions: CompilerOptions): ProgramFromBuildInfo {
+        let missingFilePaths: readonly Path[] | undefined;
+        return {
+            programFromBuildInfo: true,
+            getCompilerOptions: () => compilerOptions,
+            getRootFileNames: () => persistedProgramState.rootFileNames,
+            getSourceFiles: () => persistedProgramState.files,
+            getSourceFileByPath: path => {
+                const file = persistedProgramState.filesByName.get(path);
+                return file && !isString(file) ? file : undefined;
+            },
+            getProjectReferences: () => persistedProgramState.projectReferences,
+            getResolvedProjectReferences: () => persistedProgramState.resolvedProjectReferences,
+            getAutomaticTypeDirectiveNames: () => persistedProgramState.automaticTypeDirectiveNames,
+            getMissingFilePaths: () => missingFilePaths ||= getMissingFilePaths(persistedProgramState.filesByName),
+            getFileIncludeReasons: () => persistedProgramState.fileIncludeReasons,
+            getResolvedTypeReferenceDirectives: () => persistedProgramState.resolvedTypeReferenceDirectives,
+            getFilesByNameMap: () => persistedProgramState.filesByName,
+            isSourceFileFromExternalLibraryPath: path => !!persistedProgramState.sourceFileFromExternalLibraryPath?.has(path),
+            isSourceFileFromProjectReference: file => !!persistedProgramState.sourceFileFromProjectReferencePath?.has(file.path),
+            getFileProcessingDiagnostics: () => persistedProgramState.fileProcessingDiagnostics,
+            redirectTargetsMap: persistedProgramState.redirectTargetsMap,
+            sourceFileToPackageName: persistedProgramState.sourceFileToPackageName,
+            useSourceOfProjectReferenceRedirect: persistedProgramState.useSourceOfProjectReferenceRedirect
+        };
+    }
+
+    export function createRedirectedBuilderProgram(getState: () => Pick<ReusableBuilderProgramState, "program" | "compilerOptions" | "persistedProgramState">, configFileParsingDiagnostics: readonly Diagnostic[]): BuilderProgram {
+        let programFromBuildInfo: ProgramFromBuildInfo | false | undefined;
         return {
             getState: notImplemented,
             backupState: noop,
             restoreState: noop,
             getProgram,
             getProgramOrUndefined: () => getState().program,
+            getProgramOrProgramFromBuildInfoOrUndefined,
             releaseProgram: () => getState().program = undefined,
             getCompilerOptions: () => getState().compilerOptions,
             getSourceFile: fileName => getProgram().getSourceFile(fileName),
@@ -1341,6 +1930,17 @@ namespace ts {
 
         function getProgram() {
             return Debug.checkDefined(getState().program);
+        }
+
+        function getProgramOrProgramFromBuildInfoOrUndefined() {
+            const state = getState();
+            if (state.program) return state.program;
+            if (programFromBuildInfo !== undefined) return programFromBuildInfo || undefined;
+            if (!state.persistedProgramState) {
+                programFromBuildInfo = false;
+                return undefined;
+            }
+            return programFromBuildInfo = createProgramFromPersistedProgramState(state.persistedProgramState, state.compilerOptions);
         }
     }
 }

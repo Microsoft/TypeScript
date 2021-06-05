@@ -4,16 +4,47 @@ namespace ts {
         getCurrentDirectory(): string;
         readFile(fileName: string): string | undefined;
     }
-    export function readBuilderProgram(compilerOptions: CompilerOptions, host: ReadBuildProgramHost) {
-        if (outFile(compilerOptions)) return undefined;
+    /*@internal*/
+    export function readBuildInfoForProgram(compilerOptions: CompilerOptions, host: ReadBuildProgramHost) {
         const buildInfoPath = getTsBuildInfoEmitOutputFilePath(compilerOptions);
         if (!buildInfoPath) return undefined;
-        const content = host.readFile(buildInfoPath);
+        const content = host.readFile?.(buildInfoPath);
         if (!content) return undefined;
         const buildInfo = getBuildInfo(content);
         if (buildInfo.version !== version) return undefined;
-        if (!buildInfo.program) return undefined;
-        return createBuildProgramUsingProgramBuildInfo(buildInfo.program, buildInfoPath, host);
+        return { buildInfo, buildInfoPath };
+    }
+    export function readBuilderProgram(compilerOptions: CompilerOptions, host: ReadBuildProgramHost) {
+        if (outFileWithoutPersistResolutions(compilerOptions)) return undefined;
+        const result = readBuildInfoForProgram(compilerOptions, host);
+        if (!result?.buildInfo.program) return undefined;
+        return createBuildProgramUsingProgramBuildInfo(result.buildInfo.program, result.buildInfoPath, host);
+    }
+
+    export interface CleanPersistedProgramOfTsBuildInfoHost {
+        readFile(fileName: string): string | undefined;
+        writeFile: WriteFileCallback;
+    }
+    export function cleanPersistedProgramOfTsBuildInfo(compilerOptions: CompilerOptions, host: CleanPersistedProgramOfTsBuildInfoHost): EmitResult {
+        if (outFileWithoutPersistResolutions(compilerOptions)) return emitSkippedWithNoDiagnostics;
+        const buildInfoPath = getTsBuildInfoEmitOutputFilePath(compilerOptions);
+        if (!buildInfoPath) return emitSkippedWithNoDiagnostics;
+        const content = host.readFile(buildInfoPath);
+        if (!content) return emitSkippedWithNoDiagnostics;
+        const buildInfo = getBuildInfo(content);
+        if (buildInfo.version !== version) return emitSkippedWithNoDiagnostics;
+        if (!buildInfo.program?.peristedProgram) return emitSkippedWithNoDiagnostics;
+        const { program: { peristedProgram, ...program } } = buildInfo;
+        buildInfo.program = program;
+
+        // Actual writeFile with new program
+        const emitDiagnostics = createDiagnosticCollection();
+        writeFile(host, emitDiagnostics, buildInfoPath, getBuildInfoText(buildInfo), /*writeByteOrderMark*/ false);
+        return {
+            emitSkipped: false,
+            diagnostics: emitDiagnostics.getDiagnostics(),
+            emittedFiles: compilerOptions.listEmittedFiles ? [buildInfoPath] : undefined
+        };
     }
 
     export function createIncrementalCompilerHost(options: CompilerOptions, system = sys): CompilerHost {
@@ -101,9 +132,9 @@ namespace ts {
         getEnvironmentVariable?(name: string): string | undefined;
 
         /** If provided, used to resolve the module names, otherwise typescript's default module resolution */
-        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedModule | undefined)[];
+        resolveModuleNames?(moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedModuleWithFailedLookupLocations[] | (ResolvedModule | undefined)[];
         /** If provided, used to resolve type reference directives, otherwise typescript's default resolution */
-        resolveTypeReferenceDirectives?(typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): (ResolvedTypeReferenceDirective | undefined)[];
+        resolveTypeReferenceDirectives?(typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ResolvedProjectReference | undefined, options: CompilerOptions): ResolvedTypeReferenceDirectiveWithFailedLookupLocations[] | (ResolvedTypeReferenceDirective | undefined)[];
     }
     /** Internal interface used to wire emit through same host */
 
@@ -426,7 +457,7 @@ namespace ts {
 
             // All resolutions are invalid if user provided resolutions
             const hasInvalidatedResolution = resolutionCache.createHasInvalidatedResolution(userProvidedResolution);
-            if (isProgramUptoDate(getCurrentProgram(), rootFileNames, compilerOptions, getSourceVersion, fileExists, hasInvalidatedResolution, hasChangedAutomaticTypeDirectiveNames, getParsedCommandLine, projectReferences)) {
+            if (isProgramUptoDate(getCurrentProgram(), rootFileNames, compilerOptions, getSourceVersion, /*getScriptKind*/ undefined, fileExists, hasInvalidatedResolution, hasChangedAutomaticTypeDirectiveNames, getParsedCommandLine, projectReferences)) {
                 if (hasChangedConfigFileParsingErrors) {
                     builderProgram = createProgram(/*rootNames*/ undefined, /*options*/ undefined, compilerHost, builderProgram, configFileParsingDiagnostics, projectReferences);
                     hasChangedConfigFileParsingErrors = false;

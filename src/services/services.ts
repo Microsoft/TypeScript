@@ -636,8 +636,8 @@ namespace ts {
         public languageVariant!: LanguageVariant;
         public identifiers!: ESMap<string, string>;
         public nameTable: UnderscoreEscapedMap<number> | undefined;
-        public resolvedModules: ESMap<string, ResolvedModuleFull> | undefined;
-        public resolvedTypeReferenceDirectiveNames!: ESMap<string, ResolvedTypeReferenceDirective>;
+        public resolvedModules: ESMap<string, ResolvedModuleWithFailedLookupLocations> | undefined;
+        public resolvedTypeReferenceDirectiveNames: ESMap<string, ResolvedTypeReferenceDirectiveWithFailedLookupLocations> | undefined;
         public imports!: readonly StringLiteralLike[];
         public moduleAugmentations!: StringLiteral[];
         private namedDeclarations: ESMap<string, Declaration[]> | undefined;
@@ -1272,6 +1272,15 @@ namespace ts {
             return sourceFile;
         }
 
+        function getOldProgram(options: CompilerOptions, compilerHost: CompilerHost): Program | ProgramFromBuildInfo | undefined {
+            if (program) return program;
+            if (!options.persistResolutions) return undefined;
+            const buildInfoResult = readBuildInfoForProgram(options, compilerHost);
+            if (!buildInfoResult?.buildInfo.program?.peristedProgram) return undefined;
+            const result = createProgramFromBuildInfo(buildInfoResult.buildInfo.program, buildInfoResult.buildInfoPath, compilerHost);
+            return result?.program;
+        }
+
         function synchronizeHostData(): void {
             Debug.assert(languageServiceMode !== LanguageServiceMode.Syntactic);
             // perform fast check if host supports it
@@ -1312,7 +1321,7 @@ namespace ts {
             };
 
             // If the program is already up-to-date, we can reuse it
-            if (isProgramUptoDate(program, rootFileNames, newSettings, (_path, fileName) => host.getScriptVersion(fileName), fileExists, hasInvalidatedResolution, hasChangedAutomaticTypeDirectiveNames, getParsedCommandLine, projectReferences)) {
+            if (isProgramUptoDate(program, rootFileNames, newSettings, (_path, fileName) => host.getScriptVersion(fileName), host.getScriptKind ? (_path, fileName) => host.getScriptKind!(fileName) : undefined, fileExists, hasInvalidatedResolution, hasChangedAutomaticTypeDirectiveNames, getParsedCommandLine, projectReferences)) {
                 return;
             }
 
@@ -1357,14 +1366,13 @@ namespace ts {
             host.setCompilerHost?.(compilerHost);
 
             const documentRegistryBucketKey = documentRegistry.getKeyForCompilationSettings(newSettings);
-            const options: CreateProgramOptions = {
+            program = createProgram({
                 rootNames: rootFileNames,
                 options: newSettings,
                 host: compilerHost,
-                oldProgram: program,
+                oldProgram: getOldProgram(newSettings, compilerHost),
                 projectReferences
-            };
-            program = createProgram(options);
+            });
 
             // hostCache is captured in the closure for 'getOrCreateSourceFile' but it should not be used past this point.
             // It needs to be cleared to allow all collected snapshots to be released

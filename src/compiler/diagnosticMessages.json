@@ -4919,6 +4919,14 @@
         "code": 6257
     },
 
+    "Save module and type reference directive resolution information in '.tsbuildinfo' file.": {
+        "category": "Message",
+        "code": 6258
+    },
+    "Clean persisted program information in '.tsbuildinfo' file.": {
+        "category": "Message",
+        "code": 6259
+    },
 
     "Projects to reference": {
         "category": "Message",
