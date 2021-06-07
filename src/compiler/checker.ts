@@ -635,6 +635,7 @@ namespace ts {
             getSuggestionForNonexistentSymbol: (location, name, meaning) => getSuggestionForNonexistentSymbol(location, escapeLeadingUnderscores(name), meaning),
             getSuggestedSymbolForNonexistentModule,
             getSuggestionForNonexistentExport,
+            getSuggestionForNonexistentIndexSignatureMethod,
             getBaseConstraintOfType,
             getDefaultFromTypeParameter: type => type && type.flags & TypeFlags.TypeParameter ? getDefaultFromTypeParameter(type as TypeParameter) : undefined,
             resolveName(name, location, meaning, excludeGlobals) {
@@ -27774,7 +27775,7 @@ namespace ts {
             return suggestion && symbolName(suggestion);
         }
 
-        function getSuggestionForNonexistentIndexSignature(objectType: Type, expr: ElementAccessExpression, keyedType: Type): string | undefined {
+        function getSuggestionForNonexistentIndexSignatureMethod(objectType: Type, expr: ElementAccessExpression, keyedType: Type): string | undefined {
             // check if object type has setter or getter
             function hasProp(name: "set" | "get") {
                 const prop = getPropertyOfObjectType(objectType, name as __String);
@@ -27789,7 +27790,13 @@ namespace ts {
             if (!hasProp(suggestedMethod)) {
                 return undefined;
             }
-
+            return suggestedMethod;
+        }
+        function getSuggestionForNonexistentIndexSignature(objectType: Type, expr: ElementAccessExpression, keyedType: Type): string | undefined {
+            const suggestedMethod = getSuggestionForNonexistentIndexSignatureMethod(objectType, expr, keyedType);
+            if(suggestedMethod === undefined) {
+                return undefined;
+            }
             let suggestion = tryGetPropertyAccessOrIdentifierToString(expr.expression);
             if (suggestion === undefined) {
                 suggestion = suggestedMethod;
