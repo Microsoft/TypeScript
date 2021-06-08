@@ -238,6 +238,22 @@ interface Symbol {
 
     type ReadableProgramBuildInfoDiagnostic = string | [string, readonly ReusableDiagnostic[]];
     type ReadableProgramBuilderInfoFilePendingEmit = [string, "DtsOnly" | "Full"];
+    type ReadableProgramBuildInfoResolvedModuleFull = Omit<ProgramBuildInfoResolvedModuleFull, "resolvedFileName" | "originalPath"> & {
+        resolvedFileName: string;
+        readonly originalPath?: string;
+    };
+    interface ReadableProgramBuildInfoResolvedModuleWithFailedLookupLocations {
+        readonly resolvedModule: ReadableProgramBuildInfoResolvedModuleFull | undefined;
+        failedLookupLocations?: readonly string[];
+    }
+    type ReadableProgramBuildInfoResolutionEntry = [name: string, resolution: ReadableProgramBuildInfoResolvedModuleWithFailedLookupLocations];
+    type ReadableProgramBuildInfoResolvedModules = MapLike<MapLike<ReadableProgramBuildInfoResolvedModuleWithFailedLookupLocations>>;
+    interface ReadableProgramBuildInfoPersistedResolutions {
+        resolutions: readonly ReadableProgramBuildInfoResolvedModuleWithFailedLookupLocations[];
+        names: readonly string[];
+        resolutionEntries: readonly ReadableProgramBuildInfoResolutionEntry[];
+        resolutionMap: ReadableProgramBuildInfoResolvedModules;
+    }
     interface ReadableProgramBuildInfo {
         fileNames: readonly string[];
         fileNamesList: readonly (readonly string[])[] | undefined;
@@ -247,12 +263,24 @@ interface Symbol {
         exportedModulesMap?: MapLike<string[]>;
         semanticDiagnosticsPerFile?: readonly ReadableProgramBuildInfoDiagnostic[];
         affectedFilesPendingEmit?: readonly ReadableProgramBuilderInfoFilePendingEmit[];
+        persistedResolutions?: ReadableProgramBuildInfoPersistedResolutions;
     }
     type ReadableBuildInfo = Omit<BuildInfo, "program"> & { program: ReadableProgramBuildInfo | undefined; size: number; };
     function generateBuildInfoProgramBaseline(sys: System, originalWriteFile: System["writeFile"], buildInfoPath: string, buildInfo: BuildInfo) {
         const fileInfos: ReadableProgramBuildInfo["fileInfos"] = {};
         buildInfo.program?.fileInfos.forEach((fileInfo, index) => fileInfos[toFileName(index + 1 as ProgramBuildInfoFileId)] = toBuilderStateFileInfo(fileInfo));
         const fileNamesList = buildInfo.program?.fileIdsList?.map(fileIdsListId => fileIdsListId.map(toFileName));
+        const resolutions = buildInfo.program?.persistedResolutions?.resolutions.map(toReadableProgramBuildInfoResolvedModuleWithFailedLookupLocations)!;
+        const resolutionEntries = buildInfo.program?.persistedResolutions?.resolutionEntries.map(toReadableProgramBuildInfoResolutionEntry)!;
+        const resolutionMap: ReadableProgramBuildInfoResolvedModules = buildInfo.program?.persistedResolutions?.resolutionMap ? {} : undefined!;
+        buildInfo.program?.persistedResolutions?.resolutionMap.forEach(([fileId, resolutionEntryIds]) => {
+            const resolvedModules: MapLike<ReadableProgramBuildInfoResolvedModuleWithFailedLookupLocations> = {};
+            resolutionEntryIds.forEach(entryId => {
+                const [name, resolution] = resolutionEntries[entryId - 1];
+                resolvedModules[name] = resolution;
+            });
+            resolutionMap[toFileName(fileId)] = resolvedModules;
+        });
         const program: ReadableProgramBuildInfo | undefined = buildInfo.program && {
             fileNames: buildInfo.program.fileNames,
             fileNamesList,
@@ -271,6 +299,12 @@ interface Symbol {
                     emitKind === BuilderFileEmit.Full ? "Full" :
                         Debug.assertNever(emitKind)
             ]),
+            persistedResolutions: buildInfo.program.persistedResolutions && {
+                ...buildInfo.program.persistedResolutions,
+                resolutions,
+                resolutionEntries,
+                resolutionMap
+            },
         };
         const version = buildInfo.version === ts.version ? fakes.version : buildInfo.version;
         const result: ReadableBuildInfo = {
@@ -282,7 +316,7 @@ interface Symbol {
         // For now its just JSON.stringify
         originalWriteFile.call(sys, `${buildInfoPath}.readable.baseline.txt`, JSON.stringify(result, /*replacer*/ undefined, 2));
 
-        function toFileName(fileId: ProgramBuildInfoFileId) {
+        function toFileName(fileId: ProgramBuildInfoFileId | ProgramBuildInfoAbsoluteFileId) {
             return buildInfo.program!.fileNames[fileId - 1];
         }
 
@@ -297,6 +331,21 @@ interface Symbol {
                 result[toFileName(fileNamesKey)] = toFileNames(fileNamesListKey);
             }
             return result;
+        }
+
+        function toReadableProgramBuildInfoResolvedModuleWithFailedLookupLocations(resolution: ProgramBuildInfoResolvedModuleWithFailedLookupLocations): ReadableProgramBuildInfoResolvedModuleWithFailedLookupLocations {
+            return {
+                resolvedModule: resolution.resolvedModule && {
+                    ...resolution.resolvedModule,
+                    resolvedFileName: toFileName(resolution.resolvedModule.resolvedFileName),
+                    originalPath: resolution.resolvedModule.originalPath ? toFileName(resolution.resolvedModule.originalPath) : undefined,
+                },
+                failedLookupLocations: resolution.failedLookupLocations?.map(toFileName)
+            };
+        }
+
+        function toReadableProgramBuildInfoResolutionEntry([nameId, resolutionId]: ProgramBuildInfoResolutionEntry): ReadableProgramBuildInfoResolutionEntry {
+            return [buildInfo.program!.persistedResolutions!.names[nameId - 1], resolutions[resolutionId - 1]];
         }
     }
 

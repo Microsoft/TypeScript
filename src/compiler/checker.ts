@@ -300,7 +300,7 @@ namespace ts {
                 if (!sf.resolvedModules) return;
 
                 forEachEntry(sf.resolvedModules, r => {
-                    if (r && r.packageId) set.add(r.packageId.name);
+                    if (r.resolvedModule?.packageId) set.add(r.resolvedModule.packageId.name);
                 });
             });
             return set;
@@ -40338,11 +40338,11 @@ namespace ts {
             if (resolvedTypeReferenceDirectives) {
                 // populate reverse mapping: file path -> type reference directive that was resolved to this file
                 fileToDirective = new Map<string, string>();
-                resolvedTypeReferenceDirectives.forEach((resolvedDirective, key) => {
-                    if (!resolvedDirective || !resolvedDirective.resolvedFileName) {
+                resolvedTypeReferenceDirectives.forEach(({ resolvedTypeReferenceDirective }, key) => {
+                    if (!resolvedTypeReferenceDirective || !resolvedTypeReferenceDirective.resolvedFileName) {
                         return;
                     }
-                    const file = host.getSourceFile(resolvedDirective.resolvedFileName);
+                    const file = host.getSourceFile(resolvedTypeReferenceDirective.resolvedFileName);
                     if (file) {
                         // Add the transitive closure of path references loaded by this file (as long as they are not)
                         // part of an existing type reference.

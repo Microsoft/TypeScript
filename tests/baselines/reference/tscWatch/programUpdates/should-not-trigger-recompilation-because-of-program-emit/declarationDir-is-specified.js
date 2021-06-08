@@ -56,6 +56,7 @@ interface Array<T> { length: number; [n: number]: T; }
     // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
     // "resolveJsonModule": true,                        /* Include modules imported with '.json' extension */
     // "noResolve": true,                                /* Do not add triple-slash references or imported modules to the list of compiled files. */
+    // "persistResolutions": true,                       /* Save module and type reference directive resolution information in '.tsbuildinfo' file. */
 
     /* JavaScript Support */
     // "allowJs": true,                                  /* Allow javascript files to be compiled. */

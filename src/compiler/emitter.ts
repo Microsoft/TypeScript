@@ -28,7 +28,8 @@ namespace ts {
             const prepends = host.getPrependNodes();
             if (sourceFiles.length || prepends.length) {
                 const bundle = factory.createBundle(sourceFiles, prepends);
-                const result = action(getOutputPathsFor(bundle, host, forceDtsEmit), bundle);
+                const outputPaths = getOutputPathsFor(bundle, host, forceDtsEmit);
+                const result = action(!onlyBuildInfo ? outputPaths : { buildInfoPath: outputPaths.buildInfoPath }, bundle);
                 if (result) {
                     return result;
                 }
@@ -385,7 +386,7 @@ namespace ts {
                 return;
             }
             const version = ts.version; // Extracted into a const so the form is stable between namespace and module
-            writeFile(host, emitterDiagnostics, buildInfoPath, getBuildInfoText({ bundle, program, version }), /*writeByteOrderMark*/ false);
+            writeFile(host, emitterDiagnostics, buildInfoPath, getBuildInfoText({ bundle: bundle && (bundle.js || bundle.dts) ? bundle : undefined, program, version }), /*writeByteOrderMark*/ false);
         }
 
         function emitJsFileOrBundle(

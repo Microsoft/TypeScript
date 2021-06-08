@@ -19,7 +19,7 @@ namespace ts {
     }
 
     export type ReusableDiagnosticMessageChain = DiagnosticMessageChain;
-
+    export type BuilderPersistedResolutions = ESMap<Path, Map<ResolvedModuleWithFailedLookupLocations>> | false;
     export interface ReusableBuilderProgramState extends ReusableBuilderState {
         /**
          * Cache of bind and check diagnostics for files with their Path being the key
@@ -74,6 +74,7 @@ namespace ts {
          * true if semantic diagnostics are ReusableDiagnostic instead of Diagnostic
          */
         hasReusableDiagnostic?: true;
+        persistedResolutions?: BuilderPersistedResolutions;
     }
 
     export const enum BuilderFileEmit {
@@ -159,6 +160,7 @@ namespace ts {
          * true if program has been emitted
          */
         programEmitComplete?: true;
+        persistedResolutions?: BuilderPersistedResolutions;
     }
 
     function hasSameKeys(map1: ReadonlyCollection<string> | undefined, map2: ReadonlyCollection<string> | undefined): boolean {
@@ -257,13 +259,22 @@ namespace ts {
             state.seenAffectedFiles = state.seenAffectedFiles || new Set();
         }
 
-        state.buildInfoEmitPending = !!state.changedFilesSet.size;
+        if (oldState && newProgram.structureIsReused === StructureIsReused.Completely) {
+            state.persistedResolutions = oldState.persistedResolutions;
+        }
+
+        state.buildInfoEmitPending = !!state.changedFilesSet.size || !!compilerOptions.persistResolutions && newProgram.structureIsReused !== StructureIsReused.Completely;
         return state;
+    }
+
+    export function getToPathForBuildInfoFilePath(options: CompilerOptions, currentDirectory: string, getCanonicalFileName: GetCanonicalFileName) {
+        const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(getTsBuildInfoEmitOutputFilePath(options)!, currentDirectory));
+        return (path: string) => toPath(path, buildInfoDirectory, getCanonicalFileName);
     }
 
     function convertToDiagnostics(diagnostics: readonly ReusableDiagnostic[], newProgram: Program, getCanonicalFileName: GetCanonicalFileName): readonly Diagnostic[] {
         if (!diagnostics.length) return emptyArray;
-        const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(getTsBuildInfoEmitOutputFilePath(newProgram.getCompilerOptions())!, newProgram.getCurrentDirectory()));
+        const toPath = getToPathForBuildInfoFilePath(newProgram.getCompilerOptions(), newProgram.getCurrentDirectory(), getCanonicalFileName);
         return diagnostics.map(diagnostic => {
             const result: Diagnostic = convertToDiagnosticRelatedInformation(diagnostic, newProgram, toPath);
             result.reportsUnnecessary = diagnostic.reportsUnnecessary;
@@ -278,10 +289,6 @@ namespace ts {
                 undefined;
             return result;
         });
-
-        function toPath(path: string) {
-            return ts.toPath(path, buildInfoDirectory, getCanonicalFileName);
-        }
     }
 
     function convertToDiagnosticRelatedInformation(diagnostic: ReusableDiagnosticRelatedInformation, newProgram: Program, toPath: (path: string) => Path): DiagnosticRelatedInformation {
@@ -297,7 +304,16 @@ namespace ts {
      */
     function releaseCache(state: BuilderProgramState) {
         BuilderState.releaseCache(state);
+        createPersistedProgramInfo(state);
         state.program = undefined;
+    }
+
+    function createPersistedProgramInfo(state: BuilderProgramState) {
+        if (!state.program || !state.compilerOptions.persistResolutions || state.persistedResolutions !== undefined) return;
+        state.program.getSourceFiles().forEach(file => {
+            if (file.resolvedModules) (state.persistedResolutions ||= new Map()).set(file.resolvedPath, file.resolvedModules);
+        });
+        state.persistedResolutions ||= false;
     }
 
     /**
@@ -706,6 +722,7 @@ namespace ts {
     }
 
     export type ProgramBuildInfoFileId = number & { __programBuildInfoFileIdBrand: any };
+    export type ProgramBuildInfoAbsoluteFileId = number & { __programBuildInfoAbsoluteFileIdBrand: any };
     export type ProgramBuildInfoFileIdListId = number & { __programBuildInfoFileIdListIdBrand: any };
     export type ProgramBuildInfoDiagnostic = ProgramBuildInfoFileId | [fileId: ProgramBuildInfoFileId, diagnostics: readonly ReusableDiagnostic[]];
     export type ProgramBuilderInfoFilePendingEmit = [fileId: ProgramBuildInfoFileId, emitKind: BuilderFileEmit];
@@ -723,6 +740,29 @@ namespace ts {
      * ProgramBuildInfoFileInfo is string if FileInfo.version === FileInfo.signature && !FileInfo.affectsGlobalScope otherwise encoded FileInfo
      */
     export type ProgramBuildInfoFileInfo = string | ProgramBuildInfoBuilderStateFileInfo;
+    export type ProgramBuildInfoResolvedModuleFull = Omit<ResolvedModuleFull, "resolvedFileName" | "isExternalLibraryImport" | "originalPath"> & {
+        resolvedFileName: ProgramBuildInfoAbsoluteFileId;
+        isExternalLibraryImport?: true;
+        readonly originalPath?: ProgramBuildInfoAbsoluteFileId;
+    };
+    export interface ProgramBuildInfoResolvedModuleWithFailedLookupLocations {
+        readonly resolvedModule: ProgramBuildInfoResolvedModuleFull | undefined;
+        failedLookupLocations?: readonly ProgramBuildInfoAbsoluteFileId[];
+    }
+    export type ProgramBuildInfoResolutionId = number & { __programBuildInfoResolutionIdBrand: any };
+    export type ProgramBuildInfoResolutionNameId = number & { __programBuildInfoResolutionNameIdBrand: any };
+    export interface ResolvedModuleWithFailedLookupLocations {
+        serializationIndex?: ProgramBuildInfoResolutionId;
+    }
+    export type ProgramBuildInfoResolutionEntry = [nameId: ProgramBuildInfoResolutionNameId, resolutionId: ProgramBuildInfoResolutionId];
+    export type ProgramBuildInfoResolutionEntryId = number & { __programBuildInfoResolutionEntryId: any };
+    export type ProgramBuildInfoResolvedModules = [fileId: ProgramBuildInfoFileId, resolvedModules: readonly ProgramBuildInfoResolutionEntryId[]];
+    export interface ProgramBuildInfoPersistedResolutions {
+        resolutions: readonly ProgramBuildInfoResolvedModuleWithFailedLookupLocations[];
+        names: readonly string[];
+        resolutionEntries: readonly ProgramBuildInfoResolutionEntry[];
+        resolutionMap: readonly ProgramBuildInfoResolvedModules[];
+    }
     export interface ProgramBuildInfo {
         fileNames: readonly string[];
         fileInfos: readonly ProgramBuildInfoFileInfo[];
@@ -732,19 +772,26 @@ namespace ts {
         exportedModulesMap?: ProgramBuildInfoReferencedMap;
         semanticDiagnosticsPerFile?: ProgramBuildInfoDiagnostic[];
         affectedFilesPendingEmit?: ProgramBuilderInfoFilePendingEmit[];
+        persistedResolutions?: ProgramBuildInfoPersistedResolutions;
     }
 
     /**
      * Gets the program information to be emitted in buildInfo so that we can use it to create new program
      */
     function getProgramBuildInfo(state: Readonly<ReusableBuilderProgramState>, getCanonicalFileName: GetCanonicalFileName): ProgramBuildInfo | undefined {
-        if (outFile(state.compilerOptions)) return undefined;
-        const currentDirectory = Debug.checkDefined(state.program).getCurrentDirectory();
+        if (outFileWithoutPersistResolutions(state.compilerOptions)) return undefined;
+        const program = Debug.checkDefined(state.program);
+        const currentDirectory = program.getCurrentDirectory();
         const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(getTsBuildInfoEmitOutputFilePath(state.compilerOptions)!, currentDirectory));
         const fileNames: string[] = [];
-        const fileNameToFileId = new Map<string, ProgramBuildInfoFileId>();
+        const fileNameToFileId = new Map<string, ProgramBuildInfoFileId & ProgramBuildInfoAbsoluteFileId>();
         let fileIdsList: (readonly ProgramBuildInfoFileId[])[] | undefined;
         let fileNamesToFileIdListId: ESMap<string, ProgramBuildInfoFileIdListId> | undefined;
+        let resolutions: ResolvedModuleWithFailedLookupLocations[] | undefined;
+        let resolutionNames: string[] | undefined;
+        let resolutionNameToResolutionId: ESMap<string, ProgramBuildInfoResolutionNameId> | undefined;
+        let resolutionEntries: ProgramBuildInfoResolutionEntry[] | undefined;
+        let resolutionEntryToResolutionEntryId: ESMap<string, ProgramBuildInfoResolutionEntryId> | undefined;
         const fileInfos = arrayFrom(state.fileInfos.entries(), ([key, value]): ProgramBuildInfoFileInfo => {
             // Ensure fileId
             const fileId = toFileId(key);
@@ -808,15 +855,31 @@ namespace ts {
             }
         }
 
+        let persistedResolutions: ProgramBuildInfoPersistedResolutions | undefined;
+        if (state.compilerOptions.persistResolutions) {
+            let resolutionMap: ProgramBuildInfoResolvedModules[] | undefined;
+            program.getSourceFiles().forEach(file => {
+                const resolvedModules = toProgramBuildInfoResolvedModules(file);
+                if (resolvedModules) (resolutionMap ||= []).push(resolvedModules);
+            });
+
+            persistedResolutions = resolutionMap && {
+                resolutions: resolutions!.map(toProgramBuildInfoResolvedModuleWithFailedLookupLocations),
+                names: resolutionNames!,
+                resolutionEntries: resolutionEntries!,
+                resolutionMap
+            };
+        }
         return {
             fileNames,
             fileInfos,
-            options: convertToProgramBuildInfoCompilerOptions(state.compilerOptions, relativeToBuildInfoEnsuringAbsolutePath),
+            options: convertToProgramBuildInfoCompilerOptions(state.compilerOptions, relativeToBuildInfoEnsuringAbsolutePath, !state.compilerOptions.persistResolutions),
             fileIdsList,
             referencedMap,
             exportedModulesMap,
             semanticDiagnosticsPerFile,
             affectedFilesPendingEmit,
+            persistedResolutions,
         };
 
         function relativeToBuildInfoEnsuringAbsolutePath(path: string) {
@@ -827,13 +890,21 @@ namespace ts {
             return ensurePathIsNonModuleName(getRelativePathFromDirectory(buildInfoDirectory, path, getCanonicalFileName));
         }
 
-        function toFileId(path: Path): ProgramBuildInfoFileId {
+        function toFileAndAbsoluteFileId(path: string): ProgramBuildInfoFileId & ProgramBuildInfoAbsoluteFileId {
             let fileId = fileNameToFileId.get(path);
             if (fileId === undefined) {
                 fileNames.push(relativeToBuildInfo(path));
-                fileNameToFileId.set(path, fileId = fileNames.length as ProgramBuildInfoFileId);
+                fileNameToFileId.set(path, fileId = fileNames.length as ProgramBuildInfoFileId & ProgramBuildInfoAbsoluteFileId);
             }
             return fileId;
+        }
+
+        function toFileId(path: Path): ProgramBuildInfoFileId {
+            return toFileAndAbsoluteFileId(path);
+        }
+
+        function toAbsoluteFileId(path: string): ProgramBuildInfoAbsoluteFileId {
+            return toFileAndAbsoluteFileId(getNormalizedAbsolutePath(path, currentDirectory));
         }
 
         function toFileIdListId(set: ReadonlySet<Path>): ProgramBuildInfoFileIdListId {
@@ -846,16 +917,73 @@ namespace ts {
             }
             return fileIdListId;
         }
+
+        function toProgramBuildInfoProgramBuildInfoResolutionId(resolution: ResolvedModuleWithFailedLookupLocations): ProgramBuildInfoResolutionId {
+            if (resolution.serializationIndex === undefined) {
+                (resolutions ||= []).push(resolution);
+                resolution.serializationIndex = resolutions.length as ProgramBuildInfoResolutionId;
+            }
+            return resolution.serializationIndex;
+        }
+
+        function toProgramBuildInfoResolutionNameId(name: string): ProgramBuildInfoResolutionNameId {
+            let resolutionId = resolutionNameToResolutionId?.get(name);
+            if (resolutionId === undefined) {
+                (resolutionNames ||= []).push(name);
+                (resolutionNameToResolutionId ||= new Map()).set(name, resolutionId = resolutionNames.length as ProgramBuildInfoResolutionNameId);
+            }
+            return resolutionId;
+        }
+
+        function toProgramBuildInfoResolutionEntryId(resolutionName: string, resolution: ResolvedModuleWithFailedLookupLocations): ProgramBuildInfoResolutionEntryId {
+            const resolutionNameId = toProgramBuildInfoResolutionNameId(resolutionName);
+            const resolutionId = toProgramBuildInfoProgramBuildInfoResolutionId(resolution);
+            const key = `${resolutionNameId},${resolutionId}`;
+            let resolutionEntryId = resolutionEntryToResolutionEntryId?.get(key);
+            if (resolutionEntryId === undefined) {
+                (resolutionEntries ||= []).push([resolutionNameId, resolutionId]);
+                (resolutionEntryToResolutionEntryId ||= new Map()).set(key, resolutionEntryId = resolutionEntries.length as ProgramBuildInfoResolutionEntryId);
+            }
+            return resolutionEntryId;
+        }
+
+        function toProgramBuildInfoResolvedModules(file: SourceFile): ProgramBuildInfoResolvedModules | undefined {
+            return file.resolvedModules?.size ?
+                [
+                    toFileId(file.resolvedPath),
+                    arrayFrom(file.resolvedModules.keys()).sort(compareStringsCaseSensitive).map(resolutionName =>
+                        toProgramBuildInfoResolutionEntryId(resolutionName, file.resolvedModules!.get(resolutionName)!))
+                ] :
+                undefined;
+        }
+
+        function toProgramBuildInfoResolvedModuleWithFailedLookupLocations(r: ResolvedModuleWithFailedLookupLocations): ProgramBuildInfoResolvedModuleWithFailedLookupLocations {
+            // Reset serializing index
+            r.serializationIndex = undefined;
+            return {
+                resolvedModule: r.resolvedModule && {
+                    ...r.resolvedModule,
+                    resolvedFileName: toAbsoluteFileId(r.resolvedModule.resolvedFileName),
+                    isExternalLibraryImport: r.resolvedModule.isExternalLibraryImport ? true : undefined,
+                    originalPath: r.resolvedModule.originalPath ? toAbsoluteFileId(r.resolvedModule.originalPath) : undefined,
+                },
+                failedLookupLocations: mapToReadonlyArrayOrUndefined(r.failedLookupLocations, toAbsoluteFileId),
+            };
+        }
     }
 
-    function convertToProgramBuildInfoCompilerOptions(options: CompilerOptions, relativeToBuildInfo: (path: string) => string) {
+    function mapToReadonlyArrayOrUndefined<T, U>(array: readonly T[] | undefined, map: (value: T) => U): readonly U[] | undefined {
+        return array?.length ? array.map(map) : undefined;
+    }
+
+    function convertToProgramBuildInfoCompilerOptions(options: CompilerOptions, relativeToBuildInfo: (path: string) => string, filterOptions: boolean) {
         let result: CompilerOptions | undefined;
         const { optionsNameMap } = getOptionsNameMap();
 
         for (const name of getOwnKeys(options).sort(compareStringsCaseSensitive)) {
             const optionKey = name.toLowerCase();
             const optionInfo = optionsNameMap.get(optionKey);
-            if (optionInfo?.affectsEmit || optionInfo?.affectsSemanticDiagnostics ||
+            if (!filterOptions || optionInfo?.affectsEmit || optionInfo?.affectsSemanticDiagnostics ||
                 // We need to store `strict`, even though it won't be examined directly, so that the
                 // flags it controls (e.g. `strictNullChecks`) will be retrieved correctly from the buildinfo
                 optionKey === "strict" ||
@@ -868,6 +996,7 @@ namespace ts {
                 );
             }
         }
+        if (!filterOptions && result?.configFilePath) result.configFilePath = relativeToBuildInfo(result.configFilePath);
         return result;
     }
 
@@ -941,7 +1070,7 @@ namespace ts {
                 rootNames: newProgramOrRootNames,
                 options: hostOrOptions as CompilerOptions,
                 host: oldProgramOrHost as CompilerHost,
-                oldProgram: oldProgram && oldProgram.getProgramOrUndefined(),
+                oldProgram: oldProgram?.getProgramOrProgramFromBuildInfoOrUndefined(),
                 configFileParsingDiagnostics,
                 projectReferences
             });
@@ -989,9 +1118,11 @@ namespace ts {
         builderProgram.getState = getState;
         builderProgram.backupState = () => {
             Debug.assert(backupState === undefined);
+            Debug.checkDefined(state.program);
             backupState = cloneBuilderProgramState(state);
         };
         builderProgram.restoreState = () => {
+            Debug.assert(backupState!.program === state.program);
             state = Debug.checkDefined(backupState);
             backupState = undefined;
         };
@@ -1250,12 +1381,45 @@ namespace ts {
                 { version: fileInfo.version, signature: fileInfo.signature === false ? undefined : fileInfo.version, affectsGlobalScope: fileInfo.affectsGlobalScope };
     }
 
-    export function createBuildProgramUsingProgramBuildInfo(program: ProgramBuildInfo, buildInfoPath: string, host: ReadBuildProgramHost): EmitAndSemanticDiagnosticsBuilderProgram {
+    function getProgramBuildInfoIdDecoder(program: ProgramBuildInfo, buildInfoPath: string, host: ReadBuildProgramHost) {
         const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(buildInfoPath, host.getCurrentDirectory()));
         const getCanonicalFileName = createGetCanonicalFileName(host.useCaseSensitiveFileNames());
+        const filePaths: (Path | undefined)[] = [];
+        let fileAbsolutePaths: (string | undefined)[] | undefined;
+        let filePathsSetList: (Set<Path> | undefined)[] | undefined;
+        return {
+            toAbsolutePath,
+            toFilePath,
+            toFileAbsolutePath,
+            toFilePathsSet,
+        };
 
-        const filePaths = program.fileNames.map(toPath);
-        const filePathsSetList = program.fileIdsList?.map(fileIds => new Set(fileIds.map(toFilePath)));
+        function toPath(path: string) {
+            return ts.toPath(path, buildInfoDirectory, getCanonicalFileName);
+        }
+
+        function toAbsolutePath(path: string) {
+            return getNormalizedAbsolutePath(path, buildInfoDirectory);
+        }
+
+        function toFilePath(fileId: ProgramBuildInfoFileId): Path {
+            const result = filePaths[fileId - 1];
+            return result !== undefined ? result : filePaths[fileId - 1] = toPath(program.fileNames[fileId - 1]);
+        }
+
+        function toFileAbsolutePath(fileId: ProgramBuildInfoAbsoluteFileId): string {
+            const result = fileAbsolutePaths?.[fileId - 1];
+            return result !== undefined ? result : (fileAbsolutePaths ||= [])[fileId - 1] = toAbsolutePath(program.fileNames[fileId - 1]);
+        }
+
+        function toFilePathsSet(fileIdsListId: ProgramBuildInfoFileIdListId): Set<Path> {
+            const result = filePathsSetList?.[fileIdsListId - 1];
+            return result !== undefined ? result : (filePathsSetList ||= [])[fileIdsListId - 1] = new Set(program.fileIdsList![fileIdsListId - 1].map(toFilePath));
+        }
+    }
+
+    export function createBuildProgramUsingProgramBuildInfo(program: ProgramBuildInfo, buildInfoPath: string, host: ReadBuildProgramHost): EmitAndSemanticDiagnosticsBuilderProgram {
+        const { toAbsolutePath, toFilePath, toFilePathsSet } = getProgramBuildInfoIdDecoder(program, buildInfoPath, host);
         const fileInfos = new Map<Path, BuilderState.FileInfo>();
         program.fileInfos.forEach((fileInfo, index) => fileInfos.set(toFilePath(index + 1 as ProgramBuildInfoFileId), toBuilderStateFileInfo(fileInfo)));
         const state: ReusableBuilderProgramState = {
@@ -1269,12 +1433,14 @@ namespace ts {
             affectedFilesPendingEmitKind: program.affectedFilesPendingEmit && arrayToMap(program.affectedFilesPendingEmit, value => toFilePath(value[0]), value => value[1]),
             affectedFilesPendingEmitIndex: program.affectedFilesPendingEmit && 0,
         };
+        let programFromBuildInfo: ProgramFromBuildInfo | false | undefined;
         return {
             getState: () => state,
             backupState: noop,
             restoreState: noop,
             getProgram: notImplemented,
             getProgramOrUndefined: returnUndefined,
+            getProgramOrProgramFromBuildInfoOrUndefined,
             releaseProgram: noop,
             getCompilerOptions: () => state.compilerOptions,
             getSourceFile: notImplemented,
@@ -1294,20 +1460,19 @@ namespace ts {
             close: noop,
         };
 
-        function toPath(path: string) {
-            return ts.toPath(path, buildInfoDirectory, getCanonicalFileName);
-        }
+        function getProgramOrProgramFromBuildInfoOrUndefined() {
+            if (programFromBuildInfo === undefined) {
+                const result = createProgramFromBuildInfo(program, buildInfoPath, host, state.compilerOptions);
+                if (result) {
+                    state.persistedResolutions = result.persistedResolutions;
+                    programFromBuildInfo = result.program;
+                }
+                else {
+                    programFromBuildInfo = false;
+                }
+            }
 
-        function toAbsolutePath(path: string) {
-            return getNormalizedAbsolutePath(path, buildInfoDirectory);
-        }
-
-        function toFilePath(fileId: ProgramBuildInfoFileId) {
-            return filePaths[fileId - 1];
-        }
-
-        function toFilePathsSet(fileIdsListId: ProgramBuildInfoFileIdListId) {
-            return filePathsSetList![fileIdsListId - 1];
+            return programFromBuildInfo || undefined;
         }
 
         function toMapOfReferencedSet(referenceMap: ProgramBuildInfoReferencedMap | undefined): ReadonlyESMap<Path, BuilderState.ReferencedSet> | undefined {
@@ -1315,13 +1480,73 @@ namespace ts {
         }
     }
 
-    export function createRedirectedBuilderProgram(getState: () => { program: Program | undefined; compilerOptions: CompilerOptions; }, configFileParsingDiagnostics: readonly Diagnostic[]): BuilderProgram {
+    function mapToReadonlyArray<T, U>(array: readonly T[] | undefined, map: (value: T) => U): readonly U[] {
+        return array?.length ? array.map(map) : emptyArray;
+    }
+
+    export function createProgramFromBuildInfo(
+        program: ProgramBuildInfo,
+        buildInfoPath: string,
+        host: ReadBuildProgramHost,
+        compilerOptions?: CompilerOptions
+    ): { program: ProgramFromBuildInfo; persistedResolutions: BuilderPersistedResolutions; } | undefined {
+        if (!program.persistedResolutions) return undefined;
+        const { toAbsolutePath, toFilePath, toFileAbsolutePath } = getProgramBuildInfoIdDecoder(program, buildInfoPath, host);
+
+        compilerOptions ||= program.options ? convertToOptionsWithAbsolutePaths(program.options, toAbsolutePath) : {};
+        const resolvedModules = mapToReadonlyArray(program.persistedResolutions.resolutions, toResolvedModuleWithFailedLookupLocations);
+        const persistedResolutions: BuilderPersistedResolutions = arrayToMap(
+            program.persistedResolutions.resolutionMap,
+            entry => toFilePath(entry[0]),
+            entry => arrayToMap(entry[1], toResolutionName, toResolution)
+        );
+        return {
+            program: createProgramFromPersistedProgramState(persistedResolutions, compilerOptions),
+            persistedResolutions
+        };
+
+        function toResolutionName(entryId: ProgramBuildInfoResolutionEntryId): string {
+            const nameId = program.persistedResolutions!.resolutionEntries[entryId - 1][0];
+            return program.persistedResolutions!.names[nameId - 1];
+        }
+
+        function toResolution(entryId: ProgramBuildInfoResolutionEntryId): ResolvedModuleWithFailedLookupLocations {
+            const resolutionId = program.persistedResolutions!.resolutionEntries[entryId - 1][1];
+            return resolvedModules[resolutionId - 1];
+        }
+
+        function toResolvedModuleWithFailedLookupLocations(resolution: ProgramBuildInfoResolvedModuleWithFailedLookupLocations): ResolvedModuleWithFailedLookupLocations {
+            return {
+                resolvedModule: resolution.resolvedModule && {
+                    ...resolution.resolvedModule,
+                    resolvedFileName: toFileAbsolutePath(resolution.resolvedModule.resolvedFileName),
+                    originalPath: resolution.resolvedModule.originalPath && toFileAbsolutePath(resolution.resolvedModule.originalPath),
+                },
+                failedLookupLocations: resolution.failedLookupLocations ? resolution.failedLookupLocations.map(toFileAbsolutePath) : []
+            };
+        }
+    }
+
+    function createProgramFromPersistedProgramState(persistedResolutions: ESMap<Path, Map<ResolvedModuleWithFailedLookupLocations>>, compilerOptions: CompilerOptions): ProgramFromBuildInfo {
+        return {
+            programFromBuildInfo: true,
+            getCompilerOptions: () => compilerOptions,
+            getSourceFileByPath: path => {
+                const resolvedModules = persistedResolutions.get(path);
+                return resolvedModules && { resolvedModules };
+            },
+        };
+    }
+
+    export function createRedirectedBuilderProgram(getState: () => Pick<ReusableBuilderProgramState, "program" | "compilerOptions" | "persistedResolutions">, configFileParsingDiagnostics: readonly Diagnostic[]): BuilderProgram {
+        let programFromBuildInfo: ProgramFromBuildInfo | false | undefined;
         return {
             getState: notImplemented,
             backupState: noop,
             restoreState: noop,
             getProgram,
             getProgramOrUndefined: () => getState().program,
+            getProgramOrProgramFromBuildInfoOrUndefined,
             releaseProgram: () => getState().program = undefined,
             getCompilerOptions: () => getState().compilerOptions,
             getSourceFile: fileName => getProgram().getSourceFile(fileName),
@@ -1341,6 +1566,17 @@ namespace ts {
 
         function getProgram() {
             return Debug.checkDefined(getState().program);
+        }
+
+        function getProgramOrProgramFromBuildInfoOrUndefined() {
+            const state = getState();
+            if (state.program) return state.program;
+            if (programFromBuildInfo !== undefined) return programFromBuildInfo || undefined;
+            if (!state.persistedResolutions) {
+                programFromBuildInfo = false;
+                return undefined;
+            }
+            return programFromBuildInfo = createProgramFromPersistedProgramState(state.persistedResolutions, state.compilerOptions);
         }
     }
 }
