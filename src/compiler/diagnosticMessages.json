@@ -1706,7 +1706,7 @@
         "category": "Error",
         "code": 2375
     },
-    "A 'super' call must be the first statement in the constructor when a class contains initialized properties, parameter properties, or private identifiers.": {
+    "A 'super' call must be the first statement in the constructor to refer to 'super' or 'this' when a derived class contains initialized properties, parameter properties, or private identifiers.": {
         "category": "Error",
         "code": 2376
     },
@@ -1717,6 +1717,10 @@
     "A 'get' accessor must return a value.": {
         "category": "Error",
         "code": 2378
+    },
+    "A 'super' call must be a root-level statement within a constructor of a derived class that contains initialized properties, parameter properties, or private identifiers.": {
+        "category": "Error",
+        "code": 1279
     },
     "The return type of a 'get' accessor must be assignable to its 'set' accessor type": {
         "category": "Error",

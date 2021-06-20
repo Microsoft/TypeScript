@@ -15,7 +15,7 @@ class Derived extends Base {
 class Derived2 extends Base {
     constructor(public y: string) {
         var a = 1;
-        super(); // error
+        super();
     }
 }
 
@@ -30,7 +30,7 @@ class Derived4 extends Base {
     a = 1;
     constructor(y: string) {
         var b = 2;
-        super(); // error
+        super();
     }
 }
 
@@ -57,7 +57,7 @@ class Derived7 extends Base {
     constructor(y: string) {
         this.a = 3;
         this.b = 3;
-        super(); // error
+        super();
     }
 }
 
@@ -80,7 +80,7 @@ class Derived9<T> extends Base2<T> {
     constructor(y: string) {
         this.a = 3;
         this.b = 3;
-        super(); // error
+        super();
     }
 }
 
@@ -119,10 +119,8 @@ var Base = /** @class */ (function () {
 var Derived = /** @class */ (function (_super) {
     __extends(Derived, _super);
     function Derived(y) {
-        var _this = this;
         var a = 1;
-        _this = _super.call(this) || this; // ok
-        return _this;
+        return _super.call(this) || this;
     }
     return Derived;
 }(Base));
@@ -131,7 +129,7 @@ var Derived2 = /** @class */ (function (_super) {
     function Derived2(y) {
         var _this = this;
         var a = 1;
-        _this = _super.call(this) || this; // error
+        _this = _super.call(this) || this;
         _this.y = y;
         return _this;
     }
@@ -152,7 +150,7 @@ var Derived4 = /** @class */ (function (_super) {
     function Derived4(y) {
         var _this = this;
         var b = 2;
-        _this = _super.call(this) || this; // error
+        _this = _super.call(this) || this;
         _this.a = 1;
         return _this;
     }
@@ -185,7 +183,7 @@ var Derived7 = /** @class */ (function (_super) {
         var _this = this;
         _this.a = 3;
         _this.b = 3;
-        _this = _super.call(this) || this; // error
+        _this = _super.call(this) || this;
         _this.a = 1;
         return _this;
     }
@@ -214,7 +212,7 @@ var Derived9 = /** @class */ (function (_super) {
         var _this = this;
         _this.a = 3;
         _this.b = 3;
-        _this = _super.call(this) || this; // error
+        _this = _super.call(this) || this;
         _this.a = 1;
         return _this;
     }
