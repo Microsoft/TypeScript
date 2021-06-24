@@ -1,0 +1,76 @@
+=== tests/cases/compiler/doExpressionContinue.ts ===
+for (const i of [1]) {
+>i : number
+>[1] : number[]
+>1 : 1
+
+    (do {
+>(do {        if (i === 1) continue;        1;    }) : 1
+>do {        if (i === 1) continue;        1;    } : 1
+
+        if (i === 1) continue;
+>i === 1 : boolean
+>i : number
+>1 : 1
+
+        1;
+>1 : 1
+
+    })
+}
+
+
+for (const i of [1]) {
+>i : number
+>[1] : number[]
+>1 : 1
+
+    for (const i of [1]) {
+>i : number
+>[1] : number[]
+>1 : 1
+
+        (do {
+>(do {            if (i === 1) continue;            1;        }) : 1
+>do {            if (i === 1) continue;            1;        } : 1
+
+            if (i === 1) continue;
+>i === 1 : boolean
+>i : number
+>1 : 1
+
+            1;
+>1 : 1
+
+        })
+    }
+}
+
+a: for (const i of [1]) {
+>a : any
+>i : number
+>[1] : number[]
+>1 : 1
+
+    for (const i of [1]) {
+>i : number
+>[1] : number[]
+>1 : 1
+
+        (do {
+>(do {            if (i === 1) continue a;            1;        }) : 1
+>do {            if (i === 1) continue a;            1;        } : 1
+
+            if (i === 1) continue a;
+>i === 1 : boolean
+>i : number
+>1 : 1
+>a : any
+
+            1;
+>1 : 1
+
+        })
+    }
+}
+

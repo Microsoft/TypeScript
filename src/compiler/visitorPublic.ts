@@ -814,6 +814,10 @@ namespace ts {
                     nodeVisitor(node.asteriskToken, tokenVisitor, isAsteriskToken),
                     nodeVisitor(node.expression, visitor, isExpression));
 
+            case SyntaxKind.DoExpression:
+                return factory.updateDoExpression(node as DoExpression, (node as DoExpression).async,
+                    nodeVisitor((node as DoExpression).block, visitor, isBlock));
+
             case SyntaxKind.SpreadElement:
                 Debug.type<SpreadElement>(node);
                 return factory.updateSpreadElement(node,

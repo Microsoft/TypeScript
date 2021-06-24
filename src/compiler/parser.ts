@@ -429,6 +429,8 @@ namespace ts {
                 return visitNode(cbNode, (node as TemplateLiteralTypeNode).head) || visitNodes(cbNode, cbNodes, (node as TemplateLiteralTypeNode).templateSpans);
             case SyntaxKind.TemplateLiteralTypeSpan:
                 return visitNode(cbNode, (node as TemplateLiteralTypeSpan).type) || visitNode(cbNode, (node as TemplateLiteralTypeSpan).literal);
+            case SyntaxKind.DoExpression:
+                return visitNode(cbNode, (node as DoExpression).block);
             case SyntaxKind.ComputedPropertyName:
                 return visitNode(cbNode, (node as ComputedPropertyName).expression);
             case SyntaxKind.HeritageClause:
@@ -2637,6 +2639,15 @@ namespace ts {
             );
         }
 
+        function parseDoExpression(isAsync: boolean) {
+            const pos = getNodePos();
+            if (isAsync) parseExpectedToken(SyntaxKind.AsyncKeyword);
+            parseExpectedToken(SyntaxKind.DoKeyword);
+            const createDo = () => finishNode(factory.createDoExpression(isAsync, parseBlock(/* ignoreMissingOpenBrace */ false)), pos);
+            if (isAsync) return doOutsideOfContext(NodeFlags.YieldContext, () => doInAwaitContext(createDo));
+            return createDo();
+        }
+
         function parseTemplateType(): TemplateLiteralTypeNode {
             const pos = getNodePos();
             return finishNode(
@@ -3886,6 +3897,7 @@ namespace ts {
                 case SyntaxKind.StringLiteral:
                 case SyntaxKind.NoSubstitutionTemplateLiteral:
                 case SyntaxKind.TemplateHead:
+                case SyntaxKind.DoKeyword:
                 case SyntaxKind.OpenParenToken:
                 case SyntaxKind.OpenBracketToken:
                 case SyntaxKind.OpenBraceToken:
@@ -3940,11 +3952,12 @@ namespace ts {
         }
 
         function isStartOfExpressionStatement(): boolean {
-            // As per the grammar, none of '{' or 'function' or 'class' can start an expression statement.
+            // As per the grammar, none of '{' or 'function' or 'class' or 'do' can start an expression statement.
             return token() !== SyntaxKind.OpenBraceToken &&
                 token() !== SyntaxKind.FunctionKeyword &&
                 token() !== SyntaxKind.ClassKeyword &&
                 token() !== SyntaxKind.AtToken &&
+                token() !== SyntaxKind.DoKeyword &&
                 isStartOfExpression();
         }
 
@@ -4396,6 +4409,7 @@ namespace ts {
             if (token() !== SyntaxKind.SemicolonToken &&
                 token() !== SyntaxKind.FunctionKeyword &&
                 token() !== SyntaxKind.ClassKeyword &&
+                token() !== SyntaxKind.DoKeyword &&
                 isStartOfStatement() &&
                 !isStartOfExpressionStatement()) {
                 // Check if we got a plain statement (i.e. no expression-statements, no function/class expressions/declarations)
@@ -4690,6 +4704,7 @@ namespace ts {
                 case SyntaxKind.TypeOfKeyword:
                 case SyntaxKind.VoidKeyword:
                 case SyntaxKind.AwaitKeyword:
+                case SyntaxKind.DoKeyword:
                     return false;
                 case SyntaxKind.LessThanToken:
                     // If we are not in JSX context, we are parsing TypeAssertion which is an UnaryExpression
@@ -4815,6 +4830,7 @@ namespace ts {
             //      (Expression)
             //      FunctionExpression
             //      new MemberExpression Arguments?
+            //      DoExpression
             //
             //   MemberExpression : See 11.2
             //      PrimaryExpression
@@ -5428,6 +5444,7 @@ namespace ts {
                 case SyntaxKind.OpenBraceToken:
                     return parseObjectLiteralExpression();
                 case SyntaxKind.AsyncKeyword:
+                    if (lookAhead(nextTokenIsDoKeywordOnSameLine)) return parseDoExpression(/** isAsync */ true);
                     // Async arrow functions are parsed earlier in parseAssignmentExpressionOrHigher.
                     // If we encounter `async [no LineTerminator here] function` then this is an async
                     // function; otherwise, its an identifier.
@@ -5450,6 +5467,8 @@ namespace ts {
                     break;
                 case SyntaxKind.TemplateHead:
                     return parseTemplateExpression(/* isTaggedTemplate */ false);
+                case SyntaxKind.DoKeyword:
+                    return parseDoExpression(/** isAsync */ false);
             }
 
             return parseIdentifier(Diagnostics.Expression_expected);
@@ -5972,6 +5991,11 @@ namespace ts {
         function nextTokenIsFunctionKeywordOnSameLine() {
             nextToken();
             return token() === SyntaxKind.FunctionKeyword && !scanner.hasPrecedingLineBreak();
+        }
+
+        function nextTokenIsDoKeywordOnSameLine() {
+            nextToken();
+            return token() === SyntaxKind.DoKeyword && !scanner.hasPrecedingLineBreak();
         }
 
         function nextTokenIsIdentifierOrKeywordOrLiteralOnSameLine() {

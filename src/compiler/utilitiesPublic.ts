@@ -1495,6 +1495,7 @@ namespace ts {
             case SyntaxKind.StringLiteral:
             case SyntaxKind.NoSubstitutionTemplateLiteral:
             case SyntaxKind.TemplateExpression:
+            case SyntaxKind.DoExpression:
             case SyntaxKind.FalseKeyword:
             case SyntaxKind.NullKeyword:
             case SyntaxKind.ThisKeyword:

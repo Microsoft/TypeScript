@@ -1397,6 +1397,9 @@ namespace ts {
                     // These are not allowed inside a generator now, but eventually they may be allowed
                     // as local types. Regardless, skip them to avoid the work.
                     return;
+                case SyntaxKind.DoExpression:
+                    if ((node as DoExpression).async) return;
+                    // falls through
                 default:
                     if (isFunctionLike(node)) {
                         if (node.name && node.name.kind === SyntaxKind.ComputedPropertyName) {
@@ -1413,6 +1416,21 @@ namespace ts {
                     }
             }
         }
+    }
+
+    export function findDirectDoExpressionAncestorUnderFunctionBoundary(node: Node) {
+        return findDirectDoExpressionAncestor(node, isFunctionLike);
+    }
+
+    export function findDirectDoExpressionAncestorUnderBreakableContinuableOrFunctionBoundary(node: Node) {
+        return findDirectDoExpressionAncestor(node, node => isFunctionLike(node) || isLabeledStatement(node) || isIterationStatement(node, /** lookInLabeledStatements */ false));
+    }
+
+    export function findDirectDoExpressionAncestor(node: Node, guard: (node: Node) => boolean) {
+        return findAncestor(node, x => {
+            if (guard(x)) return "quit";
+            return isDoExpression(x);
+        }) as DoExpression | undefined;
     }
 
     /**
@@ -1900,6 +1918,7 @@ namespace ts {
             case SyntaxKind.JsxFragment:
             case SyntaxKind.YieldExpression:
             case SyntaxKind.AwaitExpression:
+            case SyntaxKind.DoExpression:
             case SyntaxKind.MetaProperty:
                 return true;
             case SyntaxKind.QualifiedName:

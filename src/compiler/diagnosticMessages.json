@@ -1368,6 +1368,22 @@
         "category": "Error",
         "code": 1433
     },
+    "Declaration or iteration cannot present at end of the do expression": {
+        "category": "Error",
+        "code": 1434
+    },
+    "A return statement cannot be used within an async do expression": {
+        "category": "Error",
+        "code": 1435
+    },
+    "A var declaration cannot be used within a do expression unless the target is ESNext.": {
+        "category": "Error",
+        "code": 1436
+    },
+    "The last if statement in the do expression must have an else branch.": {
+        "category": "Error",
+        "code": 1437
+    },
 
     "The types of '{0}' are incompatible between these types.": {
         "category": "Error",

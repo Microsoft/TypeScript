@@ -1,0 +1,62 @@
+=== tests/cases/compiler/doExpressionBasic.ts ===
+const a1 = do { };
+>a1 : Symbol(a1, Decl(doExpressionBasic.ts, 0, 5))
+
+const a1a = async do { };
+>a1a : Symbol(a1a, Decl(doExpressionBasic.ts, 1, 5))
+
+const a2 = do { 1 };
+>a2 : Symbol(a2, Decl(doExpressionBasic.ts, 2, 5))
+
+const a2a = async do { 1 };
+>a2a : Symbol(a2a, Decl(doExpressionBasic.ts, 3, 5))
+
+const a3 = () => do { throw 1 };
+>a3 : Symbol(a3, Decl(doExpressionBasic.ts, 4, 5))
+
+const a3a = () => async do { throw 1 };
+>a3a : Symbol(a3a, Decl(doExpressionBasic.ts, 5, 5))
+
+const b1 = do {
+>b1 : Symbol(b1, Decl(doExpressionBasic.ts, 7, 5))
+
+    try {
+        1
+    } catch (e) {
+>e : Symbol(e, Decl(doExpressionBasic.ts, 10, 13))
+
+        2
+    } finally {
+        3
+    }
+}
+
+const c1 = do {
+>c1 : Symbol(c1, Decl(doExpressionBasic.ts, 17, 5))
+
+    if (a2) 1; else 2
+>a2 : Symbol(a2, Decl(doExpressionBasic.ts, 2, 5))
+}
+const c2 = do {
+>c2 : Symbol(c2, Decl(doExpressionBasic.ts, 20, 5))
+
+    // only track the last expr
+    if (a2) 1; else 2
+>a2 : Symbol(a2, Decl(doExpressionBasic.ts, 2, 5))
+
+    try {
+        if (a2) 1; else 2
+>a2 : Symbol(a2, Decl(doExpressionBasic.ts, 2, 5))
+
+        if (a2) 1; else 2
+>a2 : Symbol(a2, Decl(doExpressionBasic.ts, 2, 5))
+
+    } catch (e) {
+>e : Symbol(e, Decl(doExpressionBasic.ts, 27, 13))
+
+        { e as "" }
+>e : Symbol(e, Decl(doExpressionBasic.ts, 27, 13))
+
+    } finally {}
+}
+

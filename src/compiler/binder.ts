@@ -1198,7 +1198,10 @@ namespace ts {
                     addAntecedent(currentReturnTarget, currentFlow);
                 }
             }
-            currentFlow = unreachableFlow;
+            if (node.kind === SyntaxKind.ReturnStatement && findDirectDoExpressionAncestorUnderFunctionBoundary(node)?.async) {
+                // DoExpression should not affect the control flow by return
+            }
+            else currentFlow = unreachableFlow;
         }
 
         function findActiveLabel(name: __String) {
@@ -1212,7 +1215,7 @@ namespace ts {
 
         function bindBreakOrContinueFlow(node: BreakOrContinueStatement, breakTarget: FlowLabel | undefined, continueTarget: FlowLabel | undefined) {
             const flowLabel = node.kind === SyntaxKind.BreakStatement ? breakTarget : continueTarget;
-            if (flowLabel) {
+            if (flowLabel && !findDirectDoExpressionAncestorUnderBreakableContinuableOrFunctionBoundary(node)) {
                 addAntecedent(flowLabel, currentFlow);
                 currentFlow = unreachableFlow;
             }
@@ -1850,6 +1853,9 @@ namespace ts {
                 case SyntaxKind.CaseBlock:
                     return ContainerFlags.IsBlockScopedContainer;
 
+                case SyntaxKind.DoExpression:
+                    return ContainerFlags.IsContainer | ContainerFlags.HasLocals | ContainerFlags.IsBlockScopedContainer;
+
                 case SyntaxKind.Block:
                     // do not treat blocks directly inside a function as a block-scoped-container.
                     // Locals that reside in this block should go to the function locals. Otherwise 'x'
@@ -1926,6 +1932,7 @@ namespace ts {
                 case SyntaxKind.FunctionDeclaration:
                 case SyntaxKind.FunctionExpression:
                 case SyntaxKind.ArrowFunction:
+                case SyntaxKind.DoExpression:
                 case SyntaxKind.JSDocFunctionType:
                 case SyntaxKind.JSDocTypedefTag:
                 case SyntaxKind.JSDocCallbackTag:

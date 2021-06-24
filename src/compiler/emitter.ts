@@ -1427,6 +1427,8 @@ namespace ts {
                         return emitTemplateSpan(node as TemplateSpan);
                     case SyntaxKind.SemicolonClassElement:
                         return emitSemicolonClassElement();
+                    case SyntaxKind.DoExpression:
+                        return emitDoExpression(node as DoExpression);
 
                     // Statements
                     case SyntaxKind.Block:
@@ -1690,6 +1692,8 @@ namespace ts {
                         return emitElementAccessExpression(node as ElementAccessExpression);
                     case SyntaxKind.CallExpression:
                         return emitCallExpression(node as CallExpression);
+                    case SyntaxKind.DoExpression:
+                        return emitDoExpression(node as DoExpression);
                     case SyntaxKind.NewExpression:
                         return emitNewExpression(node as NewExpression);
                     case SyntaxKind.TaggedTemplateExpression:
@@ -2733,6 +2737,16 @@ namespace ts {
         function emitTemplateExpression(node: TemplateExpression) {
             emit(node.head);
             emitList(node, node.templateSpans, ListFormat.TemplateExpressionSpans);
+        }
+
+        function emitDoExpression(node: DoExpression) {
+            if (node.async) {
+                emitTokenWithComment(SyntaxKind.AsyncKeyword, node.pos, writeKeyword, node);
+                writeSpace();
+            }
+            emitTokenWithComment(SyntaxKind.DoKeyword, node.pos, writeKeyword, node);
+            writeSpace();
+            emitBlock(node.block);
         }
 
         function emitYieldExpression(node: YieldExpression) {

@@ -331,6 +331,21 @@ namespace ts {
         let instantiationDepth = 0;
         let currentNode: Node | undefined;
 
+        // this flag is use in completion value analysis.
+        // when completion value analysis is enabled, it means we expect a "not all code paths return a value" report.
+        // when an expression produces voidType, it should also be treated as no "not all code paths return a value",
+        // because it's highly like a mistake of the following code:
+        // const val = do { console.log() } // val is voidType.
+        let enableCompletionValueAnalysis = false;
+        function withCompletionValueAnalysisContext<T>(f: (enableCompletionValueAnalysisBefore: boolean) => T): T {
+            if (!compilerOptions.noImplicitReturns) return f(/* neverCheck */ false);
+            const old = enableCompletionValueAnalysis;
+            enableCompletionValueAnalysis = false;
+            const val = f(old);
+            enableCompletionValueAnalysis = old;
+            return val;
+        }
+
         const emptySymbols = createSymbolTable();
         const arrayVariances = [VarianceFlags.Covariant];
 
@@ -32419,6 +32434,149 @@ namespace ts {
                 type.flags & TypeFlags.InstantiableNonPrimitive && maybeTypeOfKind(getBaseConstraintOfType(type) || unknownType, TypeFlags.StringLike));
         }
 
+        function checkDoExpression(node: DoExpression): Type {
+            // TODO (in spec): it's a syntax error for this is contained in a loop head and contains a break or continue which would break or continue the loop.
+            // grammar check
+            checkEndsInIterationOrBareIfOrDeclaration(node.block.statements, [], /** isLast */ true);
+
+            const type = withCompletionValueAnalysisContext(() => {
+                enableCompletionValueAnalysis = true;
+                return checkBlock(node.block) || voidType;
+            });
+            if (node.async) return createPromiseType(type);
+            return type;
+        }
+
+        type LabelSet = readonly (__String | undefined)[];
+        // https://tc39.es/proposal-do-expressions/ commit=3ef6d463b8163cbf222846b40d17178cca36e9e1
+        function checkEndsInIterationOrBareIfOrDeclaration(node: undefined | Node | readonly Statement[], labelSet: LabelSet, isLast: boolean): boolean {
+            if (!node) return false;
+            if (isArray(node)) {
+                if (!node.length) return false;
+                const statementList = node.slice(0, -1);
+                const statementListItem = last(node);
+                if (isEmpty(statementListItem, [])) return checkEndsInIterationOrBareIfOrDeclaration(statementList, labelSet, isLast);
+                if (isBreak(statementListItem, labelSet)) return checkEndsInIterationOrBareIfOrDeclaration(statementList, labelSet, /** last */ true);
+                if (checkEndsInIterationOrBareIfOrDeclaration(statementList, labelSet, /** isLast */ false)) return true;
+                return checkEndsInIterationOrBareIfOrDeclaration(statementListItem, labelSet, isLast);
+            }
+            else {
+                if (isDeclaration(node) || isVariableStatement(node) || (isLabeledStatement(node) && isFunctionDeclaration(node.statement))) {
+                    if (isLast) grammarErrorOnNode(node, Diagnostics.Declaration_or_iteration_cannot_present_at_end_of_the_do_expression);
+                    return isLast;
+                }
+                else if (isIterationStatement(node, /* lookInLabeledStatements */ false)) {
+                    if (isLast || isBreak(node.statement, labelSet)) {
+                        grammarErrorOnNode(node, Diagnostics.Declaration_or_iteration_cannot_present_at_end_of_the_do_expression);
+                        return true;
+                    }
+                    return checkEndsInIterationOrBareIfOrDeclaration(node.statement, labelSet, isLast);
+                }
+                // Not mentioned in the spec https://github.com/tc39/proposal-do-expressions/issues/68
+                else if (isBlock(node)) return checkEndsInIterationOrBareIfOrDeclaration(node.statements, labelSet, isLast);
+                else if (isIfStatement(node)) {
+                    if (!node.elseStatement) {
+                        if (isLast) grammarErrorOnNode(node, Diagnostics.The_last_if_statement_in_the_do_expression_must_have_an_else_branch);
+                        // not returning here, need to check recursively.
+                    }
+                    const left = checkEndsInIterationOrBareIfOrDeclaration(node.thenStatement, labelSet, isLast);
+                    const right = checkEndsInIterationOrBareIfOrDeclaration(node.elseStatement, labelSet, isLast);
+                    return left || right;
+                }
+                else if (isWithStatement(node)) return checkEndsInIterationOrBareIfOrDeclaration(node.statement, labelSet, isLast);
+                else if (isLabeledStatement(node)) {
+                    const label = node.label.escapedText;
+                    return checkEndsInIterationOrBareIfOrDeclaration(node.statement, isLast ? [...labelSet, label] : labelSet, isLast);
+                }
+                else if (isSwitchStatement(node)) return checkEndsInIterationOrBareIfOrDeclaration(node.caseBlock, labelSet, isLast);
+                else if (isCaseBlock(node)) {
+                    // In spec, CaseClauses[opt] DefaultClause CaseClauses[opt]
+                    // and CaseClauses are exactly the same thing.
+                    const newLabelSet = isLast ? [...labelSet, undefined] : labelSet.filter(nonNullable);
+                    for (const clause of [...node.clauses].reverse()) {
+                        if (!isEmpty(clause, [])) {
+                            if (checkEndsInIterationOrBareIfOrDeclaration(clause, newLabelSet, isLast)) {
+                                // TODO: emit diagnostic
+                                return true;
+                            }
+                            // The spec of this section modifies isLast. Not rewriting those steps.
+                            isLast = isBreak(clause, newLabelSet);
+                        }
+                    }
+                    return false;
+                }
+                else if (isCaseClause(node) || isDefaultClause(node)) {
+                    if (!node.statements) return false;
+                    return checkEndsInIterationOrBareIfOrDeclaration(node.statements, labelSet, isLast);
+                }
+                else if (isTryStatement(node)) {
+                    const left = checkEndsInIterationOrBareIfOrDeclaration(node.tryBlock, labelSet, isLast);
+                    const right = checkEndsInIterationOrBareIfOrDeclaration(node.catchClause?.block, labelSet, isLast);
+                    return left || right;
+                }
+                return false;
+            }
+            // https://tc39.es/proposal-do-expressions/#sec-isempty
+            function isEmpty(node: undefined | Node | readonly Statement[], labelSet: LabelSet): boolean {
+                if (!node) return true;
+                if (isArray(node)) {
+                    if (!node.length) return true;
+                    const statementList = node.slice(0, -1);
+                    const statementListItem = last(node);
+                    if (isBreak(statementList, labelSet)) return true;
+                    if (!isEmpty(statementListItem, labelSet)) return false;
+                    return isEmpty(statementList, labelSet);
+                }
+                else {
+                    switch (node.kind) {
+                        case SyntaxKind.EmptyStatement:
+                        case SyntaxKind.DebuggerStatement:
+                            return true;
+                        case SyntaxKind.DefaultClause:
+                        case SyntaxKind.CaseClause:
+                        case SyntaxKind.Block:
+                            return isEmpty((node as DefaultClause | CaseClause | Block).statements, labelSet);
+                        case SyntaxKind.BreakStatement: {
+                            const label = (node as BreakStatement).label;
+                            return labelSet.includes(label?.escapedText);
+                        }
+                        case SyntaxKind.LabeledStatement: {
+                            const n = node as LabeledStatement;
+                            const label = n.label?.escapedText;
+                            return isEmpty(n.statement, [...labelSet, label]);
+                        }
+                        default: return false;
+                    }
+                }
+            }
+            // https://tc39.es/proposal-do-expressions/#sec-isbreak
+            function isBreak(node: undefined | Node | readonly Statement[], labelSet: LabelSet): boolean {
+                if (!node) return false;
+                if (isArray(node)) {
+                    if (!node.length) return false;
+                    const statementList = node.slice(0, -1);
+                    const statementListItem = last(node);
+                    if (isBreak(statementList, labelSet)) return true;
+                    if (!isEmpty(statementList, [])) return false;
+                    return isBreak(statementListItem, labelSet);
+                }
+                else {
+                    switch (node.kind) {
+                        case SyntaxKind.Block:
+                        case SyntaxKind.CaseClause:
+                        case SyntaxKind.DefaultClause:
+                            return isBreak((node as Block | CaseClause | DefaultClause).statements, labelSet);
+                        case SyntaxKind.BreakStatement: {
+                            const label = (node as BreakStatement).label;
+                            return labelSet.includes(label?.escapedText);
+                        }
+                        case SyntaxKind.LabeledStatement: return isBreak((node as LabeledStatement).statement, labelSet);
+                        default: return false;
+                    }
+                }
+            }
+        }
+
         function getContextNode(node: Expression): Node {
             if (node.kind === SyntaxKind.JsxAttributes && !isJsxSelfClosingElement(node.parent)) {
                 return node.parent.parent; // Needs to be the root JsxElement, so it encompasses the attributes _and_ the children (which are essentially part of the attributes)
@@ -32892,6 +33050,8 @@ namespace ts {
                     return falseType;
                 case SyntaxKind.TemplateExpression:
                     return checkTemplateExpression(node as TemplateExpression);
+                case SyntaxKind.DoExpression:
+                    return checkDoExpression(node as DoExpression);
                 case SyntaxKind.RegularExpressionLiteral:
                     return globalRegExpType;
                 case SyntaxKind.ArrayLiteralExpression:
@@ -35264,22 +35424,36 @@ namespace ts {
             return decl.kind === SyntaxKind.ImportClause ? decl : decl.kind === SyntaxKind.NamespaceImport ? decl.parent : decl.parent.parent;
         }
 
-        function checkBlock(node: Block) {
+        function checkBlock(node: Block): Type | undefined {
             // Grammar checking for SyntaxKind.Block
             if (node.kind === SyntaxKind.Block) {
                 checkGrammarStatementInAmbientContext(node);
             }
+            // eslint-disable-next-line no-undef-init
+            let types: (Type | void)[] = [];
             if (isFunctionOrModuleBlock(node)) {
                 const saveFlowAnalysisDisabled = flowAnalysisDisabled;
                 forEach(node.statements, checkSourceElement);
                 flowAnalysisDisabled = saveFlowAnalysisDisabled;
             }
             else {
-                forEach(node.statements, checkSourceElement);
+                withCompletionValueAnalysisContext(requireCompletionValue => {
+                    types = node.statements.map(checkSourceElementWithType);
+                    if (requireCompletionValue) {
+                        const lastType = findLastIndex(types, nonNullable);
+                        enableCompletionValueAnalysis = true;
+                        // check again with requiresStatementType on
+                        if (lastType !== -1) checkSourceElement(node.statements[lastType]);
+                    }
+                });
             }
             if (node.locals) {
                 registerForUnusedIdentifiersCheck(node);
             }
+            // TODO: combine with break/continue analysis
+            // should not return voidType if findLast has no result.
+            // see the completion value of "{1;} {}"
+            return findLast(types, nonNullable);
         }
 
         function checkCollisionWithArgumentsInGeneratedCode(node: SignatureDeclaration) {
@@ -35690,28 +35864,46 @@ namespace ts {
         function checkVariableStatement(node: VariableStatement) {
             // Grammar checking
             if (!checkGrammarDecoratorsAndModifiers(node) && !checkGrammarVariableDeclarationList(node.declarationList)) checkGrammarForDisallowedLetOrConstStatement(node);
+            const declarationKind = node.declarationList.flags;
+            if (languageVersion < ScriptTarget.ESNext && !(declarationKind & NodeFlags.Let) && !(declarationKind & NodeFlags.Const)) {
+                // var statement cannot appears inside a do-expression if target is not ESNext.
+                // cause the way our transpile it doesn't support this kind of var declaration hoisting.
+                if (findDirectDoExpressionAncestorUnderFunctionBoundary(node)) grammarErrorOnNode(node, Diagnostics.A_var_declaration_cannot_be_used_within_a_do_expression_unless_the_target_is_ESNext);
+            }
             forEach(node.declarationList.declarations, checkSourceElement);
         }
 
-        function checkExpressionStatement(node: ExpressionStatement) {
+        function checkExpressionStatement(node: ExpressionStatement): Type {
             // Grammar checking
             checkGrammarStatementInAmbientContext(node);
 
-            checkExpression(node.expression);
+            const type = checkExpression(node.expression);
+            if (enableCompletionValueAnalysis && type === voidType) {
+                // when in the context of completion value is collected, it is highly likely an mistake
+                // e.g. do { console.log(1) }
+                error(node, Diagnostics.Not_all_code_paths_return_a_value);
+            }
+            return type;
         }
 
-        function checkIfStatement(node: IfStatement) {
+        function checkIfStatement(node: IfStatement): Type {
             // Grammar checking
             checkGrammarStatementInAmbientContext(node);
             const type = checkTruthinessExpression(node.expression);
             checkTestingKnownTruthyCallableOrAwaitableType(node.expression, type, node.thenStatement);
-            checkSourceElement(node.thenStatement);
+            const type1 = checkSourceElementWithType(node.thenStatement);
 
             if (node.thenStatement.kind === SyntaxKind.EmptyStatement) {
                 error(node.thenStatement, Diagnostics.The_body_of_an_if_statement_cannot_be_the_empty_statement);
             }
 
-            checkSourceElement(node.elseStatement);
+            const type2 = checkSourceElementWithType(node.elseStatement);
+            if (enableCompletionValueAnalysis) {
+                if (!type1) error(node.thenStatement, Diagnostics.Not_all_code_paths_return_a_value);
+                if (!node.elseStatement) error(node, Diagnostics.Not_all_code_paths_return_a_value);
+                if (node.elseStatement && !type2) error(node.elseStatement, Diagnostics.Not_all_code_paths_return_a_value);
+            }
+            return getUnionType([type1 || voidType, type2 || voidType], UnionReduction.Subtype);
         }
 
         function checkTestingKnownTruthyCallableOrAwaitableType(condExpr: Expression, type: Type, body?: Statement | Expression) {
@@ -36731,11 +36923,14 @@ namespace ts {
                 getIterationTypesOfIterator(type, resolver, /*errorNode*/ undefined);
         }
 
-        function checkBreakOrContinueStatement(node: BreakOrContinueStatement) {
+        function checkBreakOrContinueStatement(node: BreakOrContinueStatement): Type {
             // Grammar checking
             if (!checkGrammarStatementInAmbientContext(node)) checkGrammarBreakOrContinueStatement(node);
 
             // TODO: Check that target label is valid
+            // complete a CompletionRecord<"continue" | "break", T>
+            // so it does not contribute to the analysis of CompletionRecord<"normal", T>
+            return neverType;
         }
 
         function unwrapReturnType(returnType: Type, functionFlags: FunctionFlags) {
@@ -36760,6 +36955,10 @@ namespace ts {
             const func = getContainingFunction(node);
             if (!func) {
                 grammarErrorOnFirstToken(node, Diagnostics.A_return_statement_can_only_be_used_within_a_function_body);
+                return;
+            }
+            if (findDirectDoExpressionAncestorUnderFunctionBoundary(node)?.async) {
+                grammarErrorOnFirstToken(node, Diagnostics.A_return_statement_cannot_be_used_within_an_async_do_expression);
                 return;
             }
 
@@ -36797,7 +36996,7 @@ namespace ts {
             }
         }
 
-        function checkWithStatement(node: WithStatement) {
+        function checkWithStatement(node: WithStatement): Type {
             // Grammar checking for withStatement
             if (!checkGrammarStatementInAmbientContext(node)) {
                 if (node.flags & NodeFlags.AwaitContext) {
@@ -36813,9 +37012,10 @@ namespace ts {
                 const end = node.statement.pos;
                 grammarErrorAtPos(sourceFile, start, end - start, Diagnostics.The_with_statement_is_not_supported_All_symbols_in_a_with_block_will_have_type_any);
             }
+            return anyType;
         }
 
-        function checkSwitchStatement(node: SwitchStatement) {
+        function checkSwitchStatement(node: SwitchStatement): Type {
             // Grammar checking
             checkGrammarStatementInAmbientContext(node);
 
@@ -36824,7 +37024,7 @@ namespace ts {
 
             const expressionType = checkExpression(node.expression);
             const expressionIsLiteral = isLiteralType(expressionType);
-            forEach(node.caseBlock.clauses, clause => {
+            const types = map(node.caseBlock.clauses, clause => {
                 // Grammar check for duplicate default clauses, skip if we already report duplicate default clause
                 if (clause.kind === SyntaxKind.DefaultClause && !hasDuplicateDefaultClause) {
                     if (firstDefaultClause === undefined) {
@@ -36852,14 +37052,28 @@ namespace ts {
                         checkTypeComparableTo(caseType, comparedExpressionType, clause.expression, /*headMessage*/ undefined);
                     }
                 }
-                forEach(clause.statements, checkSourceElement);
+                // eslint-disable-next-line no-undef-init
+                let caseType: Type | void = undefined;
+                for (const statement of clause.statements) {
+                    caseType = checkSourceElementWithType(statement) || caseType;
+                }
                 if (compilerOptions.noFallthroughCasesInSwitch && clause.fallthroughFlowNode && isReachableFlowNode(clause.fallthroughFlowNode)) {
                     error(clause, Diagnostics.Fallthrough_case_in_switch);
                 }
-            });
+                if (!caseType && clause.statements.length) {
+                    if (enableCompletionValueAnalysis) error(clause, Diagnostics.Not_all_code_paths_return_a_value);
+                    caseType = voidType;
+                }
+                return caseType;
+            }).filter(nonNullable);
             if (node.caseBlock.locals) {
                 registerForUnusedIdentifiersCheck(node.caseBlock);
             }
+            if (enableCompletionValueAnalysis && node.caseBlock.clauses.length === 0) {
+                error(node, Diagnostics.Not_all_code_paths_return_a_value);
+            }
+            if (types.length === 0) return voidType;
+            return getUnionType(types, UnionReduction.Subtype);
         }
 
         function checkLabeledStatement(node: LabeledStatement) {
@@ -36878,7 +37092,7 @@ namespace ts {
             }
 
             // ensure that label is unique
-            checkSourceElement(node.statement);
+            return checkSourceElementWithType(node.statement);
         }
 
         function checkThrowStatement(node: ThrowStatement) {
@@ -36892,13 +37106,18 @@ namespace ts {
             if (node.expression) {
                 checkExpression(node.expression);
             }
+            return neverType;
         }
 
-        function checkTryStatement(node: TryStatement) {
+        function checkTryStatement(node: TryStatement): Type {
             // Grammar checking
             checkGrammarStatementInAmbientContext(node);
 
-            checkBlock(node.tryBlock);
+            const types = [checkBlock(node.tryBlock)];
+            if (!types[0]) {
+                if (enableCompletionValueAnalysis) error(node.tryBlock, Diagnostics.Not_all_code_paths_return_a_value);
+                types[0] = voidType;
+            }
             const catchClause = node.catchClause;
             if (catchClause) {
                 // Grammar checking
@@ -36927,12 +37146,24 @@ namespace ts {
                     }
                 }
 
-                checkBlock(catchClause.block);
+                let catchType = checkBlock(catchClause.block);
+                if (!catchType) {
+                    if (enableCompletionValueAnalysis) error(catchClause.block, Diagnostics.Not_all_code_paths_return_a_value);
+                    catchType = voidType;
+                }
+                types.push(catchType);
+            }
+            else {
+                // try { 1; } finally { }
+                if (enableCompletionValueAnalysis) error(node, Diagnostics.Not_all_code_paths_return_a_value);
+                types.push(voidType);
             }
 
             if (node.finallyBlock) {
+                // completion value of finally block never contributes to the return type of try-catch
                 checkBlock(node.finallyBlock);
             }
+            return getUnionType(filter(types, nonNullable), UnionReduction.Subtype);
         }
 
         function checkIndexConstraints(type: Type, isStatic?: boolean) {
@@ -38573,16 +38804,22 @@ namespace ts {
         }
 
         function checkSourceElement(node: Node | undefined): void {
+            checkSourceElementWithType(node);
+        }
+
+        function checkSourceElementWithType(node: Node | undefined): void | Type {
             if (node) {
                 const saveCurrentNode = currentNode;
                 currentNode = node;
                 instantiationCount = 0;
-                checkSourceElementWorker(node);
+                const type = checkSourceElementWorker(node);
                 currentNode = saveCurrentNode;
+                return type;
             }
         }
 
-        function checkSourceElementWorker(node: Node): void {
+        /** If your new statement contributes to the type of do expreesion, please return a Type. */
+        function checkSourceElementWorker(node: Node): Type | void {
             if (isInJSFile(node)) {
                 forEach((node as JSDocContainer).jsDoc, ({ tags }) => forEach(tags, checkSourceElement));
             }
@@ -38720,7 +38957,9 @@ namespace ts {
                 case SyntaxKind.BreakStatement:
                     return checkBreakOrContinueStatement(node as BreakOrContinueStatement);
                 case SyntaxKind.ReturnStatement:
-                    return checkReturnStatement(node as ReturnStatement);
+                    // return statement complete a CompletionRecord<"return", T>
+                    // so it does not contribute to the analysis of CompletionRecord<"normal", T>
+                    return (checkReturnStatement(node as ReturnStatement), neverType);
                 case SyntaxKind.WithStatement:
                     return checkWithStatement(node as WithStatement);
                 case SyntaxKind.SwitchStatement:
