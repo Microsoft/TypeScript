@@ -45,12 +45,12 @@ class C1 {
 >this.x3 : any
 >this : this
 >x3 : any
->this.y : any
+>this.y : number
 >this : this
->y : any
->this.z : any
+>y : number
+>this.z : string
 >this : this
->z : any
+>z : string
     }
 }
 
@@ -73,9 +73,9 @@ var [a_x1, a_x2, a_x3, a_y, a_z] = [a.x1, a.x2, a.x3, a.y, a.z];
 >a_x1 : any
 >a_x2 : any
 >a_x3 : any
->a_y : any
->a_z : any
->[a.x1, a.x2, a.x3, a.y, a.z] : [any, any, any, any, any]
+>a_y : number
+>a_z : string
+>[a.x1, a.x2, a.x3, a.y, a.z] : [any, any, any, number, string]
 >a.x1 : any
 >a : C1
 >x1 : any
@@ -85,10 +85,10 @@ var [a_x1, a_x2, a_x3, a_y, a_z] = [a.x1, a.x2, a.x3, a.y, a.z];
 >a.x3 : any
 >a : C1
 >x3 : any
->a.y : any
+>a.y : number
 >a : C1
->y : any
->a.z : any
+>y : number
+>a.z : string
 >a : C1
->z : any
+>z : string
 

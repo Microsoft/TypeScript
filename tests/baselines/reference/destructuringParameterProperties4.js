@@ -30,6 +30,9 @@ class C2 extends C1<number, string, boolean> {
 class C1 {
     constructor(k, [a, b, c]) {
         this.k = k;
+        this.a = a;
+        this.b = b;
+        this.c = c;
         if ((b === undefined && c === undefined) || (this.b === undefined && this.c === undefined)) {
             this.a = a || k;
         }

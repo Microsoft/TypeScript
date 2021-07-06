@@ -3328,11 +3328,29 @@ namespace ts {
                 declareSymbolAndAddToSymbolTable(node, SymbolFlags.FunctionScopedVariable, SymbolFlags.ParameterExcludes);
             }
 
-            // If this is a property-parameter, then also declare the property symbol into the
-            // containing class.
+            // If this is a property-parameter, then also declare the property symbol into the containing class.
             if (isParameterPropertyDeclaration(node, node.parent)) {
-                const classDeclaration = node.parent.parent;
-                declareSymbol(classDeclaration.symbol.members!, classDeclaration.symbol, node, SymbolFlags.Property | (node.questionToken ? SymbolFlags.Optional : SymbolFlags.None), SymbolFlags.PropertyExcludes);
+                const symbol = node.parent.parent.symbol;
+                const members = symbol.members!;
+
+                if (isBindingPattern(node.name)) {
+                    bindParameterPropertyFromBindingPattern(node.name, members, symbol);
+                }
+                else {
+                    declareSymbol(members, symbol, node, SymbolFlags.Property | (node.questionToken ? SymbolFlags.Optional : SymbolFlags.None), SymbolFlags.PropertyExcludes);
+                }
+            }
+        }
+
+        function bindParameterPropertyFromBindingPattern(node: ObjectBindingPattern | ArrayBindingPattern, symbolTable: SymbolTable, parent: Symbol | undefined) {
+            for (const element of node.elements) {
+                if (isOmittedExpression(element)) continue;
+                if (isObjectBindingPattern(element.name) || isArrayBindingPattern(element.name)) {
+                    bindParameterPropertyFromBindingPattern(element.name, symbolTable, parent);
+                }
+                else {
+                    declareSymbol(symbolTable, parent, element, SymbolFlags.Property, SymbolFlags.PropertyExcludes);
+                }
             }
         }
 

@@ -130,12 +130,12 @@ sourceFile:sourceMap-FileWithComments.ts
 2 >            x
 3 >                  
 4 >                     x
-5 >                      : number
+5 >                      
 1 >Emitted(8, 13) Source(12, 28) + SourceIndex(0)
 2 >Emitted(8, 19) Source(12, 29) + SourceIndex(0)
 3 >Emitted(8, 22) Source(12, 28) + SourceIndex(0)
 4 >Emitted(8, 23) Source(12, 29) + SourceIndex(0)
-5 >Emitted(8, 24) Source(12, 37) + SourceIndex(0)
+5 >Emitted(8, 24) Source(12, 29) + SourceIndex(0)
 ---
 >>>            this.y = y;
 1->^^^^^^^^^^^^
@@ -143,22 +143,22 @@ sourceFile:sourceMap-FileWithComments.ts
 3 >                  ^^^
 4 >                     ^
 5 >                      ^
-1->, public 
+1->: number, public 
 2 >            y
 3 >                  
 4 >                     y
-5 >                      : number
+5 >                      
 1->Emitted(9, 13) Source(12, 46) + SourceIndex(0)
 2 >Emitted(9, 19) Source(12, 47) + SourceIndex(0)
 3 >Emitted(9, 22) Source(12, 46) + SourceIndex(0)
 4 >Emitted(9, 23) Source(12, 47) + SourceIndex(0)
-5 >Emitted(9, 24) Source(12, 55) + SourceIndex(0)
+5 >Emitted(9, 24) Source(12, 47) + SourceIndex(0)
 ---
 >>>        }
 1 >^^^^^^^^
 2 >        ^
 3 >         ^^^^^^^^^^^^^^^^^^->
-1 >) { 
+1 >: number) { 
 2 >        }
 1 >Emitted(10, 9) Source(12, 59) + SourceIndex(0)
 2 >Emitted(10, 10) Source(12, 60) + SourceIndex(0)

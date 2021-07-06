@@ -74,12 +74,12 @@ sourceFile:sourceMapValidationClass.ts
 2 >        greeting
 3 >                     
 4 >                        greeting
-5 >                                : string
+5 >                                
 1 >Emitted(7, 9) Source(2, 24) + SourceIndex(0)
 2 >Emitted(7, 22) Source(2, 32) + SourceIndex(0)
 3 >Emitted(7, 25) Source(2, 24) + SourceIndex(0)
 4 >Emitted(7, 33) Source(2, 32) + SourceIndex(0)
-5 >Emitted(7, 34) Source(2, 40) + SourceIndex(0)
+5 >Emitted(7, 34) Source(2, 32) + SourceIndex(0)
 ---
 >>>        this.x1 = 10;
 1 >^^^^^^^^
@@ -87,7 +87,7 @@ sourceFile:sourceMapValidationClass.ts
 3 >               ^^^
 4 >                  ^^
 5 >                    ^
-1 >, ...b: string[]) {
+1 >: string, ...b: string[]) {
   >    }
   >    greet() {
   >        return "<h1>" + this.greeting + "</h1>";

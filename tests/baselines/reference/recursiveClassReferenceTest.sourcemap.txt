@@ -668,12 +668,12 @@ sourceFile:recursiveClassReferenceTest.ts
 2 >                    codeThing
 3 >                                  
 4 >                                     codeThing
-5 >                                              : Sample.Thing.ICodeThing
+5 >                                              
 1->Emitted(47, 21) Source(50, 23) + SourceIndex(0)
 2 >Emitted(47, 35) Source(50, 32) + SourceIndex(0)
 3 >Emitted(47, 38) Source(50, 23) + SourceIndex(0)
 4 >Emitted(47, 47) Source(50, 32) + SourceIndex(0)
-5 >Emitted(47, 48) Source(50, 57) + SourceIndex(0)
+5 >Emitted(47, 48) Source(50, 32) + SourceIndex(0)
 ---
 >>>                    this.domNode = null;
 1 >^^^^^^^^^^^^^^^^^^^^
@@ -1376,18 +1376,18 @@ sourceFile:recursiveClassReferenceTest.ts
 2 >                        mode
 3 >                                 
 4 >                                    mode
-5 >                                        : IMode
+5 >                                        
 1->Emitted(81, 25) Source(79, 29) + SourceIndex(0)
 2 >Emitted(81, 34) Source(79, 33) + SourceIndex(0)
 3 >Emitted(81, 37) Source(79, 29) + SourceIndex(0)
 4 >Emitted(81, 41) Source(79, 33) + SourceIndex(0)
-5 >Emitted(81, 42) Source(79, 40) + SourceIndex(0)
+5 >Emitted(81, 42) Source(79, 33) + SourceIndex(0)
 ---
 >>>                    }
 1 >^^^^^^^^^^^^^^^^^^^^
 2 >                    ^
 3 >                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
-1 >) { 
+1 >: IMode) { 
 2 >                    }
 1 >Emitted(82, 21) Source(79, 44) + SourceIndex(0)
 2 >Emitted(82, 22) Source(79, 45) + SourceIndex(0)

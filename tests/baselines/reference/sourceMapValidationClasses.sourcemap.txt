@@ -175,18 +175,18 @@ sourceFile:sourceMapValidationClasses.ts
 2 >                greeting
 3 >                             
 4 >                                greeting
-5 >                                        : string
+5 >                                        
 1->Emitted(8, 17) Source(5, 28) + SourceIndex(0)
 2 >Emitted(8, 30) Source(5, 36) + SourceIndex(0)
 3 >Emitted(8, 33) Source(5, 28) + SourceIndex(0)
 4 >Emitted(8, 41) Source(5, 36) + SourceIndex(0)
-5 >Emitted(8, 42) Source(5, 44) + SourceIndex(0)
+5 >Emitted(8, 42) Source(5, 36) + SourceIndex(0)
 ---
 >>>            }
 1 >^^^^^^^^^^^^
 2 >            ^
 3 >             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
-1 >) {
+1 >: string) {
   >        
 2 >            }
 1 >Emitted(9, 13) Source(6, 9) + SourceIndex(0)

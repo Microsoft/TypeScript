@@ -583,10 +583,6 @@
         "category": "Error",
         "code": 1186
     },
-    "A parameter property may not be declared using a binding pattern.": {
-        "category": "Error",
-        "code": 1187
-    },
     "Only a single variable declaration is allowed in a 'for...of' statement.": {
         "category": "Error",
         "code": 1188
