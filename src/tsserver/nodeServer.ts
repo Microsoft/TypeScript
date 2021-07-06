@@ -195,6 +195,9 @@ namespace ts.server {
                     }
                     try {
                         const args = [combinePaths(__dirname, "watchGuard.js"), path];
+                        if (typeof process.versions.pnp !== "undefined") {
+                            args.unshift('-r', require.resolve('pnpapi'));
+                        }
                         if (logger.hasLevel(LogLevel.verbose)) {
                             logger.info(`Starting ${process.execPath} with args:${stringifyIndented(args)}`);
                         }
@@ -505,6 +508,10 @@ namespace ts.server {
                         execArgv.push(`--${match[1]}=${currentPort + 1}`);
                         break;
                     }
+                }
+
+                if (typeof process.versions.pnp !== "undefined") {
+                    execArgv.unshift('-r', require.resolve('pnpapi'));
                 }
 
                 this.installer = childProcess.fork(combinePaths(__dirname, "typingsInstaller.js"), args, { execArgv });

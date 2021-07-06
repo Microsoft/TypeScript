@@ -2219,6 +2219,40 @@ namespace ts.server {
         }
 
         updateReferences(refs: readonly ProjectReference[] | undefined) {
+            // @ts-ignore
+            if (process.versions.pnp) {
+                // With Plug'n'Play, dependencies that list peer dependencies
+                // are "virtualized": they are resolved to a unique (virtual)
+                // path that the underlying filesystem layer then resolve back
+                // to the original location.
+                //
+                // When a workspace depends on another workspace with peer
+                // dependencies, this other workspace will thus be resolved to
+                // a unique path that won't match what the initial project has
+                // listed in its `references` field, and TS thus won't leverage
+                // the reference at all.
+                //
+                // To avoid that, we compute here the virtualized paths for the
+                // user-provided references in our references by directly querying
+                // the PnP API. This way users don't have to know the virtual paths,
+                // but we still support them just fine even through references.
+
+                const pnpApi = require("pnpapi");
+                const basePath = this.getCurrentDirectory();
+
+                const getPnpPath = (path: string) => {
+                    try {
+                        const targetLocator = pnpApi.findPackageLocator(`${path}/`);
+                        return pnpApi.resolveToUnqualified(targetLocator.name, `${basePath}/`);
+                    } catch {
+                        // something went wrong with the resolution, try not to fail
+                        return path;
+                    }
+                };
+
+                refs = refs?.map(r => ({...r, path: getPnpPath(r.path)}));
+            }
+
             this.projectReferences = refs;
             this.potentialProjectReferences = undefined;
         }

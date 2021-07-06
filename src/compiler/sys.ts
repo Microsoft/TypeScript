@@ -1513,6 +1513,11 @@ namespace ts {
             }
 
             function isFileSystemCaseSensitive(): boolean {
+                // The PnP runtime is always case-sensitive
+                // @ts-ignore
+                if (process.versions.pnp) {
+                    return true;
+                }
                 // win32\win64 are case insensitive platforms
                 if (platform === "win32" || platform === "win64") {
                     return false;

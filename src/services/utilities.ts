@@ -3410,10 +3410,31 @@ namespace ts {
     }
 
     /**
+     * We only allow PnP to be used as a resolution strategy if TypeScript
+     * itself is executed under a PnP runtime (and we only allow it to access
+     * the current PnP runtime, not any on the disk). This ensures that we
+     * don't execute potentially malicious code that didn't already have a
+     * chance to be executed (if we're running within the runtime, it means
+     * that the runtime has already been executed).
+     * @internal
+     */
+    function getPnpApi(path: string) {
+        const {findPnpApi} = require("module");
+        if (findPnpApi === undefined) {
+            return undefined;
+        }
+        return findPnpApi(`${path}/`);
+    }
+
+    export function isDeprecatedDeclaration(decl: Declaration) {
+        return !!(getCombinedNodeFlagsAlwaysIncludeJSDoc(decl) & ModifierFlags.Deprecated);
+    }
+
+    /**
      * Don't include something from a `node_modules` that isn't actually reachable by a global import.
      * A relative import to node_modules is usually a bad idea.
      */
-    function isImportablePath(fromPath: string, toPath: string, getCanonicalFileName: GetCanonicalFileName, globalCachePath?: string): boolean {
+    function isImportablePathNode(fromPath: string, toPath: string, getCanonicalFileName: GetCanonicalFileName, globalCachePath?: string): boolean {
         // If it's in a `node_modules` but is not reachable from here via a global import, don't bother.
         const toNodeModules = forEachAncestorDirectory(toPath, ancestor => getBaseFileName(ancestor) === "node_modules" ? ancestor : undefined);
         const toNodeModulesParent = toNodeModules && getDirectoryPath(getCanonicalFileName(toNodeModules));
@@ -3422,8 +3443,30 @@ namespace ts {
             || (!!globalCachePath && startsWith(getCanonicalFileName(globalCachePath), toNodeModulesParent));
     }
 
-    export function isDeprecatedDeclaration(decl: Declaration) {
-        return !!(getCombinedNodeFlagsAlwaysIncludeJSDoc(decl) & ModifierFlags.Deprecated);
+    function isImportablePathPnp(fromPath: string, toPath: string): boolean {
+        const pnpApi = getPnpApi(fromPath);
+
+        const fromLocator = pnpApi.findPackageLocator(fromPath);
+        const toLocator = pnpApi.findPackageLocator(toPath);
+
+        // eslint-disable-next-line no-null/no-null
+        if (toLocator === null) {
+            return false;
+        }
+
+        const fromInfo = pnpApi.getPackageInformation(fromLocator);
+        const toReference = fromInfo.packageDependencies.get(toLocator.name);
+
+        return toReference === toLocator.reference;
+    }
+
+    function isImportablePath(fromPath: string, toPath: string, getCanonicalFileName: GetCanonicalFileName, globalCachePath?: string): boolean {
+        if (getPnpApi(fromPath)) {
+            return isImportablePathPnp(fromPath, toPath);
+        }
+        else {
+            return isImportablePathNode(fromPath, toPath, getCanonicalFileName, globalCachePath);
+        }
     }
 
     // #endregion
