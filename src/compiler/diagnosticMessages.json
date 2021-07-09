@@ -948,7 +948,7 @@
         "category": "Error",
         "code": 1323
     },
-    "Dynamic import must have one specifier as an argument.": {
+    "Dynamic import only supports a second argument when the '--module' option is set to 'esnext'.": {
         "category": "Error",
         "code": 1324
     },
@@ -1367,6 +1367,10 @@
     "Decorators may not be applied to 'this' parameters.": {
         "category": "Error",
         "code": 1433
+    },
+    "Dynamic import must only have a specifier and an optional assertion as arguments": {
+        "category": "Message",
+        "code": 1434
     },
 
     "The types of '{0}' are incompatible between these types.": {
@@ -3351,6 +3355,14 @@
     "Property '{0}' has no initializer and is not definitely assigned in a class static block.": {
         "category": "Error",
         "code": 2817
+    },
+    "Import assertions are only supported when the '--module' option is set to 'esnext'.": {
+        "category": "Error",
+        "code": 2818
+    },
+    "Import assertions cannot be used with type-only imports or exports.": {
+        "category": "Error",
+        "code": 2819
     },
 
     "Import declaration '{0}' is using private name '{1}'.": {
