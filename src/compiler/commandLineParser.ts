@@ -568,9 +568,9 @@ namespace ts {
         {
             name: "importsNotUsedAsValues",
             type: new Map(getEntries({
-                remove: ImportsNotUsedAsValues.Remove,
-                preserve: ImportsNotUsedAsValues.Preserve,
-                error: ImportsNotUsedAsValues.Error
+                "remove": ImportsNotUsedAsValues.Remove,
+                "preserve": ImportsNotUsedAsValues.Preserve,
+                "error": ImportsNotUsedAsValues.Error,
             })),
             affectsEmit: true,
             affectsSemanticDiagnostics: true,
@@ -1168,6 +1168,14 @@ namespace ts {
             description: Diagnostics.Emit_ECMAScript_standard_compliant_class_fields,
             defaultValueDescription: "false"
         },
+        {
+            name: "noErasingImportedNames",
+            type: "boolean",
+            affectsEmit: true,
+            category: Diagnostics.Emit,
+            description: Diagnostics.Disable_the_removal_of_unused_imported_identifiers_from_the_JavaScript_output
+        },
+
         {
             name: "keyofStringsOnly",
             type: "boolean",

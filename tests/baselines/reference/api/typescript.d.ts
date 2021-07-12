@@ -2880,6 +2880,7 @@ declare namespace ts {
         noEmit?: boolean;
         noEmitHelpers?: boolean;
         noEmitOnError?: boolean;
+        noErasingImportedNames?: boolean;
         noErrorTruncation?: boolean;
         noFallthroughCasesInSwitch?: boolean;
         noImplicitAny?: boolean;
