@@ -6136,7 +6136,8 @@ namespace ts {
     export const enum ImportsNotUsedAsValues {
         Remove,
         Preserve,
-        Error
+        Error,
+        PreserveExact,
     }
 
     export const enum NewLineKind {
