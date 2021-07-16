@@ -1,0 +1,16 @@
+tests/cases/conformance/final/final9.ts(5,7): error TS2415: Class 'B' incorrectly extends base class 'A'.
+  Property 'm1' is final in type 'A' that cannot be overridden in type 'B'.
+
+
+==== tests/cases/conformance/final/final9.ts (1 errors) ====
+    class A {
+        final protected m1() {}
+    }
+    
+    class B extends A {
+          ~
+!!! error TS2415: Class 'B' incorrectly extends base class 'A'.
+!!! error TS2415:   Property 'm1' is final in type 'A' that cannot be overridden in type 'B'.
+        protected m1() {}
+    }
+    

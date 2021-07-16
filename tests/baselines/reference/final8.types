@@ -1,0 +1,8 @@
+=== tests/cases/conformance/final/final8.ts ===
+class A {
+>A : A
+
+    final protected m1() {}
+>m1 : () => void
+}
+

@@ -1,0 +1,8 @@
+=== tests/cases/conformance/final/final3.ts ===
+abstract class A {
+>A : A
+
+    abstract final m(): void;
+>m : () => void
+}
+

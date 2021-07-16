@@ -1,0 +1,10 @@
+tests/cases/conformance/final/final1.ts(2,5): error TS1089: 'final' modifier cannot appear on a constructor declaration.
+
+
+==== tests/cases/conformance/final/final1.ts (1 errors) ====
+    class A {
+        final constructor() {}
+        ~~~~~
+!!! error TS1089: 'final' modifier cannot appear on a constructor declaration.
+    }
+    

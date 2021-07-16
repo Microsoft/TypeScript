@@ -1,0 +1,10 @@
+tests/cases/conformance/final/final2.ts(2,13): error TS1243: 'final' modifier cannot be used with 'private' modifier.
+
+
+==== tests/cases/conformance/final/final2.ts (1 errors) ====
+    class A {
+        private final m() {}
+                ~~~~~
+!!! error TS1243: 'final' modifier cannot be used with 'private' modifier.
+    }
+    

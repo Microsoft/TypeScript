@@ -156,6 +156,7 @@ namespace ts {
         ProtectedKeyword,
         PublicKeyword,
         StaticKeyword,
+        FinalKeyword,
         YieldKeyword,
         // Contextual keywords
         AbstractKeyword,
@@ -594,6 +595,7 @@ namespace ts {
         | SyntaxKind.PrivateKeyword
         | SyntaxKind.ProtectedKeyword
         | SyntaxKind.PublicKeyword
+        | SyntaxKind.FinalKeyword
         | SyntaxKind.ReadonlyKeyword
         | SyntaxKind.OverrideKeyword
         | SyntaxKind.RequireKeyword
@@ -630,6 +632,7 @@ namespace ts {
         | SyntaxKind.PrivateKeyword
         | SyntaxKind.ProtectedKeyword
         | SyntaxKind.PublicKeyword
+        | SyntaxKind.FinalKeyword
         | SyntaxKind.ReadonlyKeyword
         | SyntaxKind.OverrideKeyword
         | SyntaxKind.StaticKeyword
@@ -802,9 +805,10 @@ namespace ts {
         Protected =          1 << 4,  // Property/Method
         Static =             1 << 5,  // Property/Method
         Readonly =           1 << 6,  // Property/Method
-        Abstract =           1 << 7,  // Class/Method/ConstructSignature
-        Async =              1 << 8,  // Property/Method/Function
-        Default =            1 << 9,  // Function/Class (export default declaration)
+        Final =              1 << 7,  // Property/Method
+        Abstract =           1 << 8,  // Class/Method/ConstructSignature
+        Async =              1 << 9,  // Property/Method/Function
+        Default =            1 << 10,  // Function/Class (export default declaration)
         Const =              1 << 11, // Const enum
         HasComputedJSDocModifiers = 1 << 12, // Indicates the computed modifier flags include modifiers from JSDoc.
 
@@ -817,9 +821,9 @@ namespace ts {
         ParameterPropertyModifier = AccessibilityModifier | Readonly | Override,
         NonPublicAccessibilityModifier = Private | Protected,
 
-        TypeScriptModifier = Ambient | Public | Private | Protected | Readonly | Abstract | Const | Override,
+        TypeScriptModifier = Ambient | Public | Private | Protected | Final | Readonly | Abstract | Const | Override,
         ExportDefault = Export | Default,
-        All = Export | Ambient | Public | Private | Protected | Static | Readonly | Abstract | Async | Default | Const | Deprecated | Override
+        All = Export | Ambient | Public | Private | Protected | Final | Static | Readonly | Abstract | Async | Default | Const | Deprecated | Override
     }
 
     export const enum JsxFlags {
@@ -1059,6 +1063,7 @@ namespace ts {
     export type PrivateKeyword = ModifierToken<SyntaxKind.PrivateKeyword>;
     export type ProtectedKeyword = ModifierToken<SyntaxKind.ProtectedKeyword>;
     export type PublicKeyword = ModifierToken<SyntaxKind.PublicKeyword>;
+    export type FinalKeyword = ModifierToken<SyntaxKind.FinalKeyword>;
     export type ReadonlyKeyword = ModifierToken<SyntaxKind.ReadonlyKeyword>;
     export type OverrideKeyword = ModifierToken<SyntaxKind.OverrideKeyword>;
     export type StaticKeyword = ModifierToken<SyntaxKind.StaticKeyword>;
@@ -1076,6 +1081,7 @@ namespace ts {
         | PrivateKeyword
         | ProtectedKeyword
         | PublicKeyword
+        | FinalKeyword
         | OverrideKeyword
         | ReadonlyKeyword
         | StaticKeyword
@@ -4903,15 +4909,16 @@ namespace ts {
         ContainsPublic    = 1 << 8,         // Synthetic property with public constituent(s)
         ContainsProtected = 1 << 9,         // Synthetic property with protected constituent(s)
         ContainsPrivate   = 1 << 10,        // Synthetic property with private constituent(s)
-        ContainsStatic    = 1 << 11,        // Synthetic property with static constituent(s)
-        Late              = 1 << 12,        // Late-bound symbol for a computed property with a dynamic name
-        ReverseMapped     = 1 << 13,        // Property of reverse-inferred homomorphic mapped type
-        OptionalParameter = 1 << 14,        // Optional parameter
-        RestParameter     = 1 << 15,        // Rest parameter
-        DeferredType      = 1 << 16,        // Calculation of the type of this symbol is deferred due to processing costs, should be fetched with `getTypeOfSymbolWithDeferredType`
-        HasNeverType      = 1 << 17,        // Synthetic property with at least one never type in constituents
-        Mapped            = 1 << 18,        // Property of mapped type
-        StripOptional     = 1 << 19,        // Strip optionality in mapped property
+        ContainsFinal     = 1 << 11,
+        ContainsStatic    = 1 << 12,        // Synthetic property with static constituent(s)
+        Late              = 1 << 13,        // Late-bound symbol for a computed property with a dynamic name
+        ReverseMapped     = 1 << 14,        // Property of reverse-inferred homomorphic mapped type
+        OptionalParameter = 1 << 15,        // Optional parameter
+        RestParameter     = 1 << 16,        // Rest parameter
+        DeferredType      = 1 << 17,        // Calculation of the type of this symbol is deferred due to processing costs, should be fetched with `getTypeOfSymbolWithDeferredType`
+        HasNeverType      = 1 << 18,        // Synthetic property with at least one never type in constituents
+        Mapped            = 1 << 19,        // Property of mapped type
+        StripOptional     = 1 << 20,        // Strip optionality in mapped property
         Synthetic = SyntheticProperty | SyntheticMethod,
         Discriminant = HasNonUniformType | HasLiteralType,
         Partial = ReadPartial | WritePartial

@@ -1,0 +1,32 @@
+=== tests/cases/conformance/final/final7.ts ===
+class A {
+>A : Symbol(A, Decl(final7.ts, 0, 0))
+
+    final m1() {}
+>m1 : Symbol(A.m1, Decl(final7.ts, 0, 9))
+}
+
+class B extends A {
+>B : Symbol(B, Decl(final7.ts, 2, 1))
+>A : Symbol(A, Decl(final7.ts, 0, 0))
+
+    m2() {
+>m2 : Symbol(B.m2, Decl(final7.ts, 4, 19))
+
+        this.m1();
+>this.m1 : Symbol(A.m1, Decl(final7.ts, 0, 9))
+>this : Symbol(B, Decl(final7.ts, 2, 1))
+>m1 : Symbol(A.m1, Decl(final7.ts, 0, 9))
+    }
+}
+
+new B().m1();
+>new B().m1 : Symbol(A.m1, Decl(final7.ts, 0, 9))
+>B : Symbol(B, Decl(final7.ts, 2, 1))
+>m1 : Symbol(A.m1, Decl(final7.ts, 0, 9))
+
+new B().m2();
+>new B().m2 : Symbol(B.m2, Decl(final7.ts, 4, 19))
+>B : Symbol(B, Decl(final7.ts, 2, 1))
+>m2 : Symbol(B.m2, Decl(final7.ts, 4, 19))
+

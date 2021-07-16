@@ -1,0 +1,8 @@
+=== tests/cases/conformance/final/final8.ts ===
+class A {
+>A : Symbol(A, Decl(final8.ts, 0, 0))
+
+    final protected m1() {}
+>m1 : Symbol(A.m1, Decl(final8.ts, 0, 9))
+}
+

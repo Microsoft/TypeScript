@@ -1,0 +1,10 @@
+tests/cases/conformance/final/final3.ts(2,14): error TS1243: 'final' modifier cannot be used with 'abstract' modifier.
+
+
+==== tests/cases/conformance/final/final3.ts (1 errors) ====
+    abstract class A {
+        abstract final m(): void;
+                 ~~~~~
+!!! error TS1243: 'final' modifier cannot be used with 'abstract' modifier.
+    }
+    

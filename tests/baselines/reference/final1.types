@@ -1,0 +1,7 @@
+=== tests/cases/conformance/final/final1.ts ===
+class A {
+>A : A
+
+    final constructor() {}
+}
+

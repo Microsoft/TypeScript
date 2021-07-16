@@ -4858,6 +4858,7 @@ namespace ts {
             case SyntaxKind.PublicKeyword: return ModifierFlags.Public;
             case SyntaxKind.ProtectedKeyword: return ModifierFlags.Protected;
             case SyntaxKind.PrivateKeyword: return ModifierFlags.Private;
+            case SyntaxKind.FinalKeyword: return ModifierFlags.Final;
             case SyntaxKind.AbstractKeyword: return ModifierFlags.Abstract;
             case SyntaxKind.ExportKeyword: return ModifierFlags.Export;
             case SyntaxKind.DeclareKeyword: return ModifierFlags.Ambient;
@@ -5396,6 +5397,7 @@ namespace ts {
             const checkFlags = (s as TransientSymbol).checkFlags;
             const accessModifier = checkFlags & CheckFlags.ContainsPrivate ? ModifierFlags.Private :
                 checkFlags & CheckFlags.ContainsPublic ? ModifierFlags.Public :
+                checkFlags & CheckFlags.ContainsFinal ? ModifierFlags.Final :
                 ModifierFlags.Protected;
             const staticModifier = checkFlags & CheckFlags.ContainsStatic ? ModifierFlags.Static : 0;
             return accessModifier | staticModifier;

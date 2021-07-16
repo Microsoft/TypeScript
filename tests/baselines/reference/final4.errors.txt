@@ -1,0 +1,10 @@
+tests/cases/conformance/final/final4.ts(2,11): error TS1030: 'final' modifier already seen.
+
+
+==== tests/cases/conformance/final/final4.ts (1 errors) ====
+    class A {
+        final final m() {}
+              ~~~~~
+!!! error TS1030: 'final' modifier already seen.
+    }
+    

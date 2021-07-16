@@ -11799,6 +11799,7 @@ namespace ts {
                             (!(modifiers & ModifierFlags.NonPublicAccessibilityModifier) ? CheckFlags.ContainsPublic : 0) |
                             (modifiers & ModifierFlags.Protected ? CheckFlags.ContainsProtected : 0) |
                             (modifiers & ModifierFlags.Private ? CheckFlags.ContainsPrivate : 0) |
+                            (modifiers & ModifierFlags.Final ? CheckFlags.ContainsFinal : 0) |
                             (modifiers & ModifierFlags.Static ? CheckFlags.ContainsStatic : 0);
                         if (!isPrototypeProperty(prop)) {
                             syntheticFlag = CheckFlags.SyntheticProperty;
@@ -19030,6 +19031,13 @@ namespace ts {
                         }
                         return Ternary.False;
                     }
+                }
+                else if (targetPropFlags & ModifierFlags.Final) {
+                    if (reportErrors) {
+                        reportError(Diagnostics.Property_0_is_final_in_type_1_that_cannot_be_overridden_in_type_2, symbolToString(targetProp),
+                            typeToString(target), typeToString(source));
+                    }
+                    return Ternary.False;
                 }
                 else if (targetPropFlags & ModifierFlags.Protected) {
                     if (!isValidOverrideOf(sourceProp, targetProp)) {
@@ -41125,7 +41133,7 @@ namespace ts {
                 return quickResult;
             }
 
-            let lastStatic: Node | undefined, lastDeclare: Node | undefined, lastAsync: Node | undefined, lastReadonly: Node | undefined, lastOverride: Node | undefined;
+            let lastStatic: Node | undefined, lastDeclare: Node | undefined, lastAsync: Node | undefined, lastReadonly: Node | undefined, lastOverride: Node | undefined, lastFinal: Node | undefined;
             let flags = ModifierFlags.None;
             for (const modifier of node.modifiers!) {
                 if (modifier.kind !== SyntaxKind.ReadonlyKeyword) {
@@ -41267,6 +41275,19 @@ namespace ts {
 
                         flags |= ModifierFlags.Default;
                         break;
+                    case SyntaxKind.FinalKeyword:
+                        if (flags & ModifierFlags.Final) {
+                            return grammarErrorOnNode(modifier, Diagnostics._0_modifier_already_seen, "final");
+                        }
+                        if (flags & ModifierFlags.Private) {
+                            return grammarErrorOnNode(modifier, Diagnostics._0_modifier_cannot_be_used_with_1_modifier, "final", "private");
+                        }
+                        if (flags & ModifierFlags.Abstract) {
+                            return grammarErrorOnNode(modifier, Diagnostics._0_modifier_cannot_be_used_with_1_modifier, "final", "abstract");
+                        }
+                        flags |= ModifierFlags.Final;
+                        lastFinal = modifier;
+                        break;
                     case SyntaxKind.DeclareKeyword:
                         if (flags & ModifierFlags.Ambient) {
                             return grammarErrorOnNode(modifier, Diagnostics._0_modifier_already_seen, "declare");
@@ -41362,6 +41383,9 @@ namespace ts {
                 }
                 else if (flags & ModifierFlags.Readonly) {
                     return grammarErrorOnNode(lastReadonly!, Diagnostics._0_modifier_cannot_appear_on_a_constructor_declaration, "readonly");
+                }
+                if (flags & ModifierFlags.Final) {
+                    return grammarErrorOnNode(lastFinal!, Diagnostics._0_modifier_cannot_appear_on_a_constructor_declaration, "final");
                 }
                 return false;
             }

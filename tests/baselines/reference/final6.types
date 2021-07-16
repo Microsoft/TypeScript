@@ -1,0 +1,15 @@
+=== tests/cases/conformance/final/final6.ts ===
+class A {
+>A : A
+
+    final m() {}
+>m : () => void
+}
+
+new A().m();
+>new A().m() : void
+>new A().m : () => void
+>new A() : A
+>A : typeof A
+>m : () => void
+

@@ -1,0 +1,13 @@
+=== tests/cases/conformance/final/final6.ts ===
+class A {
+>A : Symbol(A, Decl(final6.ts, 0, 0))
+
+    final m() {}
+>m : Symbol(A.m, Decl(final6.ts, 0, 9))
+}
+
+new A().m();
+>new A().m : Symbol(A.m, Decl(final6.ts, 0, 9))
+>A : Symbol(A, Decl(final6.ts, 0, 0))
+>m : Symbol(A.m, Decl(final6.ts, 0, 9))
+
