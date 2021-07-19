@@ -401,11 +401,31 @@ namespace ts.server {
             createInterface(options: ReadLineOptions): NodeJS.EventEmitter;
         } = require("readline");
 
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            terminal: false,
-        });
+        const fs: {
+            readFileSync(path: string, options: { encoding: string; flag?: string; } | string): string;
+        } = require("fs");
+
+        const stream: {
+            Readable: { from(str: string): NodeJS.ReadStream; };
+        } = require("stream");
+
+        function getInputReadStream(inputFile: string | undefined) {
+            if (!inputFile) return undefined;
+            const lines = fs.readFileSync(stripQuotes(inputFile), "utf8")?.split(/\r?\n/) || [];
+            const result = [];
+            for (const line of lines) {
+                if (!line.match(/^\s*\{\"seq\":/)) continue;
+                try {
+                    const json = JSON.parse(line);
+                    if (json && json.type === "request") {
+                        result.push(line);
+                    }
+                }
+                catch (e) {
+                }
+            }
+            return stream.Readable.from(result.join("\n"));
+        }
 
         interface QueuedOperation {
             operationId: string;
@@ -754,11 +774,17 @@ namespace ts.server {
                 });
 
                 rl.on("close", () => {
-                    this.exit();
+                    if (!inputStream) this.exit();
                 });
             }
         }
 
+        const inputStream = getInputReadStream(findArgument("--inputFile"));
+        const rl = readline.createInterface({
+            input: inputStream || process.stdin,
+            output: process.stdout,
+            terminal: false,
+        });
         const eventPort: number | undefined = parseEventPort(findArgument("--eventPort"));
         const typingSafeListLocation = findArgument(Arguments.TypingSafeListLocation)!; // TODO: GH#18217
         const typesMapLocation = findArgument(Arguments.TypesMapLocation) || combinePaths(getDirectoryPath(sys.getExecutingFilePath()), "typesMap.json");
