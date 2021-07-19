@@ -16587,9 +16587,18 @@ namespace ts {
             errorOutputContainer: { errors?: Diagnostic[], skipLogging?: boolean } | undefined
         ): boolean {
             if (!node || isOrHasGenericConditional(target)) return false;
-            if (!checkTypeRelatedTo(source, target, relation, /*errorNode*/ undefined)
-                && elaborateDidYouMeanToCallOrConstruct(node, source, target, relation, headMessage, containingMessageChain, errorOutputContainer)) {
-                return true;
+            if (!checkTypeRelatedTo(source, target, relation, /*errorNode*/ undefined)) {
+                if(elaborateDidYouMeanToCallOrConstruct(node, source, target, relation, headMessage, containingMessageChain, errorOutputContainer)) {
+                    return true;
+                }
+                if(isDottedName(node)) {
+                    if(elaborateDidYouMeanAccessParent(node, source, target, headMessage, containingMessageChain, errorOutputContainer)) {
+                        return true;
+                    }
+                    if(elaborateDidYouMeanAccessChildProperty(node, source, target, headMessage, containingMessageChain, errorOutputContainer)) {
+                        return true;
+                    }
+                }
             }
             switch (node.kind) {
                 case SyntaxKind.JsxExpression:
@@ -16610,6 +16619,107 @@ namespace ts {
                     return elaborateJsxComponents(node as JsxAttributes, source, target, relation, containingMessageChain, errorOutputContainer);
                 case SyntaxKind.ArrowFunction:
                     return elaborateArrowFunction(node as ArrowFunction, source, target, relation, containingMessageChain, errorOutputContainer);
+            }
+            return false;
+        }
+
+        function elaborateDidYouMeanAccessChildProperty(
+            node: Expression,
+            source: Type,
+            target: Type,
+            headMessage: DiagnosticMessage | undefined,
+            containingMessageChain: (() => DiagnosticMessageChain | undefined) | undefined,
+            errorOutputContainer: { errors?: Diagnostic[], skipLogging?: boolean } | undefined
+        ): boolean {
+
+            // Also don't offer this error message if the target type is likely to match any property on the source type
+            if (isIndexSignatureOnlyType(target) || isEmptyObjectType(target)) return false;
+            if (target === voidType || target === globalObjectType || target === globalFunctionType) return false;
+            if (maybeTypeOfKind(source, TypeFlags.Primitive)) return false;
+
+            const properties = getPropertiesOfType(getApparentType(source));
+            if (properties.length === 0) return false;
+
+            const candidateProperties: Symbol[] = [];
+            let isEnumObject = true;
+            for (const sourceProperty of properties) {
+                const sourcePropertyType = getTypeOfSymbol(sourceProperty);
+
+                isEnumObject = isEnumObject && !!(sourcePropertyType.flags & TypeFlags.EnumLiteral);
+                // We don't offer the suggestion for properties of type any, too many false positives.
+                if(isTypeAny(sourcePropertyType)) continue;
+
+                const parentSymbol = getParentOfSymbol(sourceProperty);
+                const declaringType = parentSymbol && getDeclaredTypeOfSymbol(parentSymbol);
+                // Do not offer suggestions from Object or Function
+                if (declaringType && (declaringType === globalObjectType || declaringType === globalFunctionType)) continue;
+
+                if (isTypeAssignableTo(sourcePropertyType, target)) {
+                    candidateProperties.push(sourceProperty);
+                }
+            }
+            if (0 < candidateProperties.length && candidateProperties.length <= 5 || isEnumObject) {
+                const resultObj: { errors?: Diagnostic[] } = errorOutputContainer || {};
+                checkTypeAssignableTo(source, target, node, headMessage, containingMessageChain, resultObj);
+                const diagnostic = resultObj.errors![resultObj.errors!.length - 1];
+
+                if(isEnumObject) {
+                    addRelatedInfo(diagnostic, createDiagnosticForNode(
+                        node,
+                        Diagnostics.Did_you_mean_to_access_an_enum_member_of_0_instead,
+                        tryGetDottedNameToString(node)
+                    ));
+                }
+                else if (candidateProperties.length === 1) {
+                    addRelatedInfo(diagnostic, createDiagnosticForNode(
+                        node,
+                        Diagnostics.Did_you_mean_to_access_the_0_property_on_1_instead,
+                        symbolToString(candidateProperties[0]),
+                        tryGetDottedNameToString(node)
+                    ));
+                }
+                else {
+                    addRelatedInfo(diagnostic, createDiagnosticForNode(
+                        node,
+                        Diagnostics.Did_you_mean_to_access_one_of_these_0_properties_on_1_instead,
+                        map(candidateProperties, s => "'" + symbolToString(s) + "'").join(", "),
+                        tryGetDottedNameToString(node)
+                    ));
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function elaborateDidYouMeanAccessParent(
+            node: Expression,
+            source: Type,
+            target: Type,
+            headMessage: DiagnosticMessage | undefined,
+            containingMessageChain: (() => DiagnosticMessageChain | undefined) | undefined,
+            errorOutputContainer: { errors?: Diagnostic[], skipLogging?: boolean } | undefined
+        ): boolean {
+
+            // Don't offer this error message if the target type is likely to match any property on the source type
+            if(isIndexSignatureOnlyType(target) || isEmptyObjectType(target)) return false;
+            if(target === voidType || target === globalObjectType || target === globalFunctionType) return false;
+
+            let propertyExpression = node;
+            while(isPropertyAccessExpression(propertyExpression)) {
+                const parentType = getTypeOfExpression(propertyExpression.expression);
+                if(isTypeAssignableTo(parentType, target)) {
+                    const resultObj: { errors?: Diagnostic[] } = errorOutputContainer || {};
+                    checkTypeAssignableTo(source, target, node, headMessage, containingMessageChain, resultObj);
+                    const diagnostic = resultObj.errors![resultObj.errors!.length - 1];
+
+                    addRelatedInfo(diagnostic, createDiagnosticForNode(
+                        propertyExpression.expression,
+                        Diagnostics._0_is_compatible_with_the_original_type_Perhaps_you_meant_to_use_that_instead,
+                        tryGetDottedNameToString(propertyExpression.expression)
+                    ));
+                    return true;
+                }
+                propertyExpression = propertyExpression.expression;
             }
             return false;
         }
@@ -17257,6 +17367,13 @@ namespace ts {
         function isStringIndexSignatureOnlyType(type: Type): boolean {
             return type.flags & TypeFlags.Object && !isGenericMappedType(type) && getPropertiesOfType(type).length === 0 && getIndexInfosOfType(type).length === 1 && !!getIndexInfoOfType(type, stringType) ||
                 type.flags & TypeFlags.UnionOrIntersection && every((type as UnionOrIntersectionType).types, isStringIndexSignatureOnlyType) ||
+                false;
+        }
+
+        function isIndexSignatureOnlyType(type: Type): boolean {
+            return type.flags & TypeFlags.Object && !isGenericMappedType(type) && getPropertiesOfType(type).length === 0 &&
+                (!!getIndexInfoOfType(type, IndexKind.String) || !!getIndexInfoOfType(type, IndexKind.Number)) ||
+                type.flags & TypeFlags.UnionOrIntersection && every((<UnionOrIntersectionType>type).types, isStringIndexSignatureOnlyType) ||
                 false;
         }
 

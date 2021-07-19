@@ -4968,6 +4968,29 @@ namespace ts {
             || node.kind === SyntaxKind.PropertyAccessExpression && isDottedName((node as PropertyAccessExpression).expression)
             || node.kind === SyntaxKind.ParenthesizedExpression && isDottedName((node as ParenthesizedExpression).expression);
     }
+    export function tryGetDottedNameToString(expr: Expression): string | undefined {
+        if (isParenthesizedExpression(expr)) {
+            return tryGetDottedNameToString(expr.expression);
+        }
+        if (isPropertyAccessExpression(expr)) {
+            const baseStr = tryGetDottedNameToString(expr.expression);
+            if (baseStr !== undefined) {
+                if (isIdentifier(expr.name)) {
+                    return baseStr + "." + unescapeLeadingUnderscores(expr.name.escapedText);
+                }
+                else {
+                    return baseStr + "." + getTextOfNode(expr.name);
+                }
+            }
+        }
+        else if (isIdentifier(expr)) {
+            return unescapeLeadingUnderscores(expr.escapedText);
+        }
+        else if(expr.kind === SyntaxKind.ThisKeyword) {
+            return "this";
+        }
+        return undefined;
+    }
 
     export function isPropertyAccessEntityNameExpression(node: Node): node is PropertyAccessEntityNameExpression {
         return isPropertyAccessExpression(node) && isIdentifier(node.name) && isEntityNameExpression(node.expression);
