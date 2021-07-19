@@ -1,0 +1,506 @@
+=== tests/cases/compiler/narrowGenericTypeByInstanceOf.ts ===
+// From #28560
+
+function preserveParentParameters() {
+>preserveParentParameters : Symbol(preserveParentParameters, Decl(narrowGenericTypeByInstanceOf.ts, 0, 0))
+
+  class Parent<T> {
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 2, 37))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 3, 15))
+
+    value: T;
+>value : Symbol(Parent.value, Decl(narrowGenericTypeByInstanceOf.ts, 3, 19))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 3, 15))
+  }
+  class Child<S> extends Parent<S> {
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 5, 3))
+>S : Symbol(S, Decl(narrowGenericTypeByInstanceOf.ts, 6, 14))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 2, 37))
+>S : Symbol(S, Decl(narrowGenericTypeByInstanceOf.ts, 6, 14))
+
+    other: S;
+>other : Symbol(Child.other, Decl(narrowGenericTypeByInstanceOf.ts, 6, 36))
+>S : Symbol(S, Decl(narrowGenericTypeByInstanceOf.ts, 6, 14))
+  }
+
+  function withNumber(p: Parent<number>) {
+>withNumber : Symbol(withNumber, Decl(narrowGenericTypeByInstanceOf.ts, 8, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 10, 22))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 2, 37))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 10, 22))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 5, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 10, 22))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 10, 22))
+    }
+  }
+  function withString(p: Parent<string>) {
+>withString : Symbol(withString, Decl(narrowGenericTypeByInstanceOf.ts, 16, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 17, 22))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 2, 37))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 17, 22))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 5, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 17, 22))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 17, 22))
+    }
+  }
+  function withGeneric<A>(p: Parent<A>) {
+>withGeneric : Symbol(withGeneric, Decl(narrowGenericTypeByInstanceOf.ts, 23, 3))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 24, 23))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 24, 26))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 2, 37))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 24, 23))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 24, 26))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 5, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 24, 26))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 24, 26))
+    }
+  }
+}
+
+function copyParameterStructurally() {
+>copyParameterStructurally : Symbol(copyParameterStructurally, Decl(narrowGenericTypeByInstanceOf.ts, 31, 1))
+
+  class Parent<T> {
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 33, 38))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 34, 15))
+
+    value: T;
+>value : Symbol(Parent.value, Decl(narrowGenericTypeByInstanceOf.ts, 34, 19))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 34, 15))
+  }
+  class Child<S> {
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 36, 3))
+>S : Symbol(S, Decl(narrowGenericTypeByInstanceOf.ts, 37, 14))
+
+    value: S;
+>value : Symbol(Child.value, Decl(narrowGenericTypeByInstanceOf.ts, 37, 18))
+>S : Symbol(S, Decl(narrowGenericTypeByInstanceOf.ts, 37, 14))
+
+    other: S;
+>other : Symbol(Child.other, Decl(narrowGenericTypeByInstanceOf.ts, 38, 13))
+>S : Symbol(S, Decl(narrowGenericTypeByInstanceOf.ts, 37, 14))
+  }
+
+  function withNumber(p: Parent<number>) {
+>withNumber : Symbol(withNumber, Decl(narrowGenericTypeByInstanceOf.ts, 40, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 42, 22))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 33, 38))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 42, 22))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 36, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 42, 22))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 42, 22))
+    }
+  }
+  function withString(p: Parent<string>) {
+>withString : Symbol(withString, Decl(narrowGenericTypeByInstanceOf.ts, 48, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 49, 22))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 33, 38))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 49, 22))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 36, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 49, 22))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 49, 22))
+    }
+  }
+  function withGeneric<A>(p: Parent<A>) {
+>withGeneric : Symbol(withGeneric, Decl(narrowGenericTypeByInstanceOf.ts, 55, 3))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 56, 23))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 56, 26))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 33, 38))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 56, 23))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 56, 26))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 36, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 56, 26))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 56, 26))
+    }
+  }
+}
+
+function useConstraint() {
+>useConstraint : Symbol(useConstraint, Decl(narrowGenericTypeByInstanceOf.ts, 63, 1))
+
+  // #17473
+  interface Foo {
+>Foo : Symbol(Foo, Decl(narrowGenericTypeByInstanceOf.ts, 65, 26))
+
+    foo: string;
+>foo : Symbol(Foo.foo, Decl(narrowGenericTypeByInstanceOf.ts, 67, 17))
+  }
+
+  class Bar<T extends Foo> {
+>Bar : Symbol(Bar, Decl(narrowGenericTypeByInstanceOf.ts, 69, 3))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 71, 12))
+>Foo : Symbol(Foo, Decl(narrowGenericTypeByInstanceOf.ts, 65, 26))
+
+    constructor(readonly bar: T) {}
+>bar : Symbol(Bar.bar, Decl(narrowGenericTypeByInstanceOf.ts, 72, 16))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 71, 12))
+  }
+
+  let a: any;
+>a : Symbol(a, Decl(narrowGenericTypeByInstanceOf.ts, 75, 5))
+
+  if (a instanceof Bar) {
+>a : Symbol(a, Decl(narrowGenericTypeByInstanceOf.ts, 75, 5))
+>Bar : Symbol(Bar, Decl(narrowGenericTypeByInstanceOf.ts, 69, 3))
+
+    a.bar; // <-- a.bar should be 'Foo' instead of 'any'
+>a.bar : Symbol(Bar.bar, Decl(narrowGenericTypeByInstanceOf.ts, 72, 16))
+>a : Symbol(a, Decl(narrowGenericTypeByInstanceOf.ts, 75, 5))
+>bar : Symbol(Bar.bar, Decl(narrowGenericTypeByInstanceOf.ts, 72, 16))
+  }
+}
+
+function enhanceConstraint() {
+>enhanceConstraint : Symbol(enhanceConstraint, Decl(narrowGenericTypeByInstanceOf.ts, 79, 1))
+
+  class Parent<T extends 1 | 2 | 3 | 4> {
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 81, 30))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 82, 15))
+
+    value: T;
+>value : Symbol(Parent.value, Decl(narrowGenericTypeByInstanceOf.ts, 82, 41))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 82, 15))
+  }
+  class Child<T extends 1 | 2> extends Parent<T> {
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 84, 3))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 85, 14))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 81, 30))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 85, 14))
+
+    other: T;
+>other : Symbol(Child.other, Decl(narrowGenericTypeByInstanceOf.ts, 85, 50))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 85, 14))
+  }
+
+  function simpleExtends(p: Parent<1 | 2 | 3 | 4>) {
+>simpleExtends : Symbol(simpleExtends, Decl(narrowGenericTypeByInstanceOf.ts, 87, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 89, 25))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 81, 30))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 89, 25))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 84, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 89, 25))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 89, 25))
+    }
+  }
+  function complexExtends(p: Parent<2 | 3>) {
+>complexExtends : Symbol(complexExtends, Decl(narrowGenericTypeByInstanceOf.ts, 95, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 96, 26))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 81, 30))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 96, 26))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 84, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 96, 26))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 96, 26))
+    }
+  }
+  function impossibleExtends(p: Parent<3 | 4>) {
+>impossibleExtends : Symbol(impossibleExtends, Decl(narrowGenericTypeByInstanceOf.ts, 102, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 103, 29))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 81, 30))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 103, 29))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 84, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 103, 29))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 103, 29))
+    }
+  }
+}
+
+function dontWidenPointlessly() {
+>dontWidenPointlessly : Symbol(dontWidenPointlessly, Decl(narrowGenericTypeByInstanceOf.ts, 110, 1))
+
+  class Query<T> {
+>Query : Symbol(Query, Decl(narrowGenericTypeByInstanceOf.ts, 112, 33))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 113, 14))
+
+    uses: T;
+>uses : Symbol(Query.uses, Decl(narrowGenericTypeByInstanceOf.ts, 113, 18))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 113, 14))
+  }
+  function f<T>(p: T[] | Query<T>) {
+>f : Symbol(f, Decl(narrowGenericTypeByInstanceOf.ts, 115, 3))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 116, 13))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 116, 16))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 116, 13))
+>Query : Symbol(Query, Decl(narrowGenericTypeByInstanceOf.ts, 112, 33))
+>T : Symbol(T, Decl(narrowGenericTypeByInstanceOf.ts, 116, 13))
+
+    if (Array.isArray(p)) {
+>Array.isArray : Symbol(ArrayConstructor.isArray, Decl(lib.es5.d.ts, --, --))
+>Array : Symbol(Array, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>isArray : Symbol(ArrayConstructor.isArray, Decl(lib.es5.d.ts, --, --))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 116, 16))
+
+      p; // T[], so far so good
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 116, 16))
+
+    } else if (p instanceof Query) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 116, 16))
+>Query : Symbol(Query, Decl(narrowGenericTypeByInstanceOf.ts, 112, 33))
+
+      p; // should be Query<T>, not Query<any>
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 116, 16))
+    }
+  }
+}
+
+function multipleParameters() {
+>multipleParameters : Symbol(multipleParameters, Decl(narrowGenericTypeByInstanceOf.ts, 123, 1))
+
+  class Parent<A, B> {
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 125, 31))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 126, 15))
+>B : Symbol(B, Decl(narrowGenericTypeByInstanceOf.ts, 126, 17))
+
+    a: A;
+>a : Symbol(Parent.a, Decl(narrowGenericTypeByInstanceOf.ts, 126, 22))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 126, 15))
+
+    b: B;
+>b : Symbol(Parent.b, Decl(narrowGenericTypeByInstanceOf.ts, 127, 9))
+>B : Symbol(B, Decl(narrowGenericTypeByInstanceOf.ts, 126, 17))
+  }
+  class Swapped<X, Y> extends Parent<Y, X> {
+>Swapped : Symbol(Swapped, Decl(narrowGenericTypeByInstanceOf.ts, 129, 3))
+>X : Symbol(X, Decl(narrowGenericTypeByInstanceOf.ts, 130, 16))
+>Y : Symbol(Y, Decl(narrowGenericTypeByInstanceOf.ts, 130, 18))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 125, 31))
+>Y : Symbol(Y, Decl(narrowGenericTypeByInstanceOf.ts, 130, 18))
+>X : Symbol(X, Decl(narrowGenericTypeByInstanceOf.ts, 130, 16))
+
+    x: X;
+>x : Symbol(Swapped.x, Decl(narrowGenericTypeByInstanceOf.ts, 130, 44))
+>X : Symbol(X, Decl(narrowGenericTypeByInstanceOf.ts, 130, 16))
+
+    y: Y;
+>y : Symbol(Swapped.y, Decl(narrowGenericTypeByInstanceOf.ts, 131, 9))
+>Y : Symbol(Y, Decl(narrowGenericTypeByInstanceOf.ts, 130, 18))
+  }
+  function checkSwapped(p: Parent<number, string>) {
+>checkSwapped : Symbol(checkSwapped, Decl(narrowGenericTypeByInstanceOf.ts, 133, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 134, 24))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 125, 31))
+
+    if (p instanceof Swapped) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 134, 24))
+>Swapped : Symbol(Swapped, Decl(narrowGenericTypeByInstanceOf.ts, 129, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 134, 24))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 134, 24))
+    }
+  }
+}
+
+function inconsistentParameters() {
+>inconsistentParameters : Symbol(inconsistentParameters, Decl(narrowGenericTypeByInstanceOf.ts, 141, 1))
+
+  class Parent<A, B> {
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 143, 35))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 144, 15))
+>B : Symbol(B, Decl(narrowGenericTypeByInstanceOf.ts, 144, 17))
+
+    a: A;
+>a : Symbol(Parent.a, Decl(narrowGenericTypeByInstanceOf.ts, 144, 22))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 144, 15))
+
+    b: B;
+>b : Symbol(Parent.b, Decl(narrowGenericTypeByInstanceOf.ts, 145, 9))
+>B : Symbol(B, Decl(narrowGenericTypeByInstanceOf.ts, 144, 17))
+  }
+  class Child<C> extends Parent<C, C> {
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 147, 3))
+>C : Symbol(C, Decl(narrowGenericTypeByInstanceOf.ts, 148, 14))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 143, 35))
+>C : Symbol(C, Decl(narrowGenericTypeByInstanceOf.ts, 148, 14))
+>C : Symbol(C, Decl(narrowGenericTypeByInstanceOf.ts, 148, 14))
+
+    c: C;
+>c : Symbol(Child.c, Decl(narrowGenericTypeByInstanceOf.ts, 148, 39))
+>C : Symbol(C, Decl(narrowGenericTypeByInstanceOf.ts, 148, 14))
+  }
+  function possible(p: Parent<number, number>) {
+>possible : Symbol(possible, Decl(narrowGenericTypeByInstanceOf.ts, 150, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 151, 20))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 143, 35))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 151, 20))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 147, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 151, 20))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 151, 20))
+    }
+  }
+  function impossible(p: Parent<number, string>) {
+>impossible : Symbol(impossible, Decl(narrowGenericTypeByInstanceOf.ts, 157, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 158, 22))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 143, 35))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 158, 22))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 147, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 158, 22))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 158, 22))
+    }
+  }
+}
+
+function union() {
+>union : Symbol(union, Decl(narrowGenericTypeByInstanceOf.ts, 165, 1))
+
+  class Parent<A> {
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 167, 18))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 168, 15))
+
+    a: A;
+>a : Symbol(Parent.a, Decl(narrowGenericTypeByInstanceOf.ts, 168, 19))
+>A : Symbol(A, Decl(narrowGenericTypeByInstanceOf.ts, 168, 15))
+  }
+  class Child<B> extends Parent<B> {
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 170, 3))
+>B : Symbol(B, Decl(narrowGenericTypeByInstanceOf.ts, 171, 14))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 167, 18))
+>B : Symbol(B, Decl(narrowGenericTypeByInstanceOf.ts, 171, 14))
+
+    b: B;
+>b : Symbol(Child.b, Decl(narrowGenericTypeByInstanceOf.ts, 171, 36))
+>B : Symbol(B, Decl(narrowGenericTypeByInstanceOf.ts, 171, 14))
+  }
+  function multipleParents(
+>multipleParents : Symbol(multipleParents, Decl(narrowGenericTypeByInstanceOf.ts, 173, 3))
+
+    p: Parent<number> | Parent<string> | Parent<boolean>
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 174, 27))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 167, 18))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 167, 18))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 167, 18))
+
+  ) {
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 174, 27))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 170, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 174, 27))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 174, 27))
+    }
+  }
+  function mixedChildren(p: Parent<number> | Child<string>) {
+>mixedChildren : Symbol(mixedChildren, Decl(narrowGenericTypeByInstanceOf.ts, 182, 3))
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 183, 25))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 167, 18))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 170, 3))
+
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 183, 25))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 170, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 183, 25))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 183, 25))
+    }
+  }
+  function imcompatibleOptions(
+>imcompatibleOptions : Symbol(imcompatibleOptions, Decl(narrowGenericTypeByInstanceOf.ts, 189, 3))
+
+    p: Parent<number> | Parent<string> | { foo: boolean }
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 190, 31))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 167, 18))
+>Parent : Symbol(Parent, Decl(narrowGenericTypeByInstanceOf.ts, 167, 18))
+>foo : Symbol(foo, Decl(narrowGenericTypeByInstanceOf.ts, 191, 42))
+
+  ) {
+    if (p instanceof Child) {
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 190, 31))
+>Child : Symbol(Child, Decl(narrowGenericTypeByInstanceOf.ts, 170, 3))
+
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 190, 31))
+
+    } else {
+      p;
+>p : Symbol(p, Decl(narrowGenericTypeByInstanceOf.ts, 190, 31))
+    }
+  }
+}
+

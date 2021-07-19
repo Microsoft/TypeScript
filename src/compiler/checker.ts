@@ -23951,6 +23951,80 @@ namespace ts {
                 }
             }
 
+            function inferSubtypeTypeParameters(superType: Type, childTypeParameters: ReadonlyArray<TypeParameter>, childConstructor: Signature): Type | undefined {
+                // inferSubtypeTypeParameters infers the best possible parameters for the given childConstructor such that it represents every possible subtype of superType.
+                // An inferenceContext is created to permit us to develop inferences.
+                const inferenceContext = createInferenceContext(
+                    childTypeParameters,
+                    childConstructor,
+                    InferenceFlags.NoDefault, // exclude defaults values from inference, since they don't participate in actual typing here.
+                );
+
+                // Infer the types from superType onto the return type of the child constructor.
+                const childTemplateType = getReturnTypeOfSignature(childConstructor);
+                inferTypes(inferenceContext.inferences, superType, childTemplateType, InferencePriority.NakedTypeVariable);
+
+                // We extract the inferred arguments from the inference context.
+                // silentNeverType indicates that no type could be inferred.
+                // In these cases, falling back on any produces the simplest user experience.
+                const childArguments = getInferredTypes(inferenceContext).map(type => type === silentNeverType ? anyType : type);
+
+
+                // Lastly, supply the childType with the new parameters.
+                return instantiateType(childTemplateType, param => {
+                    if (childTypeParameters.indexOf(param) >= 0) {
+                        return childArguments[childTypeParameters.indexOf(param)];
+                    }
+                    return param;
+                });
+            }
+
+            function narrowTypeParametersByAssignability(superType: Type, childType: Type): Type | undefined {
+                if (superType.flags & TypeFlags.Never) {
+                    return undefined;
+                }
+                // Attempt to narrow `superType` to `childType`.
+                // If this is possible via an instantiation of childType's parameters, return the narrowed type.
+                // Otherwise, return undefined.
+
+                if (!(childType.flags & TypeFlags.Object)) {
+                    return undefined;
+                }
+
+                const childObjectType = <ObjectType>childType;
+
+                if (!childObjectType.constructSignatures) {
+                    // TODO: can we do anything if a construct signature doesn't exist?
+                    return undefined;
+                }
+
+                if (childObjectType.constructSignatures.length === 0) {
+                    // TODO: can we do anything if a construct signature doesn't exist?
+                    return undefined;
+                }
+
+                // TODO: how should we select the constructor if there is more than one?
+                // We should probably select the most-general overload, or maybe try all of them.
+                const childConstructor = childObjectType.constructSignatures[0];
+
+                if (!childConstructor.typeParameters) {
+                    // Narrowing via type parameter assignment is only feasible if type parameters exist.
+                    return undefined;
+                }
+
+                const childTypeParameters = childConstructor.typeParameters;
+
+                if (superType.flags & TypeFlags.Union) {
+                    // When the super type is a union type, it makes sense to spread across.
+                    // If it's possible for the child type to be a subtype, then we should instead skip it.
+                    return getUnionType(
+                        (<UnionType>superType).types.map(superTypeAlternative => inferSubtypeTypeParameters(superTypeAlternative, childTypeParameters, childConstructor)).map(type => type || neverType)
+                    );
+                }
+
+                return inferSubtypeTypeParameters(superType, childTypeParameters, childConstructor);
+            }
+
             function narrowTypeByInstanceof(type: Type, expr: BinaryExpression, assumeTrue: boolean): Type {
                 const left = getReferenceCandidate(expr.left);
                 if (!isMatchingReference(reference, left)) {
@@ -23973,6 +24047,16 @@ namespace ts {
                     const prototypePropertyType = getTypeOfSymbol(prototypeProperty);
                     if (!isTypeAny(prototypePropertyType)) {
                         targetType = prototypePropertyType;
+                    }
+
+                    const narrowedGenericClassTypeCandidate = narrowTypeParametersByAssignability(type, rightType);
+                    if (narrowedGenericClassTypeCandidate && !(narrowedGenericClassTypeCandidate.flags & TypeFlags.Never) && isTypeSubtypeOf(narrowedGenericClassTypeCandidate, type)) {
+                        // When the resulting narrowed type is actually a subtype of the original, the candidate it used.
+                        // In some cases, this fail (due to apparent non-inhabitedness).
+                        // For example, if Child<A> extends Parent<A, A> and we narrow Parent<string, number> to Child<?>,
+                        // we'll end up with a candidate Child<string | number> which fails to be a subtype of Parent<string, number>.
+                        // In this case, we skip updating the target type.
+                        targetType = narrowedGenericClassTypeCandidate;
                     }
                 }
 
