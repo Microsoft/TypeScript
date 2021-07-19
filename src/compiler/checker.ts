@@ -741,6 +741,7 @@ namespace ts {
         const anyType = createIntrinsicType(TypeFlags.Any, "any");
         const autoType = createIntrinsicType(TypeFlags.Any, "any");
         const wildcardType = createIntrinsicType(TypeFlags.Any, "any");
+        const erasedType = createIntrinsicType(TypeFlags.Any | TypeFlags.Never | TypeFlags.Unknown, "any");
         const errorType = createIntrinsicType(TypeFlags.Any, "error");
         const nonInferrableAnyType = createIntrinsicType(TypeFlags.Any, "any", ObjectFlags.ContainsWideningType);
         const intrinsicMarkerType = createIntrinsicType(TypeFlags.Any, "intrinsic");
@@ -14074,8 +14075,8 @@ namespace ts {
                     typeSet.set(type.id.toString(), type);
                 }
             }
-            else {
-                if (flags & TypeFlags.AnyOrUnknown) {
+            else if (!(flags & TypeFlags.Unknown)) {
+                if (flags & TypeFlags.Any) {
                     if (type === wildcardType) includes |= TypeFlags.IncludesWildcard;
                 }
                 else if ((strictNullChecks || !(flags & TypeFlags.Nullable)) && !typeSet.has(type.id.toString())) {
@@ -15038,6 +15039,9 @@ namespace ts {
             if (objectType === wildcardType || indexType === wildcardType) {
                 return wildcardType;
             }
+            if (objectType === erasedType || indexType === erasedType) {
+                return erasedType;
+            }
             // If the object type has a string index signature and no other members we know that the result will
             // always be the type of that index signature and we can simplify accordingly.
             if (isStringIndexSignatureOnlyType(objectType) && !(indexType.flags & TypeFlags.Nullable) && isTypeAssignableToKind(indexType, TypeFlags.String | TypeFlags.Number)) {
@@ -15912,7 +15916,7 @@ namespace ts {
         }
 
         function createTypeEraser(sources: readonly TypeParameter[]): TypeMapper {
-            return createTypeMapper(sources, /*targets*/ undefined);
+            return createTypeMapper(sources, arrayOf(sources.length, () => erasedType));
         }
 
         /**
