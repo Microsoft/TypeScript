@@ -17404,7 +17404,8 @@ namespace ts {
 
             let errorInfo: DiagnosticMessageChain | undefined;
             let relatedInfo: [DiagnosticRelatedInformation, ...DiagnosticRelatedInformation[]] | undefined;
-            let maybeKeys: string[];
+            let maybeKeyList: string[];
+            let maybeKeySet: Set<string>;
             let sourceStack: Type[];
             let targetStack: Type[];
             let maybeCount = 0;
@@ -18253,8 +18254,9 @@ namespace ts {
                         return entry & RelationComparisonResult.Succeeded ? Ternary.True : Ternary.False;
                     }
                 }
-                if (!maybeKeys) {
-                    maybeKeys = [];
+                if (!maybeKeyList) {
+                    maybeKeyList = [];
+                    maybeKeySet = new Set<string>();
                     sourceStack = [];
                     targetStack = [];
                 }
@@ -18266,11 +18268,9 @@ namespace ts {
                         const index = length(id.slice(0, offset).match(/[-=]/g) || undefined);
                         return `=${index}`;
                     })).join(",");
-                    for (let i = 0; i < maybeCount; i++) {
+                    if (maybeKeySet.has(id) || maybeKeySet.has(broadestEquivalentId)) {
                         // If source and target are already being compared, consider them related with assumptions
-                        if (id === maybeKeys[i] || broadestEquivalentId === maybeKeys[i]) {
-                            return Ternary.Maybe;
-                        }
+                        return Ternary.Maybe;
                     }
                     if (depth === 100) {
                         overflow = true;
@@ -18278,8 +18278,9 @@ namespace ts {
                     }
                 }
                 const maybeStart = maybeCount;
-                maybeKeys[maybeCount] = id;
+                maybeKeyList[maybeCount] = id;
                 maybeCount++;
+                maybeKeySet.add(id);
                 sourceStack[depth] = source;
                 targetStack[depth] = target;
                 depth++;
@@ -18312,22 +18313,27 @@ namespace ts {
                 }
                 expandingFlags = saveExpandingFlags;
                 depth--;
-                if (result) {
-                    if (result === Ternary.True || depth === 0) {
-                        if (result === Ternary.True || result === Ternary.Maybe) {
-                            // If result is definitely true, record all maybe keys as having succeeded. Also, record Ternary.Maybe
-                            // results as having succeeded once we reach depth 0, but never record Ternary.Unknown results.
-                            for (let i = maybeStart; i < maybeCount; i++) {
-                                relation.set(maybeKeys[i], RelationComparisonResult.Succeeded | propagatingVarianceFlags);
-                            }
+                if (result === Ternary.True || result === Ternary.False || depth === 0) {
+                    if (result === Ternary.True || result === Ternary.Maybe) {
+                        // If result is definitely true, record all maybe keys as having succeeded. Also, record Ternary.Maybe
+                        // results as having succeeded once we reach depth 0, but never record Ternary.Unknown results.
+                        for (let i = maybeStart; i < maybeCount; i++) {
+                            relation.set(maybeKeyList[i], RelationComparisonResult.Succeeded | propagatingVarianceFlags);
                         }
-                        maybeCount = maybeStart;
                     }
-                }
-                else {
-                    // A false result goes straight into global cache (when something is false under
-                    // assumptions it will also be false without assumptions)
-                    relation.set(id, (reportErrors ? RelationComparisonResult.Reported : 0) | RelationComparisonResult.Failed | propagatingVarianceFlags);
+                    else if (result === Ternary.False) {
+                        // A false result goes straight into global cache (when something is false under
+                        // assumptions it will also be false without assumptions)
+                        relation.set(id, (reportErrors ? RelationComparisonResult.Reported : 0) | RelationComparisonResult.Failed | propagatingVarianceFlags);
+                    }
+                    if (maybeStart === 0) {
+                        maybeKeySet.clear();
+                    }
+                    else {
+                        for (let i = maybeStart; i < maybeCount; i++) {
+                            maybeKeySet.delete(maybeKeyList[i]);
+                        }
+                    }
                     maybeCount = maybeStart;
                 }
                 return result;
