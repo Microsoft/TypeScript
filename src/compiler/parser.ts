@@ -5359,9 +5359,6 @@ namespace ts {
             const propertyAccess = isOptionalChain ?
                 factory.createPropertyAccessChain(expression, questionDotToken, name) :
                 factory.createPropertyAccessExpression(expression, name);
-            if (isOptionalChain && isPrivateIdentifier(propertyAccess.name)) {
-                parseErrorAtRange(propertyAccess.name, Diagnostics.An_optional_chain_cannot_contain_private_identifiers);
-            }
             return finishNode(propertyAccess, pos);
         }
 
