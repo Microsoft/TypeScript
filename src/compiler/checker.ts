@@ -21314,10 +21314,17 @@ namespace ts {
                 else if (target.flags & TypeFlags.Conditional) {
                     invokeOnce(source, target, inferToConditionalType);
                 }
+                else if (source.flags & TypeFlags.Union && some((source as UnionType).types, t => !!(t.flags & TypeFlags.TypeVariable))) {
+                    // Source is a union or intersection type, infer from each constituent type
+                    const sourceTypes = (<UnionOrIntersectionType>source).types;
+                    for (const sourceType of sourceTypes) {
+                        inferFromTypes(sourceType, target);
+                    }
+                }
                 else if (target.flags & TypeFlags.UnionOrIntersection) {
                     inferToMultipleTypes(source, (target as UnionOrIntersectionType).types, target.flags);
                 }
-                else if (source.flags & TypeFlags.Union) {
+                else if (source.flags & TypeFlags.Union && !some((source as UnionType).types, t => !!(t.flags & TypeFlags.TypeVariable))) {
                     // Source is a union or intersection type, infer from each constituent type
                     const sourceTypes = (source as UnionOrIntersectionType).types;
                     for (const sourceType of sourceTypes) {
