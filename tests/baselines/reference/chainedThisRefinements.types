@@ -1,0 +1,126 @@
+=== tests/cases/compiler/chainedThisRefinements.ts ===
+class Builder {
+>Builder : Builder
+
+    private _class: undefined;
+>_class : undefined
+
+    withFoo<T>() {
+>withFoo : <T>() => this & { foo: T; }
+
+        return this as this & { foo: T }
+>this as this & { foo: T } : this & { foo: T; }
+>this : this
+>foo : T
+    }
+    withBar<T>() {
+>withBar : <T>() => this & { bar: T; }
+
+        return this as this & { bar: T }
+>this as this & { bar: T } : this & { bar: T; }
+>this : this
+>bar : T
+    }
+    withFooBar<T>() {
+>withFooBar : <T>() => Builder & { foo: T; } & { bar: T; }
+
+        this.withFoo<T>().withBar<T>().foo;
+>this.withFoo<T>().withBar<T>().foo : T
+>this.withFoo<T>().withBar<T>() : Builder & { foo: T; } & { bar: T; }
+>this.withFoo<T>().withBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>this.withFoo<T>() : this & { foo: T; }
+>this.withFoo : <T>() => this & { foo: T; }
+>this : this
+>withFoo : <T>() => this & { foo: T; }
+>withBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>foo : T
+
+        this.withFoo<T>().withBar<T>().bar;
+>this.withFoo<T>().withBar<T>().bar : T
+>this.withFoo<T>().withBar<T>() : Builder & { foo: T; } & { bar: T; }
+>this.withFoo<T>().withBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>this.withFoo<T>() : this & { foo: T; }
+>this.withFoo : <T>() => this & { foo: T; }
+>this : this
+>withFoo : <T>() => this & { foo: T; }
+>withBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>bar : T
+
+        return this.withFoo<T>().withBar<T>();
+>this.withFoo<T>().withBar<T>() : Builder & { foo: T; } & { bar: T; }
+>this.withFoo<T>().withBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>this.withFoo<T>() : this & { foo: T; }
+>this.withFoo : <T>() => this & { foo: T; }
+>this : this
+>withFoo : <T>() => this & { foo: T; }
+>withBar : <T>() => Builder & { foo: T; } & { bar: T; }
+    }
+}
+
+declare var f: {foo: number};
+>f : { foo: number; }
+>foo : number
+
+new Builder().withFoo<number>().withBar<number>().foo;
+>new Builder().withFoo<number>().withBar<number>().foo : number
+>new Builder().withFoo<number>().withBar<number>() : Builder & { foo: number; } & { bar: number; }
+>new Builder().withFoo<number>().withBar : <T>() => Builder & { foo: number; } & { bar: T; }
+>new Builder().withFoo<number>() : Builder & { foo: number; }
+>new Builder().withFoo : <T>() => Builder & { foo: T; }
+>new Builder() : Builder
+>Builder : typeof Builder
+>withFoo : <T>() => Builder & { foo: T; }
+>withBar : <T>() => Builder & { foo: number; } & { bar: T; }
+>foo : number
+
+new Builder().withFoo<number>().withBar<number>().bar;
+>new Builder().withFoo<number>().withBar<number>().bar : number
+>new Builder().withFoo<number>().withBar<number>() : Builder & { foo: number; } & { bar: number; }
+>new Builder().withFoo<number>().withBar : <T>() => Builder & { foo: number; } & { bar: T; }
+>new Builder().withFoo<number>() : Builder & { foo: number; }
+>new Builder().withFoo : <T>() => Builder & { foo: T; }
+>new Builder() : Builder
+>Builder : typeof Builder
+>withFoo : <T>() => Builder & { foo: T; }
+>withBar : <T>() => Builder & { foo: number; } & { bar: T; }
+>bar : number
+
+f = new Builder().withFoo<number>().withBar<number>();
+>f = new Builder().withFoo<number>().withBar<number>() : Builder & { foo: number; } & { bar: number; }
+>f : { foo: number; }
+>new Builder().withFoo<number>().withBar<number>() : Builder & { foo: number; } & { bar: number; }
+>new Builder().withFoo<number>().withBar : <T>() => Builder & { foo: number; } & { bar: T; }
+>new Builder().withFoo<number>() : Builder & { foo: number; }
+>new Builder().withFoo : <T>() => Builder & { foo: T; }
+>new Builder() : Builder
+>Builder : typeof Builder
+>withFoo : <T>() => Builder & { foo: T; }
+>withBar : <T>() => Builder & { foo: number; } & { bar: T; }
+
+new Builder().withFooBar<number>().foo;
+>new Builder().withFooBar<number>().foo : number
+>new Builder().withFooBar<number>() : Builder & { foo: number; } & { bar: number; }
+>new Builder().withFooBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>new Builder() : Builder
+>Builder : typeof Builder
+>withFooBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>foo : number
+
+new Builder().withFooBar<number>().bar;
+>new Builder().withFooBar<number>().bar : number
+>new Builder().withFooBar<number>() : Builder & { foo: number; } & { bar: number; }
+>new Builder().withFooBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>new Builder() : Builder
+>Builder : typeof Builder
+>withFooBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>bar : number
+
+f = new Builder().withFooBar<number>();
+>f = new Builder().withFooBar<number>() : Builder & { foo: number; } & { bar: number; }
+>f : { foo: number; }
+>new Builder().withFooBar<number>() : Builder & { foo: number; } & { bar: number; }
+>new Builder().withFooBar : <T>() => Builder & { foo: T; } & { bar: T; }
+>new Builder() : Builder
+>Builder : typeof Builder
+>withFooBar : <T>() => Builder & { foo: T; } & { bar: T; }
+

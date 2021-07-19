@@ -10453,6 +10453,9 @@ namespace ts {
                 const types = sameMap((type as IntersectionType).types, t => getTypeWithThisArgument(t, thisArgument, needApparentType));
                 return types !== (type as IntersectionType).types ? getIntersectionType(types) : type;
             }
+            else if (type.flags & TypeFlags.TypeParameter && thisArgument && (type as TypeParameter).isThisType) {
+                return getTypeWithThisArgument(createTypeReference(globalThisType, [type]), needApparentType ? instantiateType(thisArgument, createTypeMapper([type], [getApparentType(type)])) : thisArgument, needApparentType);
+            }
             return needApparentType ? getApparentType(type) : type;
         }
 
@@ -10499,6 +10502,23 @@ namespace ts {
         }
 
         function resolveTypeReferenceMembers(type: TypeReference): void {
+
+            if (type.target === globalThisType && type.typeArguments && type.typeArguments[0].flags & TypeFlags.TypeParameter &&
+                (type.typeArguments[0] as TypeParameter).isThisType && type.typeArguments[1]) {
+                if (type.typeArguments[1].flags & TypeFlags.StructuredType) {
+                    const instantiatedTarget = instantiateType(type.typeArguments[1], createTypeMapper([type.typeArguments[0]], [type.typeArguments[1]]));
+                    const props = getPropertiesOfType(instantiatedTarget);
+                    const calls = getSignaturesOfType(instantiatedTarget, SignatureKind.Call);
+                    const ctors = getSignaturesOfType(instantiatedTarget, SignatureKind.Construct);
+                    const strIndex = getIndexInfoOfType(instantiatedTarget, IndexKind.String);
+                    const numIndex = getIndexInfoOfType(instantiatedTarget, IndexKind.Number);
+                    setStructuredTypeMembers(type, createMapFromEntries(props.map(p => [p.escapedName, p]) as [string, Symbol][]) as SymbolTable, calls, ctors, strIndex, numIndex);
+                }
+                else {
+                    setStructuredTypeMembers(type, emptySymbols, emptyArray, emptyArray, /*stringIndexInfo*/ undefined, /*numberIndexInfo*/ undefined);
+                }
+                return;
+            }
             const source = resolveDeclaredMembers(type.target);
             const typeParameters = concatenate(source.typeParameters!, [source.thisType!]);
             const typeArguments = getTypeArguments(type);
