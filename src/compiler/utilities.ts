@@ -605,6 +605,7 @@ namespace ts {
                 AsyncIterableIterator: emptyArray,
                 AsyncGenerator: emptyArray,
                 AsyncGeneratorFunction: emptyArray,
+                NumberFormat: ["formatToParts"]
             },
             es2019: {
                 Array: ["flat", "flatMap"],
@@ -625,9 +626,6 @@ namespace ts {
             es2021: {
                 PromiseConstructor: ["any"],
                 String: ["replaceAll"]
-            },
-            esnext: {
-                NumberFormat: ["formatToParts"]
             }
         };
     }
