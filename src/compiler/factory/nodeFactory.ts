@@ -983,6 +983,7 @@ namespace ts {
                 case SyntaxKind.PublicKeyword:
                 case SyntaxKind.PrivateKeyword:
                 case SyntaxKind.ProtectedKeyword:
+                case SyntaxKind.FinalKeyword:
                 case SyntaxKind.ReadonlyKeyword:
                 case SyntaxKind.AbstractKeyword:
                 case SyntaxKind.DeclareKeyword:
@@ -1064,6 +1065,7 @@ namespace ts {
             if (flags & ModifierFlags.Default) { result.push(createModifier(SyntaxKind.DefaultKeyword)); }
             if (flags & ModifierFlags.Const) { result.push(createModifier(SyntaxKind.ConstKeyword)); }
             if (flags & ModifierFlags.Public) { result.push(createModifier(SyntaxKind.PublicKeyword)); }
+            if (flags & ModifierFlags.Final) { result.push(createModifier(SyntaxKind.FinalKeyword)); }
             if (flags & ModifierFlags.Private) { result.push(createModifier(SyntaxKind.PrivateKeyword)); }
             if (flags & ModifierFlags.Protected) { result.push(createModifier(SyntaxKind.ProtectedKeyword)); }
             if (flags & ModifierFlags.Abstract) { result.push(createModifier(SyntaxKind.AbstractKeyword)); }

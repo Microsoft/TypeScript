@@ -1,0 +1,37 @@
+=== tests/cases/conformance/final/final7.ts ===
+class A {
+>A : A
+
+    final m1() {}
+>m1 : () => void
+}
+
+class B extends A {
+>B : B
+>A : A
+
+    m2() {
+>m2 : () => void
+
+        this.m1();
+>this.m1() : void
+>this.m1 : () => void
+>this : this
+>m1 : () => void
+    }
+}
+
+new B().m1();
+>new B().m1() : void
+>new B().m1 : () => void
+>new B() : B
+>B : typeof B
+>m1 : () => void
+
+new B().m2();
+>new B().m2() : void
+>new B().m2 : () => void
+>new B() : B
+>B : typeof B
+>m2 : () => void
+

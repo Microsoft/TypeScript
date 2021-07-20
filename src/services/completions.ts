@@ -2084,6 +2084,7 @@ namespace ts.Completions {
                     case SyntaxKind.TemplateMiddle:
                         return containingNodeKind === SyntaxKind.TemplateSpan;                // `aa ${10} dd ${|
 
+                    case SyntaxKind.FinalKeyword:
                     case SyntaxKind.PublicKeyword:
                     case SyntaxKind.PrivateKeyword:
                     case SyntaxKind.ProtectedKeyword:
@@ -2307,6 +2308,9 @@ namespace ts.Completions {
                     case "private":
                         classElementModifierFlags = classElementModifierFlags | ModifierFlags.Private;
                         break;
+                    case "final":
+                        classElementModifierFlags = classElementModifierFlags | ModifierFlags.Final;
+                        break;
                     case "static":
                         classElementModifierFlags = classElementModifierFlags | ModifierFlags.Static;
                         break;
@@ -2320,7 +2324,7 @@ namespace ts.Completions {
             }
 
             // No member list for private methods
-            if (!(classElementModifierFlags & ModifierFlags.Private)) {
+            if (!(classElementModifierFlags & (ModifierFlags.Private | ModifierFlags.Final))) {
                 // List of property symbols of base type that are not private and already implemented
                 const baseTypeNodes = isClassLike(decl) && classElementModifierFlags & ModifierFlags.Override ? singleElementArray(getEffectiveBaseTypeNode(decl)) : getAllSuperTypeNodes(decl);
                 const baseSymbols = flatMap(baseTypeNodes, baseTypeNode => {
@@ -2582,6 +2586,7 @@ namespace ts.Completions {
                 case SyntaxKind.InterfaceKeyword:
                 case SyntaxKind.LetKeyword:
                 case SyntaxKind.PrivateKeyword:
+                case SyntaxKind.FinalKeyword:
                 case SyntaxKind.ProtectedKeyword:
                 case SyntaxKind.PublicKeyword:
                 case SyntaxKind.StaticKeyword:
@@ -2982,6 +2987,7 @@ namespace ts.Completions {
             case SyntaxKind.PrivateKeyword:
             case SyntaxKind.ProtectedKeyword:
             case SyntaxKind.PublicKeyword:
+            case SyntaxKind.FinalKeyword:
             case SyntaxKind.ReadonlyKeyword:
             case SyntaxKind.StringKeyword:
             case SyntaxKind.SymbolKeyword:

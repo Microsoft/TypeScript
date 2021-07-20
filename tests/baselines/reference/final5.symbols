@@ -1,0 +1,16 @@
+=== tests/cases/conformance/final/final5.ts ===
+class A {
+>A : Symbol(A, Decl(final5.ts, 0, 0))
+
+    public final m() {}
+>m : Symbol(A.m, Decl(final5.ts, 0, 9))
+}
+
+class B extends A {
+>B : Symbol(B, Decl(final5.ts, 2, 1))
+>A : Symbol(A, Decl(final5.ts, 0, 0))
+
+    m() {}
+>m : Symbol(B.m, Decl(final5.ts, 4, 19))
+}
+

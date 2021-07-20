@@ -3400,6 +3400,10 @@
         "category": "Error",
         "code": 2819
     },
+    "Property '{0}' is final in type '{1}' that cannot be overridden in type '{2}'.": {
+        "category": "Error",
+        "code": 2820
+    },
 
     "Import declaration '{0}' is using private name '{1}'.": {
         "category": "Error",

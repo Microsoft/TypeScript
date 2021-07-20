@@ -1,0 +1,16 @@
+=== tests/cases/conformance/final/final9.ts ===
+class A {
+>A : A
+
+    final protected m1() {}
+>m1 : () => void
+}
+
+class B extends A {
+>B : B
+>A : A
+
+    protected m1() {}
+>m1 : () => void
+}
+

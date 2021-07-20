@@ -1153,6 +1153,7 @@ namespace FourSlashInterface {
                     case "private":
                     case "protected":
                     case "public":
+                    case "final":
                     case "abstract":
                     case "any":
                     case "boolean":
@@ -1182,7 +1183,7 @@ namespace FourSlashInterface {
         }
 
         export const classElementKeywords: readonly ExpectedCompletionEntryObject[] =
-            ["private", "protected", "public", "static", "abstract", "async", "constructor", "declare", "get", "readonly", "set", "override"].map(keywordEntry);
+            ["private", "protected", "public", "static", "final", "abstract", "async", "constructor", "declare", "get", "readonly", "set", "override"].map(keywordEntry);
 
         export const classElementInJsKeywords = getInJsKeywords(classElementKeywords);
 
