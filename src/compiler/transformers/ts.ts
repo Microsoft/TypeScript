@@ -3306,9 +3306,10 @@ namespace ts {
                 // an identifier that is exported from a merged namespace.
                 const container = resolver.getReferencedExportContainer(node, /*prefixLocals*/ false);
                 if (container && container.kind !== SyntaxKind.SourceFile) {
-                    const substitute =
+                    let substitute =
                         (applicableSubstitutions & TypeScriptSubstitutionFlags.NamespaceExports && container.kind === SyntaxKind.ModuleDeclaration) ||
                         (applicableSubstitutions & TypeScriptSubstitutionFlags.NonQualifiedEnumMembers && container.kind === SyntaxKind.EnumDeclaration);
+                    substitute = substitute && node.escapedText !== "undefined";
                     if (substitute) {
                         return setTextRange(
                             factory.createPropertyAccessExpression(factory.getGeneratedNameForNode(container), node),
