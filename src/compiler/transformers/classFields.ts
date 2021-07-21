@@ -207,6 +207,8 @@ namespace ts {
                         return visitPreOrPostfixUnaryExpression(node as PrefixUnaryExpression | PostfixUnaryExpression, valueIsDiscarded);
                     case SyntaxKind.BinaryExpression:
                         return visitBinaryExpression(node as BinaryExpression, valueIsDiscarded);
+                    case SyntaxKind.PrivateIdentifierInInExpression:
+                        return visitPrivateIdentifierInInExpression(node as PrivateIdentifierInInExpression);
                     case SyntaxKind.CallExpression:
                         return visitCallExpression(node as CallExpression);
                     case SyntaxKind.TaggedTemplateExpression:
@@ -273,6 +275,27 @@ namespace ts {
                 return node;
             }
             return setOriginalNode(factory.createIdentifier(""), node);
+        }
+
+        /**
+         * Visits `#id in expr`
+         */
+        function visitPrivateIdentifierInInExpression(node: PrivateIdentifierInInExpression) {
+            if (!shouldTransformPrivateElementsOrClassStaticBlocks) {
+                return node;
+            }
+            const info = accessPrivateIdentifier(node.name);
+            if (info) {
+                const receiver = visitNode(node.expression, visitor, isExpression);
+
+                return setOriginalNode(
+                    context.getEmitHelperFactory().createClassPrivateFieldInHelper(receiver, info.brandCheckIdentifier),
+                    node
+                );
+            }
+
+            // Private name has not been declared. Subsequent transformers will handle this error
+            return visitEachChild(node, visitor, context);
         }
 
         /**
