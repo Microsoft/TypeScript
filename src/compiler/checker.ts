@@ -30492,8 +30492,8 @@ namespace ts {
         }
 
         function checkImportMetaProperty(node: MetaProperty) {
-            if (moduleKind !== ModuleKind.ES2020 && moduleKind !== ModuleKind.ESNext && moduleKind !== ModuleKind.System) {
-                error(node, Diagnostics.The_import_meta_meta_property_is_only_allowed_when_the_module_option_is_es2020_esnext_or_system);
+            if (moduleKind < ModuleKind.ES2020 && moduleKind !== ModuleKind.System) {
+                error(node, Diagnostics.The_import_meta_meta_property_is_only_allowed_when_the_module_option_is_es2020_es2022_esnext_or_system);
             }
             const file = getSourceFileOfNode(node);
             Debug.assert(!!(file.flags & NodeFlags.PossiblyContainsImportMeta), "Containing file is missing import meta node flag.");
@@ -31502,10 +31502,10 @@ namespace ts {
                                     Diagnostics.await_expressions_are_only_allowed_at_the_top_level_of_a_file_when_that_file_is_a_module_but_this_file_has_no_imports_or_exports_Consider_adding_an_empty_export_to_make_this_file_a_module);
                                 diagnostics.add(diagnostic);
                             }
-                            if ((moduleKind !== ModuleKind.ESNext && moduleKind !== ModuleKind.System) || languageVersion < ScriptTarget.ES2017) {
+                            if ((moduleKind < ModuleKind.ES2022 && moduleKind !== ModuleKind.System) || languageVersion < ScriptTarget.ES2017) {
                                 span = getSpanOfTokenAtPosition(sourceFile, node.pos);
                                 const diagnostic = createFileDiagnostic(sourceFile, span.start, span.length,
-                                    Diagnostics.Top_level_await_expressions_are_only_allowed_when_the_module_option_is_set_to_esnext_or_system_and_the_target_option_is_set_to_es2017_or_higher);
+                                    Diagnostics.Top_level_await_expressions_are_only_allowed_when_the_module_option_is_set_to_es2022_esnext_or_system_and_the_target_option_is_set_to_es2017_or_higher);
                                 diagnostics.add(diagnostic);
                             }
                         }
@@ -41919,9 +41919,9 @@ namespace ts {
                                 diagnostics.add(createDiagnosticForNode(forInOrOfStatement.awaitModifier,
                                     Diagnostics.for_await_loops_are_only_allowed_at_the_top_level_of_a_file_when_that_file_is_a_module_but_this_file_has_no_imports_or_exports_Consider_adding_an_empty_export_to_make_this_file_a_module));
                             }
-                            if ((moduleKind !== ModuleKind.ESNext && moduleKind !== ModuleKind.System) || languageVersion < ScriptTarget.ES2017) {
+                            if ((moduleKind < ModuleKind.ES2022 && moduleKind !== ModuleKind.System) || languageVersion < ScriptTarget.ES2017) {
                                 diagnostics.add(createDiagnosticForNode(forInOrOfStatement.awaitModifier,
-                                    Diagnostics.Top_level_for_await_loops_are_only_allowed_when_the_module_option_is_set_to_esnext_or_system_and_the_target_option_is_set_to_es2017_or_higher));
+                                    Diagnostics.Top_level_for_await_loops_are_only_allowed_when_the_module_option_is_set_to_es2022_esnext_or_system_and_the_target_option_is_set_to_es2017_or_higher));
                             }
                         }
                     }
@@ -42671,7 +42671,7 @@ namespace ts {
 
         function checkGrammarImportCallExpression(node: ImportCall): boolean {
             if (moduleKind === ModuleKind.ES2015) {
-                return grammarErrorOnNode(node, Diagnostics.Dynamic_imports_are_only_supported_when_the_module_flag_is_set_to_es2020_esnext_commonjs_amd_system_or_umd);
+                return grammarErrorOnNode(node, Diagnostics.Dynamic_imports_are_only_supported_when_the_module_flag_is_set_to_es2020_es2022_esnext_commonjs_amd_system_or_umd);
             }
 
             if (node.typeArguments) {

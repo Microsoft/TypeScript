@@ -393,6 +393,7 @@ namespace ts {
                 es6: ModuleKind.ES2015,
                 es2015: ModuleKind.ES2015,
                 es2020: ModuleKind.ES2020,
+                es2022: ModuleKind.ES2022,
                 esnext: ModuleKind.ESNext
             })),
             affectsModuleResolution: true,

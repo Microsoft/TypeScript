@@ -2505,9 +2505,7 @@ namespace ts {
         function hasNamespaceQualifiedExportName(node: Node) {
             return isExportOfNamespace(node)
                 || (isExternalModuleExport(node)
-                    && moduleKind !== ModuleKind.ES2015
-                    && moduleKind !== ModuleKind.ES2020
-                    && moduleKind !== ModuleKind.ESNext
+                    && moduleKind < ModuleKind.ES2015
                     && moduleKind !== ModuleKind.System);
         }
 
