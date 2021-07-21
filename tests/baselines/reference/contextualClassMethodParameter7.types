@@ -1,0 +1,19 @@
+=== tests/cases/conformance/classes/contextualClassMethodParameter/contextualClassMethodParameter7.ts ===
+class Base {
+>Base : Base
+
+    method(x: "a" | "b") { }
+>method : (x: "a" | "b") => void
+>x : "a" | "b"
+}
+
+class Derived extends Base {
+>Derived : Derived
+>Base : Base
+
+    method(y = "c") { }
+>method : (y?: any) => void
+>y : any
+>"c" : "c"
+}
+

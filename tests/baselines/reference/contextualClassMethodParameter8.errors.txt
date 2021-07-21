@@ -1,0 +1,18 @@
+tests/cases/conformance/classes/contextualClassMethodParameter/contextualClassMethodParameter8.ts(6,5): error TS2416: Property 'method' in type 'Derived' is not assignable to the same property in base type 'Base'.
+  Type '(x: number) => void' is not assignable to type '(x: number) => true'.
+    Type 'void' is not assignable to type 'true'.
+
+
+==== tests/cases/conformance/classes/contextualClassMethodParameter/contextualClassMethodParameter8.ts (1 errors) ====
+    class Base {
+        method(x: number): true { return true }
+    }
+    
+    class Derived extends Base {
+        method(x) { }
+        ~~~~~~
+!!! error TS2416: Property 'method' in type 'Derived' is not assignable to the same property in base type 'Base'.
+!!! error TS2416:   Type '(x: number) => void' is not assignable to type '(x: number) => true'.
+!!! error TS2416:     Type 'void' is not assignable to type 'true'.
+    }
+    

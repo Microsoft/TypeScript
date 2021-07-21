@@ -16464,6 +16464,11 @@ namespace ts {
                 isContextSensitiveFunctionLikeDeclaration(func);
         }
 
+        function isContextSensitiveClassMethod(func: Node): func is MethodDeclaration {
+            return noImplicitAny && isClassMethodInSubClass(func) && !(func.type && isTypePredicateNode(func.type)) &&
+                !getThisParameter(func) && !func.typeParameters && hasContextSensitiveParameters(func);
+        }
+
         function getTypeWithoutSignatures(type: Type): Type {
             if (type.flags & TypeFlags.Object) {
                 const resolved = resolveStructuredTypeMembers(type as ObjectType);
@@ -25129,7 +25134,7 @@ namespace ts {
         // Return contextual type of parameter or undefined if no contextual type is available
         function getContextuallyTypedParameterType(parameter: ParameterDeclaration): Type | undefined {
             const func = parameter.parent;
-            if (!isContextSensitiveFunctionOrObjectLiteralMethod(func)) {
+            if (!isContextSensitiveFunctionOrObjectLiteralMethod(func) && !isContextSensitiveClassMethod(func)) {
                 return undefined;
             }
             const iife = getImmediatelyInvokedFunctionExpression(func);
@@ -25543,6 +25548,75 @@ namespace ts {
             return getContextualTypeForObjectLiteralElement(node, contextFlags);
         }
 
+        function getContextualTypeForClassMethod(node: MethodDeclaration): Type | undefined {
+            if (!isPropertyNameLiteral(node.name) || !isClassMethodInSubClass(node) || !hasContextSensitiveParameters(node)) {
+                return undefined;
+            }
+
+            const container = cast(node.parent, isClassLike);
+            const baseTypeNode = getEffectiveBaseTypeNode(container);
+            Debug.assertIsDefined(baseTypeNode);
+
+            const methodDeclType = getTypeOfNode(node);
+            if (methodDeclType === errorType) {
+                return undefined;
+            }
+
+            const signature = getSingleCallSignature(methodDeclType);
+            if (!signature || signature.typeParameters || signature.flags & SignatureFlags.HasRestParameter) {
+                return undefined;
+            }
+
+            const baseType = getTypeOfNode(baseTypeNode);
+            if (baseType === errorType) {
+                return undefined;
+            }
+            const baseMethodType = getTypeOfPropertyOfType(baseType, getTextOfPropertyName(node.name));
+            if (!baseMethodType) {
+                return undefined;
+            }
+            
+            const baseSignature = getSingleCallSignature(baseMethodType);
+            if (!baseSignature || baseSignature.typeParameters || baseSignature.flags & SignatureFlags.HasRestParameter) {
+                return undefined;
+            }
+
+            const contextualSignature = resolveContextualClassMethodParameters(baseSignature, signature);
+            return createAnonymousType(
+                /*symbol*/undefined,
+                emptySymbols,
+                [contextualSignature],
+                emptyArray,
+                /*stringIndexInfo*/undefined,
+                /*numberIndexInfo*/undefined
+            );
+        }
+
+        function resolveContextualClassMethodParameters(baseSignature: Signature, signature: Signature) {
+            const newSignatureParameters: Symbol[] = [];
+            for (let i = 0; i < signature.parameters.length; ++i) {
+                const parameter = signature.parameters[i];
+                const parameterDeclaration = isParameter(parameter.valueDeclaration) && parameter.valueDeclaration;
+                if (!parameterDeclaration || parameterDeclaration.initializer || i >= baseSignature.parameters.length || getEffectiveTypeAnnotationNode(parameterDeclaration)) {
+                    newSignatureParameters.push(parameter);
+                    continue;
+                }
+
+                newSignatureParameters.push(baseSignature.parameters[i]);
+            }
+
+            return createSignature(
+                signature.declaration,
+                /*typeParameters*/ undefined,
+                /*thisParameter*/ undefined,
+                newSignatureParameters,
+                signature.resolvedReturnType,
+                /*resolvedTypePredicate*/ undefined,
+                signature.minArgumentCount,
+                SignatureFlags.None
+            );
+        }
+
         function getContextualTypeForObjectLiteralElement(element: ObjectLiteralElementLike, contextFlags?: ContextFlags) {
             const objectLiteral = element.parent as ObjectLiteralExpression;
             const propertyAssignmentType = isPropertyAssignment(element) && getContextualTypeForVariableLikeDeclaration(element);
@@ -25693,6 +25767,7 @@ namespace ts {
         function getApparentTypeOfContextualType(node: Expression | MethodDeclaration, contextFlags?: ContextFlags): Type | undefined {
             const contextualType = isObjectLiteralMethod(node) ?
                 getContextualTypeForObjectLiteralMethod(node, contextFlags) :
+                isClassMethodInSubClass(node) ? getContextualTypeForClassMethod(node) :
                 getContextualType(node, contextFlags);
             const instantiatedType = instantiateContextualType(contextualType, node, contextFlags);
             if (instantiatedType && !(contextFlags && contextFlags & ContextFlags.NoConstraints && instantiatedType.flags & TypeFlags.TypeVariable)) {
@@ -26113,7 +26188,7 @@ namespace ts {
         // all identical ignoring their return type, the result is same signature but with return type as
         // union type of return types from these signatures
         function getContextualSignature(node: FunctionExpression | ArrowFunction | MethodDeclaration): Signature | undefined {
-            Debug.assert(node.kind !== SyntaxKind.MethodDeclaration || isObjectLiteralMethod(node));
+            Debug.assert(node.kind !== SyntaxKind.MethodDeclaration || isObjectLiteralMethod(node) || isClassMethodInSubClass(node));
             const typeTagSignature = getSignatureOfTypeTag(node);
             if (typeTagSignature) {
                 return typeTagSignature;
