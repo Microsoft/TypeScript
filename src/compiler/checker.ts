@@ -40319,7 +40319,7 @@ namespace ts {
         }
 
         function isAliasResolvedToValue(symbol: Symbol): boolean {
-            const target = resolveAlias(symbol);
+            const target = getExportSymbolOfValueSymbolIfExported(resolveAlias(symbol));
             if (target === unknownSymbol) {
                 return true;
             }
