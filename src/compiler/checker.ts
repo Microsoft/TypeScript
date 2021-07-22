@@ -977,7 +977,7 @@ namespace ts {
 
         let _jsxNamespace: __String;
         let _jsxFactoryEntity: EntityName | undefined;
-        let outofbandVarianceMarkerHandler: ((onlyUnreliable: boolean) => void) | undefined;
+        let outofbandVarianceMarkerHandler: ((flag: VarianceFlags) => void) | undefined;
 
         const subtypeRelation = new Map<string, RelationComparisonResult>();
         const strictSubtypeRelation = new Map<string, RelationComparisonResult>();
@@ -8158,6 +8158,8 @@ namespace ts {
             return getTypeOfPropertyOfType(type, name) || getApplicableIndexInfoForName(type, name)?.type || unknownType;
         }
 
+        function isTypeAny(type: Type): boolean;
+        function isTypeAny(type: Type | undefined): boolean | undefined;
         function isTypeAny(type: Type | undefined) {
             return type && (type.flags & TypeFlags.Any) !== 0;
         }
@@ -18102,6 +18104,7 @@ namespace ts {
             function typeRelatedToEachType(source: Type, target: IntersectionType, reportErrors: boolean, intersectionState: IntersectionState): Ternary {
                 let result = Ternary.True;
                 const targetTypes = target.types;
+                forEach(targetTypes, reportUnmeasurableIfAnyMarkers);
                 for (const targetType of targetTypes) {
                     const related = isRelatedTo(source, targetType, reportErrors, /*headMessage*/ undefined, intersectionState);
                     if (!related) {
@@ -18183,7 +18186,7 @@ namespace ts {
                         const s = sources[i];
                         const t = targets[i];
                         let related = Ternary.True;
-                        if (varianceFlags & VarianceFlags.Unmeasurable) {
+                        if (varianceFlags & VarianceFlags.Unmeasurable || (isTypeAny(s) || isTypeAny(t)) && varianceFlags & VarianceFlags.UnmeasurableIfAny) {
                             // Even an `Unmeasurable` variance works out without a structural check if the source and target are _identical_.
                             // We can't simply assume invariance, because `Unmeasurable` marks nonlinear relations, for example, a relation tained by
                             // the `-?` modifier in a mapped type (where, no matter how the inputs are related, the outputs still might not be)
@@ -18223,6 +18226,12 @@ namespace ts {
                 return result;
             }
 
+            function varianceFlagsToRelationCacheFlags(flags: VarianceFlags): RelationComparisonResult {
+                return ((flags & VarianceFlags.Unreliable) ? RelationComparisonResult.ReportsUnreliable : 0)
+                    | ((flags & VarianceFlags.Unmeasurable) ? RelationComparisonResult.ReportsUnmeasurable : 0)
+                    | ((flags & VarianceFlags.UnmeasurableIfAny) ? RelationComparisonResult.ReportsUnmeasurableIfAny : 0);
+            }
+
             // Determine if possibly recursive types are related. First, check if the result is already available in the global cache.
             // Second, check if we have already started a comparison of the given two types in which case we assume the result to be true.
             // Third, check if both types are part of deeply nested chains of generic type instantiations and if so assume the types are
@@ -18245,6 +18254,9 @@ namespace ts {
                             const saved = entry & RelationComparisonResult.ReportsMask;
                             if (saved & RelationComparisonResult.ReportsUnmeasurable) {
                                 instantiateType(source, makeFunctionTypeMapper(reportUnmeasurableMarkers));
+                            }
+                            if (saved & RelationComparisonResult.ReportsUnmeasurableIfAny) {
+                                instantiateType(source, makeFunctionTypeMapper(reportUnmeasurableIfAnyMarkers));
                             }
                             if (saved & RelationComparisonResult.ReportsUnreliable) {
                                 instantiateType(source, makeFunctionTypeMapper(reportUnreliableMarkers));
@@ -18290,9 +18302,9 @@ namespace ts {
                 let propagatingVarianceFlags: RelationComparisonResult = 0;
                 if (outofbandVarianceMarkerHandler) {
                     originalHandler = outofbandVarianceMarkerHandler;
-                    outofbandVarianceMarkerHandler = onlyUnreliable => {
-                        propagatingVarianceFlags |= onlyUnreliable ? RelationComparisonResult.ReportsUnreliable : RelationComparisonResult.ReportsUnmeasurable;
-                        return originalHandler!(onlyUnreliable);
+                    outofbandVarianceMarkerHandler = flags => {
+                        propagatingVarianceFlags |= varianceFlagsToRelationCacheFlags(flags);
+                        return originalHandler!(flags);
                     };
                 }
 
@@ -18865,14 +18877,22 @@ namespace ts {
 
             function reportUnmeasurableMarkers(p: TypeParameter) {
                 if (outofbandVarianceMarkerHandler && (p === markerSuperType || p === markerSubType || p === markerOtherType)) {
-                    outofbandVarianceMarkerHandler(/*onlyUnreliable*/ false);
+                    outofbandVarianceMarkerHandler(VarianceFlags.Unmeasurable);
+                }
+                return p;
+            }
+
+
+            function reportUnmeasurableIfAnyMarkers(p: TypeParameter) {
+                if (outofbandVarianceMarkerHandler && (p === markerSuperType || p === markerSubType || p === markerOtherType)) {
+                    outofbandVarianceMarkerHandler(VarianceFlags.UnmeasurableIfAny);
                 }
                 return p;
             }
 
             function reportUnreliableMarkers(p: TypeParameter) {
                 if (outofbandVarianceMarkerHandler && (p === markerSuperType || p === markerSubType || p === markerOtherType)) {
-                    outofbandVarianceMarkerHandler(/*onlyUnreliable*/ true);
+                    outofbandVarianceMarkerHandler(VarianceFlags.Unreliable);
                 }
                 return p;
             }
@@ -19678,10 +19698,9 @@ namespace ts {
                 cache.variances = emptyArray;
                 variances = [];
                 for (const tp of typeParameters) {
-                    let unmeasurable = false;
-                    let unreliable = false;
+                    let outOfBandFlags: VarianceFlags = 0;
                     const oldHandler = outofbandVarianceMarkerHandler;
-                    outofbandVarianceMarkerHandler = (onlyUnreliable) => onlyUnreliable ? unreliable = true : unmeasurable = true;
+                    outofbandVarianceMarkerHandler = flags => outOfBandFlags |= flags;
                     // We first compare instantiations where the type parameter is replaced with
                     // marker types that have a known subtype relationship. From this we can infer
                     // invariance, covariance, contravariance or bivariance.
@@ -19697,13 +19716,8 @@ namespace ts {
                         variance = VarianceFlags.Independent;
                     }
                     outofbandVarianceMarkerHandler = oldHandler;
-                    if (unmeasurable || unreliable) {
-                        if (unmeasurable) {
-                            variance |= VarianceFlags.Unmeasurable;
-                        }
-                        if (unreliable) {
-                            variance |= VarianceFlags.Unreliable;
-                        }
+                    if (outOfBandFlags) {
+                        variance |= outOfBandFlags;
                     }
                     variances.push(variance);
                 }
