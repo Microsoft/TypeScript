@@ -1,0 +1,17 @@
+Exit Code: 2
+Standard output:
+lib/ProgressPlugin.js(487,56): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'string'.
+lib/ProgressPlugin.js(521,51): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'string'.
+lib/cache/IdleFileCachePlugin.js(111,43): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string[]'.
+lib/cache/IdleFileCachePlugin.js(119,25): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string[]'.
+lib/cache/PackFileCacheStrategy.js(1126,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string[]'.
+lib/cache/PackFileCacheStrategy.js(1159,11): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string[]'.
+lib/cache/PackFileCacheStrategy.js(1192,13): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string[]'.
+lib/cache/PackFileCacheStrategy.js(1234,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'string[]'.
+lib/javascript/StartupHelpers.js(51,36): error TS2694: Namespace 'ChunkGraph' has no exported member 'EntryModuleWithChunkGroup'.
+lib/javascript/StartupHelpers.js(129,36): error TS2694: Namespace 'ChunkGraph' has no exported member 'EntryModuleWithChunkGroup'.
+lib/util/deterministicGrouping.js(501,14): error TS2314: Generic type 'GroupedItems' requires 1 type argument(s).
+
+
+
+Standard error:

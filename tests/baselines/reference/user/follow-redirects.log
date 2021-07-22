@@ -1,32 +1,34 @@
 Exit Code: 2
 Standard output:
-node_modules/follow-redirects/index.js(38,17): error TS2345: Argument of type 'this' is not assignable to parameter of type 'Writable'.
+node_modules/follow-redirects/index.js(39,17): error TS2345: Argument of type 'this' is not assignable to parameter of type 'Writable'.
   Type 'RedirectableRequest' is missing the following properties from type 'Writable': writable, writableEnded, writableFinished, writableHighWaterMark, and 27 more.
-node_modules/follow-redirects/index.js(50,10): error TS2339: Property 'on' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(71,8): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(72,8): error TS2339: Property 'removeAllListeners' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(107,10): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(156,10): error TS2339: Property 'on' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(161,14): error TS2339: Property '_timeout' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(162,25): error TS2339: Property '_timeout' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(164,10): error TS2339: Property '_timeout' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(165,12): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(174,12): error TS2339: Property 'removeListener' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(182,12): error TS2339: Property 'socket' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(189,8): error TS2339: Property 'once' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(190,8): error TS2339: Property 'once' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(249,10): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(51,10): error TS2339: Property 'on' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(67,8): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(102,10): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(151,10): error TS2339: Property 'on' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(162,14): error TS2339: Property '_timeout' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(163,25): error TS2339: Property '_timeout' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(165,10): error TS2339: Property '_timeout' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(166,12): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(176,12): error TS2339: Property 'removeListener' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(184,12): error TS2339: Property 'socket' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(185,21): error TS2339: Property 'socket' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(191,8): error TS2339: Property 'on' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(192,8): error TS2339: Property 'once' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(193,8): error TS2339: Property 'once' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(252,10): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
 node_modules/follow-redirects/index.js(288,16): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(338,12): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(360,17): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+node_modules/follow-redirects/index.js(336,12): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(358,17): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-node_modules/follow-redirects/index.js(363,35): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+node_modules/follow-redirects/index.js(361,35): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-node_modules/follow-redirects/index.js(381,14): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(393,13): error TS2339: Property 'cause' does not exist on type 'CustomError'.
-node_modules/follow-redirects/index.js(394,12): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(401,10): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
-node_modules/follow-redirects/index.js(519,25): error TS2339: Property 'code' does not exist on type 'Error'.
+node_modules/follow-redirects/index.js(379,14): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(390,72): error TS2571: Object is of type 'unknown'.
+node_modules/follow-redirects/index.js(391,13): error TS2339: Property 'cause' does not exist on type 'CustomError'.
+node_modules/follow-redirects/index.js(392,12): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(399,10): error TS2339: Property 'emit' does not exist on type 'RedirectableRequest'.
+node_modules/follow-redirects/index.js(517,25): error TS2339: Property 'code' does not exist on type 'Error'.
 
 
 

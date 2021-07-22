@@ -4,7 +4,7 @@ node_modules/graceful-fs/clone.js(16,9): error TS2403: Subsequent variable decla
 node_modules/graceful-fs/clone.js(19,38): error TS2345: Argument of type 'PropertyDescriptor | undefined' is not assignable to parameter of type 'PropertyDescriptor & ThisType<any>'.
   Type 'undefined' is not assignable to type 'PropertyDescriptor & ThisType<any>'.
     Type 'undefined' is not assignable to type 'PropertyDescriptor'.
-node_modules/graceful-fs/graceful-fs.js(34,3): error TS2322: Type '(msg: string, ...param: any[]) => void' is not assignable to type '() => void'.
+node_modules/graceful-fs/graceful-fs.js(34,3): error TS2322: Type '(msg: string, ...param: unknown[]) => void' is not assignable to type '() => void'.
 node_modules/graceful-fs/graceful-fs.js(37,37): error TS2345: Argument of type 'IArguments' is not assignable to parameter of type '[format?: any, ...param: any[]]'.
 node_modules/graceful-fs/graceful-fs.js(52,3): error TS2741: Property '__promisify__' is missing in type '(fd: any, cb: any) => void' but required in type 'typeof close'.
 node_modules/graceful-fs/graceful-fs.js(74,30): error TS2345: Argument of type 'IArguments' is not assignable to parameter of type '[fd: number]'.
@@ -39,6 +39,7 @@ node_modules/graceful-fs/legacy-streams.js(99,36): error TS2339: Property 'start
 node_modules/graceful-fs/legacy-streams.js(102,16): error TS2339: Property 'start' does not exist on type 'WriteStream'.
 node_modules/graceful-fs/legacy-streams.js(106,23): error TS2339: Property 'start' does not exist on type 'WriteStream'.
 node_modules/graceful-fs/legacy-streams.js(115,12): error TS2339: Property 'flush' does not exist on type 'WriteStream'.
+node_modules/graceful-fs/polyfills.js(149,13): error TS2571: Object is of type 'unknown'.
 
 
 

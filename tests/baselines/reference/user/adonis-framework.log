@@ -91,6 +91,7 @@ node_modules/adonis-framework/src/Exceptions/index.js(164,14): error TS1056: Acc
 node_modules/adonis-framework/src/Exceptions/index.js(178,21): error TS2554: Expected 0 arguments, but got 3.
 node_modules/adonis-framework/src/Exceptions/index.js(191,21): error TS2554: Expected 0 arguments, but got 3.
 node_modules/adonis-framework/src/Exceptions/index.js(205,21): error TS2554: Expected 0 arguments, but got 3.
+node_modules/adonis-framework/src/File/index.js(139,22): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
 node_modules/adonis-framework/src/File/index.js(175,5): error TS2322: Type 'Promise<any>' is not assignable to type 'boolean'.
 node_modules/adonis-framework/src/File/index.js(273,5): error TS2322: Type 'string | boolean' is not assignable to type 'boolean'.
   Type 'string' is not assignable to type 'boolean'.

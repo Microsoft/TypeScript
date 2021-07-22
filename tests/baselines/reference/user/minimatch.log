@@ -15,6 +15,9 @@ node_modules/minimatch/minimatch.js(185,19): error TS2339: Property 'pattern' do
 node_modules/minimatch/minimatch.js(192,3): error TS2722: Cannot invoke an object which is possibly 'undefined'.
 node_modules/minimatch/minimatch.js(192,19): error TS2339: Property 'pattern' does not exist on type 'make'.
 node_modules/minimatch/minimatch.js(201,22): error TS2339: Property 'options' does not exist on type 'parseNegate'.
+node_modules/minimatch/minimatch.js(206,23): error TS2532: Object is possibly 'undefined'.
+node_modules/minimatch/minimatch.js(207,16): error TS2532: Object is possibly 'undefined'.
+node_modules/minimatch/minimatch.js(213,36): error TS2532: Object is possibly 'undefined'.
 node_modules/minimatch/minimatch.js(410,15): error TS2532: Object is possibly 'undefined'.
 node_modules/minimatch/minimatch.js(411,13): error TS2532: Object is possibly 'undefined'.
 node_modules/minimatch/minimatch.js(414,9): error TS2532: Object is possibly 'undefined'.

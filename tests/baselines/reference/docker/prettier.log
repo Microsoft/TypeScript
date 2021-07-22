@@ -1,7 +1,7 @@
-Exit Code: 0
+Exit Code: 134
 Standard output:
 yarn run vX.X.X
-$ node --max-old-space-size=3072 ./scripts/build/build.js
+$ node --max-old-space-size=3072 ./scripts/build/build.mjs
  Building packages 
 index.js.......................   DONE  
 doc.js.........................   DONE  
@@ -10,19 +10,27 @@ bin-prettier.js................   DONE
 third-party.js.................   DONE  
 parser-babel.js................   DONE  
 parser-flow.js.................   DONE  
-parser-typescript.js...........   DONE  
-parser-espree.js...............   DONE  
-parser-meriyah.js..............   DONE  
-parser-angular.js..............   DONE  
-parser-postcss.js..............   DONE  
-esm/parser-postcss.mjs.........   DONE  
-parser-graphql.js..............   DONE  
-parser-markdown.js.............   DONE  
-parser-glimmer.js..............   DONE  
-parser-html.js.................   DONE  
-parser-yaml.js.................   DONE  
-Done in ?s.
+parser-typescript.js...........info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
 
 
 
 Standard error:
+
+<--- Last few GCs --->
+[18:0x5d39090]   ?s: Scavenge 3027.8 (3096.4) -> 3024.4 (3098.7) MB, 11.8 / ?s  (average mu = 0.418, current mu = 0.319) allocation failure 
+[18:0x5d39090]   ?s: Scavenge 3030.2 (3098.7) -> 3026.4 (3116.7) MB, 11.4 / ?s  (average mu = 0.418, current mu = 0.319) allocation failure 
+[18:0x5d39090]   ?s: Mark-sweep 3039.9 (3116.7) -> 3030.4 (3123.4) MB, 5403.5 / ?s  (average mu = 0.238, current mu = 0.029) allocation failure scavenge might not succeed
+<--- JS stacktrace --->
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+ 1: 0xb22900 node::Abort() [/usr/local/bin/node]
+ 2: 0xa3c161 node::FatalError(char const*, char const*) [/usr/local/bin/node]
+ 3: 0xd0b15e v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, bool) [/usr/local/bin/node]
+ 4: 0xd0b4d7 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, bool) [/usr/local/bin/node]
+ 5: 0xeec565  [/usr/local/bin/node]
+ 6: 0xefb295 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/local/bin/node]
+ 7: 0xefe38c v8::internal::Heap::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/local/bin/node]
+ 8: 0xec2dbc v8::internal::Factory::NewFillerObject(int, bool, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/usr/local/bin/node]
+ 9: 0x123977b v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/usr/local/bin/node]
+10: 0x16437d9  [/usr/local/bin/node]
+Aborted (core dumped)
+error Command failed with exit code 134.
