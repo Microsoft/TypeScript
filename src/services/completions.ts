@@ -3041,15 +3041,11 @@ namespace ts.Completions {
             : contextualType;
 
         const properties = type.isUnion()
-            ? checker.getAllPossiblePropertiesOfTypes(type.types.filter(memberType =>
-                // If we're providing completions for an object literal, skip primitive, array-like, or callable types since those shouldn't be implemented by object literals.
-                !(memberType.flags & TypeFlags.Primitive ||
-                    checker.isArrayLikeType(memberType) ||
-                    typeHasCallOrConstructSignatures(memberType, checker) ||
-                    checker.isTypeInvalidDueToUnionDiscriminant(memberType, obj))))
+            ? checker.getAllPossiblePropertiesOfTypes(filter(type.types, memberType => isApparentType(memberType, obj, checker)))
             : type.getApparentProperties();
 
-        return hasCompletionsType ? properties.filter(hasDeclarationOtherThanSelf) : properties;
+        return type.isClass() && containsHiddenProps(properties) ? [] :
+            hasCompletionsType ? filter(properties, hasDeclarationOtherThanSelf) : properties;
 
         // Filter out members whose only declaration is the object literal itself to avoid
         // self-fulfilling completions like:
@@ -3059,6 +3055,18 @@ namespace ts.Completions {
         function hasDeclarationOtherThanSelf(member: Symbol) {
             return some(member.declarations, decl => decl.parent !== obj);
         }
+    }
+
+    function isApparentType(type: Type, node: ObjectLiteralExpression | JsxAttributes, checker: TypeChecker) {
+        return !(type.flags & TypeFlags.Primitive
+            || checker.isArrayLikeType(type)
+            || checker.isTypeInvalidDueToUnionDiscriminant(type, node)
+            || typeHasCallOrConstructSignatures(type, checker)
+            || type.isClass() && containsHiddenProps(type.getApparentProperties()));
+    }
+
+    function containsHiddenProps(props: Symbol[]) {
+        return some(props, p => !!(getDeclarationModifierFlagsFromSymbol(p) & ModifierFlags.NonPublicAccessibilityModifier));
     }
 
     /**
