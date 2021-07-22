@@ -15912,7 +15912,7 @@ namespace ts {
         }
 
         function createTypeEraser(sources: readonly TypeParameter[]): TypeMapper {
-            return createTypeMapper(sources, /*targets*/ undefined);
+            return createTypeMapper(sources, map(sources, () => wildcardType));
         }
 
         /**
