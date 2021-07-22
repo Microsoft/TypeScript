@@ -6083,6 +6083,8 @@ namespace ts {
         esModuleInterop?: boolean;
         /* @internal */ showConfig?: boolean;
         useDefineForClassFields?: boolean;
+        instantiationDepthLimit: number;
+        instantiationCountLimit: number;
 
         [option: string]: CompilerOptionsValue | TsConfigSourceFile | undefined;
     }
