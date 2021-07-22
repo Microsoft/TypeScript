@@ -5,5 +5,6 @@
 goTo.select("a", "b");
 verify.refactorKindAvailable("refactor.rewrite",
 [
+    "refactor.rewrite.addTypeAnnotation",
     "refactor.rewrite.string"
 ]);

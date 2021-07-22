@@ -122,6 +122,7 @@
         "refactors/helpers.ts",
         "refactors/moveToNewFile.ts",
         "refactors/addOrRemoveBracesToArrowFunction.ts",
+        "refactors/addTypeAnnotation.ts",
         "refactors/convertParamsToDestructuredObject.ts",
         "refactors/convertStringOrTemplateLiteral.ts",
         "refactors/convertArrowFunctionOrFunctionExpression.ts",

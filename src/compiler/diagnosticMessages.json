@@ -7106,6 +7106,14 @@
         "category": "Message",
         "code": 95166
     },
+    "Add type annotation": {
+        "category": "Message",
+        "code": 95167
+    },
+    "A type must be inferred from annotatable declaration with an initializer": {
+        "category": "Message",
+        "code": 95168
+    },
 
     "No value exists in scope for the shorthand property '{0}'. Either declare one or provide an initializer.": {
         "category": "Error",

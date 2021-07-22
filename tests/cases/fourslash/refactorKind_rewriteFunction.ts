@@ -4,6 +4,7 @@
 
 goTo.select("a", "b");
 verify.refactorKindAvailable("refactor.rewrite", [
+    "refactor.rewrite.addTypeAnnotation",
     "refactor.rewrite.arrow.braces.add",
     "refactor.rewrite.function.named",
     "refactor.rewrite.function.anonymous",

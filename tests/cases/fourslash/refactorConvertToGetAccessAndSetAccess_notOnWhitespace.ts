@@ -5,4 +5,4 @@
 ////}
 
 goTo.select("a", "b");
-verify.refactorsAvailable([]);
+verify.refactorsAvailable(["Add type annotation"]);
