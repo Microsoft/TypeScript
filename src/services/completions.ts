@@ -281,6 +281,8 @@ namespace ts.Completions {
                 return jsdocCompletionInfo(JsDoc.getJSDocParameterNameCompletions(completionData.tag));
             case CompletionDataKind.Keywords:
                 return specificKeywordCompletionInfo(completionData.keywords);
+            case CompletionDataKind.MetaProperty:
+                return metaPropertyCompletionInfo(completionData.node);
             default:
                 return Debug.assertNever(completionData);
         }
@@ -373,6 +375,28 @@ namespace ts.Completions {
                 sortText: SortText.GlobalsOrKeywords,
             })),
         };
+    }
+
+    function metaPropertyCompletionInfo(node: MetaProperty): CompletionInfo {
+        return {
+            isGlobalCompletion: false,
+            isMemberCompletion: true,
+            isNewIdentifierLocation: false,
+            entries: [{
+                name: getMetaPropertyName(node),
+                kind: ScriptElementKind.memberVariableElement,
+                kindModifiers: ScriptElementKindModifier.none,
+                sortText: SortText.LocationPriority,
+            }],
+        };
+    }
+
+    function getMetaPropertyName(node: MetaProperty) {
+        return node.keywordToken === SyntaxKind.NewKeyword
+            ? "target"
+            : node.keywordToken === SyntaxKind.ImportKeyword
+            ? "meta"
+            : Debug.assertNever(node.keywordToken);
     }
 
     function getOptionalReplacementSpan(location: Node | undefined) {
@@ -1005,6 +1029,8 @@ namespace ts.Completions {
                         return JsDoc.getJSDocParameterNameCompletionDetails(name);
                     case CompletionDataKind.Keywords:
                         return request.keywords.indexOf(stringToToken(name)!) > -1 ? createSimpleDetails(name, ScriptElementKind.keyword, SymbolDisplayPartKind.keyword) : undefined;
+                    case CompletionDataKind.MetaProperty:
+                        return createImportMetaDetails(request.node);
                     default:
                         return Debug.assertNever(request);
                 }
@@ -1028,6 +1054,24 @@ namespace ts.Completions {
 
     function createSimpleDetails(name: string, kind: ScriptElementKind, kind2: SymbolDisplayPartKind): CompletionEntryDetails {
         return createCompletionDetails(name, ScriptElementKindModifier.none, kind, [displayPart(name, kind2)]);
+    }
+
+    function createImportMetaDetails(node: MetaProperty): CompletionEntryDetails {
+        return {
+            name: getMetaPropertyName(node),
+            kind: ScriptElementKind.memberVariableElement,
+            kindModifiers: ScriptElementKindModifier.none,
+            displayParts: [
+                displayPart("(", SymbolDisplayPartKind.punctuation),
+                displayPart("property", SymbolDisplayPartKind.text),
+                displayPart(")", SymbolDisplayPartKind.punctuation),
+                displayPart(" ", SymbolDisplayPartKind.space),
+                displayPart(getMetaPropertyName(node), SymbolDisplayPartKind.propertyName),
+                displayPart(":", SymbolDisplayPartKind.punctuation),
+                displayPart(" ", SymbolDisplayPartKind.space),
+                displayPart("ImportMeta", SymbolDisplayPartKind.interfaceName),
+            ]
+        };
     }
 
     export function createCompletionDetailsForSymbol(symbol: Symbol, checker: TypeChecker, sourceFile: SourceFile, location: Node, cancellationToken: CancellationToken, codeActions?: CodeAction[], sourceDisplay?: SymbolDisplayPart[]): CompletionEntryDetails {
@@ -1101,7 +1145,7 @@ namespace ts.Completions {
         return completion.type === "symbol" ? completion.symbol : undefined;
     }
 
-    const enum CompletionDataKind { Data, JsDocTagName, JsDocTag, JsDocParameterName, Keywords }
+    const enum CompletionDataKind { Data, JsDocTagName, JsDocTag, JsDocParameterName, Keywords, MetaProperty }
     /** true: after the `=` sign but no identifier has been typed yet. Else is the Identifier after the initializer. */
     type IsJsxInitializer = boolean | Identifier;
     interface CompletionData {
@@ -1130,7 +1174,8 @@ namespace ts.Completions {
     type Request =
         | { readonly kind: CompletionDataKind.JsDocTagName | CompletionDataKind.JsDocTag }
         | { readonly kind: CompletionDataKind.JsDocParameterName, tag: JSDocParameterTag }
-        | { readonly kind: CompletionDataKind.Keywords, keywords: readonly SyntaxKind[] };
+        | { readonly kind: CompletionDataKind.Keywords, keywords: readonly SyntaxKind[] }
+        | { readonly kind: CompletionDataKind.MetaProperty, node: MetaProperty };
 
     export const enum CompletionKind {
         ObjectPropertyDeclaration,
@@ -1458,7 +1503,12 @@ namespace ts.Completions {
         });
 
         if (isRightOfDot || isRightOfQuestionDot) {
-            getTypeScriptMemberSymbols();
+            if (isMetaProperty(node) && contextToken === node.getChildAt(1)) {
+                return { kind: CompletionDataKind.MetaProperty, node };
+            }
+            else {
+                getTypeScriptMemberSymbols();
+            }
         }
         else if (isRightOfOpenTag) {
             symbols = typeChecker.getJsxIntrinsicTagNamesAt(location);
@@ -1589,12 +1639,6 @@ namespace ts.Completions {
                         return;
                     }
                 }
-            }
-
-            if (isMetaProperty(node) && (node.keywordToken === SyntaxKind.NewKeyword || node.keywordToken === SyntaxKind.ImportKeyword) && contextToken === node.getChildAt(1)) {
-                const completion = (node.keywordToken === SyntaxKind.NewKeyword) ? "target" : "meta";
-                symbols.push(typeChecker.createSymbol(SymbolFlags.Property, escapeLeadingUnderscores(completion)));
-                return;
             }
 
             if (!isTypeLocation) {
