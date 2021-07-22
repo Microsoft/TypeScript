@@ -670,7 +670,7 @@ namespace ts {
                 const escapeText = flags & GetLiteralTextFlags.NeverAsciiEscape || (getEmitFlags(node) & EmitFlags.NoAsciiEscaping) ? escapeString :
                     escapeNonAsciiString;
 
-                const rawText = (node as TemplateLiteralLikeNode).rawText || escapeTemplateSubstitution(escapeText(node.text, CharacterCodes.backtick));
+                const rawText = (node as TemplateLiteralLikeNode).rawText ?? escapeTemplateSubstitution(escapeText(node.text, CharacterCodes.backtick)); //!!!!!!
                 switch (node.kind) {
                     case SyntaxKind.NoSubstitutionTemplateLiteral:
                         return "`" + rawText + "`";
@@ -3847,8 +3847,8 @@ namespace ts {
     // There is no reason for this other than that JSON.stringify does not handle it either.
     const doubleQuoteEscapedCharsRegExp = /[\\\"\u0000-\u001f\t\v\f\b\r\n\u2028\u2029\u0085]/g;
     const singleQuoteEscapedCharsRegExp = /[\\\'\u0000-\u001f\t\v\f\b\r\n\u2028\u2029\u0085]/g;
-    // Template strings should be preserved as much as possible
-    const backtickQuoteEscapedCharsRegExp = /[\\`]/g;
+    // Template strings preserve simple LF newlines, still encode CRLF (or CR)
+    const backtickQuoteEscapedCharsRegExp = /\r\n|[\\\`\u0000-\u001f\t\v\f\b\r\u2028\u2029\u0085]/g;
     const escapedCharsMap = new Map(getEntries({
         "\t": "\\t",
         "\v": "\\v",
@@ -3862,7 +3862,8 @@ namespace ts {
         "\`": "\\\`",
         "\u2028": "\\u2028", // lineSeparator
         "\u2029": "\\u2029", // paragraphSeparator
-        "\u0085": "\\u0085"  // nextLine
+        "\u0085": "\\u0085", // nextLine
+        "\r\n": "\\r\\n", // special case for CRLFs in backticks
     }));
 
     function encodeUtf16EscapeSequence(charCode: number): string {
@@ -3881,7 +3882,7 @@ namespace ts {
             // Otherwise, keep printing a literal \0 for the null character
             return "\\0";
         }
-        return escapedCharsMap.get(c) || encodeUtf16EscapeSequence(c.charCodeAt(0));
+        return escapedCharsMap.get(c) ?? encodeUtf16EscapeSequence(c.charCodeAt(0));
     }
 
     /**
@@ -3927,7 +3928,7 @@ namespace ts {
         if (c.charCodeAt(0) === CharacterCodes.nullCharacter) {
             return "&#0;";
         }
-        return jsxEscapedCharsMap.get(c) || encodeJsxCharacterEntity(c.charCodeAt(0));
+        return jsxEscapedCharsMap.get(c) ?? encodeJsxCharacterEntity(c.charCodeAt(0));
     }
 
     export function escapeJsxAttributeString(s: string, quoteChar?: CharacterCodes.doubleQuote | CharacterCodes.singleQuote) {
