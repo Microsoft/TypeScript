@@ -21,21 +21,21 @@ class C1<T, U, V> {
 >(this.b === undefined && this.c === undefined) : boolean
 >this.b === undefined && this.c === undefined : boolean
 >this.b === undefined : boolean
->this.b : any
+>this.b : U
 >this : this
->b : any
+>b : U
 >undefined : undefined
 >this.c === undefined : boolean
->this.c : any
+>this.c : V
 >this : this
->c : any
+>c : V
 >undefined : undefined
 
             this.a = a || k;
 >this.a = a || k : T
->this.a : any
+>this.a : T
 >this : this
->a : any
+>a : T
 >a || k : T
 >a : T
 >k : T
@@ -43,30 +43,30 @@ class C1<T, U, V> {
     }
 
     public getA() {
->getA : () => any
+>getA : () => T
 
         return this.a
->this.a : any
+>this.a : T
 >this : this
->a : any
+>a : T
     }
 
     public getB() {
->getB : () => any
+>getB : () => U
 
         return this.b
->this.b : any
+>this.b : U
 >this : this
->b : any
+>b : U
     }
 
     public getC() {
->getC : () => any
+>getC : () => V
 
         return this.c;
->this.c : any
+>this.c : V
 >this : this
->c : any
+>c : V
     }
 }
 
@@ -79,15 +79,15 @@ class C2 extends C1<number, string, boolean> {
 
         return `${this.a} ${this.b} ${this.c}`;
 >`${this.a} ${this.b} ${this.c}` : string
->this.a : any
+>this.a : number
 >this : this
->a : any
->this.b : any
+>a : number
+>this.b : string
 >this : this
->b : any
->this.c : any
+>b : string
+>this.c : boolean
 >this : this
->c : any
+>c : boolean
     }
 }
 

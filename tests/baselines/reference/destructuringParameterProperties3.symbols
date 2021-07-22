@@ -20,13 +20,19 @@ class C1<T, U, V> {
 >undefined : Symbol(undefined)
 >c : Symbol(c, Decl(destructuringParameterProperties3.ts, 1, 44))
 >undefined : Symbol(undefined)
+>this.b : Symbol(C1.b, Decl(destructuringParameterProperties3.ts, 1, 41))
 >this : Symbol(C1, Decl(destructuringParameterProperties3.ts, 0, 0))
+>b : Symbol(C1.b, Decl(destructuringParameterProperties3.ts, 1, 41))
 >undefined : Symbol(undefined)
+>this.c : Symbol(C1.c, Decl(destructuringParameterProperties3.ts, 1, 44))
 >this : Symbol(C1, Decl(destructuringParameterProperties3.ts, 0, 0))
+>c : Symbol(C1.c, Decl(destructuringParameterProperties3.ts, 1, 44))
 >undefined : Symbol(undefined)
 
             this.a = a || k;
+>this.a : Symbol(C1.a, Decl(destructuringParameterProperties3.ts, 1, 39))
 >this : Symbol(C1, Decl(destructuringParameterProperties3.ts, 0, 0))
+>a : Symbol(C1.a, Decl(destructuringParameterProperties3.ts, 1, 39))
 >a : Symbol(a, Decl(destructuringParameterProperties3.ts, 1, 39))
 >k : Symbol(k, Decl(destructuringParameterProperties3.ts, 1, 16))
         }
@@ -36,21 +42,27 @@ class C1<T, U, V> {
 >getA : Symbol(C1.getA, Decl(destructuringParameterProperties3.ts, 5, 5))
 
         return this.a
+>this.a : Symbol(C1.a, Decl(destructuringParameterProperties3.ts, 1, 39))
 >this : Symbol(C1, Decl(destructuringParameterProperties3.ts, 0, 0))
+>a : Symbol(C1.a, Decl(destructuringParameterProperties3.ts, 1, 39))
     }
 
     public getB() {
 >getB : Symbol(C1.getB, Decl(destructuringParameterProperties3.ts, 9, 5))
 
         return this.b
+>this.b : Symbol(C1.b, Decl(destructuringParameterProperties3.ts, 1, 41))
 >this : Symbol(C1, Decl(destructuringParameterProperties3.ts, 0, 0))
+>b : Symbol(C1.b, Decl(destructuringParameterProperties3.ts, 1, 41))
     }
 
     public getC() {
 >getC : Symbol(C1.getC, Decl(destructuringParameterProperties3.ts, 13, 5))
 
         return this.c;
+>this.c : Symbol(C1.c, Decl(destructuringParameterProperties3.ts, 1, 44))
 >this : Symbol(C1, Decl(destructuringParameterProperties3.ts, 0, 0))
+>c : Symbol(C1.c, Decl(destructuringParameterProperties3.ts, 1, 44))
     }
 }
 

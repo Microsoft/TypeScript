@@ -41371,9 +41371,6 @@ namespace ts {
             else if ((node.kind === SyntaxKind.ImportDeclaration || node.kind === SyntaxKind.ImportEqualsDeclaration) && flags & ModifierFlags.Ambient) {
                 return grammarErrorOnNode(lastDeclare!, Diagnostics.A_0_modifier_cannot_be_used_with_an_import_declaration, "declare");
             }
-            else if (node.kind === SyntaxKind.Parameter && (flags & ModifierFlags.ParameterPropertyModifier) && isBindingPattern((node as ParameterDeclaration).name)) {
-                return grammarErrorOnNode(node, Diagnostics.A_parameter_property_may_not_be_declared_using_a_binding_pattern);
-            }
             else if (node.kind === SyntaxKind.Parameter && (flags & ModifierFlags.ParameterPropertyModifier) && (node as ParameterDeclaration).dotDotDotToken) {
                 return grammarErrorOnNode(node, Diagnostics.A_parameter_property_cannot_be_declared_using_a_rest_parameter);
             }

@@ -20,18 +20,27 @@ class C3 {
 var C1 = /** @class */ (function () {
     function C1(_a) {
         var x = _a[0], y = _a[1], z = _a[2];
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
     return C1;
 }());
 var C2 = /** @class */ (function () {
     function C2(_a) {
         var x = _a[0], y = _a[1], z = _a[2];
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
     return C2;
 }());
 var C3 = /** @class */ (function () {
     function C3(_a) {
         var x = _a.x, y = _a.y, z = _a.z;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
     return C3;
 }());

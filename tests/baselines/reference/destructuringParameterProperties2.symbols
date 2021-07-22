@@ -13,13 +13,19 @@ class C1 {
 >undefined : Symbol(undefined)
 >c : Symbol(c, Decl(destructuringParameterProperties2.ts, 1, 49))
 >undefined : Symbol(undefined)
+>this.b : Symbol(C1.b, Decl(destructuringParameterProperties2.ts, 1, 46))
 >this : Symbol(C1, Decl(destructuringParameterProperties2.ts, 0, 0))
+>b : Symbol(C1.b, Decl(destructuringParameterProperties2.ts, 1, 46))
 >undefined : Symbol(undefined)
+>this.c : Symbol(C1.c, Decl(destructuringParameterProperties2.ts, 1, 49))
 >this : Symbol(C1, Decl(destructuringParameterProperties2.ts, 0, 0))
+>c : Symbol(C1.c, Decl(destructuringParameterProperties2.ts, 1, 49))
 >undefined : Symbol(undefined)
 
             this.a = a || k;
+>this.a : Symbol(C1.a, Decl(destructuringParameterProperties2.ts, 1, 44))
 >this : Symbol(C1, Decl(destructuringParameterProperties2.ts, 0, 0))
+>a : Symbol(C1.a, Decl(destructuringParameterProperties2.ts, 1, 44))
 >a : Symbol(a, Decl(destructuringParameterProperties2.ts, 1, 44))
 >k : Symbol(k, Decl(destructuringParameterProperties2.ts, 1, 16))
         }
@@ -29,21 +35,27 @@ class C1 {
 >getA : Symbol(C1.getA, Decl(destructuringParameterProperties2.ts, 5, 5))
 
         return this.a
+>this.a : Symbol(C1.a, Decl(destructuringParameterProperties2.ts, 1, 44))
 >this : Symbol(C1, Decl(destructuringParameterProperties2.ts, 0, 0))
+>a : Symbol(C1.a, Decl(destructuringParameterProperties2.ts, 1, 44))
     }
 
     public getB() {
 >getB : Symbol(C1.getB, Decl(destructuringParameterProperties2.ts, 9, 5))
 
         return this.b
+>this.b : Symbol(C1.b, Decl(destructuringParameterProperties2.ts, 1, 46))
 >this : Symbol(C1, Decl(destructuringParameterProperties2.ts, 0, 0))
+>b : Symbol(C1.b, Decl(destructuringParameterProperties2.ts, 1, 46))
     }
 
     public getC() {
 >getC : Symbol(C1.getC, Decl(destructuringParameterProperties2.ts, 13, 5))
 
         return this.c;
+>this.c : Symbol(C1.c, Decl(destructuringParameterProperties2.ts, 1, 49))
 >this : Symbol(C1, Decl(destructuringParameterProperties2.ts, 0, 0))
+>c : Symbol(C1.c, Decl(destructuringParameterProperties2.ts, 1, 49))
     }
 }
 

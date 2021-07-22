@@ -1949,8 +1949,9 @@ namespace ts {
             //      this.x = x;
             //      this.y = y;
             //  }
-            //
-            addRange(statements, map(parametersWithPropertyAssignments, transformParameterWithPropertyAssignment));
+
+            addRange(statements, flatMap(parametersWithPropertyAssignments, p =>
+                isObjectBindingPattern(p.name) || isArrayBindingPattern(p.name) ? transformBindingPatternWithPropertyAssignment(p.name) : transformParameterNameWithPropertyAssignment(p.name)));
 
             // Add the existing statements, skipping the initial super call.
             addRange(statements, visitNodes(body.statements, visitor, isStatement, indexOfFirstStatement));
@@ -1963,23 +1964,19 @@ namespace ts {
             return block;
         }
 
-        /**
-         * Transforms a parameter into a property assignment statement.
-         *
-         * @param node The parameter declaration.
-         */
-        function transformParameterWithPropertyAssignment(node: ParameterPropertyDeclaration) {
-            const name = node.name;
-            if (!isIdentifier(name)) {
-                return undefined;
-            }
+        function transformBindingPatternWithPropertyAssignment(node: ObjectBindingPattern | ArrayBindingPattern): readonly ExpressionStatement[] {
+            return flatMap(node.elements, n => isOmittedExpression(n) ? undefined :
+                isObjectBindingPattern(n.name) || isArrayBindingPattern(n.name) ? transformBindingPatternWithPropertyAssignment(n.name) :
+                    transformParameterNameWithPropertyAssignment(n.name));
+        }
 
+        function transformParameterNameWithPropertyAssignment(node: Identifier) {
             // TODO(rbuckton): Does this need to be parented?
-            const propertyName = setParent(setTextRange(factory.cloneNode(name), name), name.parent);
+            const propertyName = setParent(setTextRange(factory.cloneNode(node), node), node.parent);
             setEmitFlags(propertyName, EmitFlags.NoComments | EmitFlags.NoSourceMap);
 
             // TODO(rbuckton): Does this need to be parented?
-            const localName = setParent(setTextRange(factory.cloneNode(name), name), name.parent);
+            const localName = setParent(setTextRange(factory.cloneNode(node), node), node.parent);
             setEmitFlags(localName, EmitFlags.NoComments);
 
             return startOnNewLine(
@@ -1993,12 +1990,12 @@ namespace ts {
                                             factory.createThis(),
                                             propertyName
                                         ),
-                                        node.name
+                                        node
                                     ),
                                     localName
                                 )
                             ),
-                            node
+                            node.parent
                         ),
                         moveRangePos(node, -1)
                     )

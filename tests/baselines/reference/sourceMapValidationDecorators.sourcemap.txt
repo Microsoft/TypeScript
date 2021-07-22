@@ -99,18 +99,18 @@ sourceFile:sourceMapValidationDecorators.ts
 2 >        greeting
 3 >                     
 4 >                        greeting
-5 >                                : string
+5 >                                
 1 >Emitted(16, 9) Source(14, 14) + SourceIndex(0)
 2 >Emitted(16, 22) Source(14, 22) + SourceIndex(0)
 3 >Emitted(16, 25) Source(14, 14) + SourceIndex(0)
 4 >Emitted(16, 33) Source(14, 22) + SourceIndex(0)
-5 >Emitted(16, 34) Source(14, 30) + SourceIndex(0)
+5 >Emitted(16, 34) Source(14, 22) + SourceIndex(0)
 ---
 >>>    }
 1 >^^^^
 2 >    ^
 3 >     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
-1 >, 
+1 >: string, 
   >      
   >      @ParameterDecorator1 
   >      @ParameterDecorator2(30) 

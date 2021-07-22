@@ -30,11 +30,21 @@ class C1 {
 
         var bar: any = this.x1 || this.x2 || this.x3 || this.y || this.z;
 >bar : Symbol(bar, Decl(destructuringParameterProperties5.ts, 6, 11))
+>this.x1 : Symbol(C1.x1, Decl(destructuringParameterProperties5.ts, 4, 25))
 >this : Symbol(C1, Decl(destructuringParameterProperties5.ts, 1, 44))
+>x1 : Symbol(C1.x1, Decl(destructuringParameterProperties5.ts, 4, 25))
+>this.x2 : Symbol(C1.x2, Decl(destructuringParameterProperties5.ts, 4, 29))
 >this : Symbol(C1, Decl(destructuringParameterProperties5.ts, 1, 44))
+>x2 : Symbol(C1.x2, Decl(destructuringParameterProperties5.ts, 4, 29))
+>this.x3 : Symbol(C1.x3, Decl(destructuringParameterProperties5.ts, 4, 33))
 >this : Symbol(C1, Decl(destructuringParameterProperties5.ts, 1, 44))
+>x3 : Symbol(C1.x3, Decl(destructuringParameterProperties5.ts, 4, 33))
+>this.y : Symbol(C1.y, Decl(destructuringParameterProperties5.ts, 4, 39))
 >this : Symbol(C1, Decl(destructuringParameterProperties5.ts, 1, 44))
+>y : Symbol(C1.y, Decl(destructuringParameterProperties5.ts, 4, 39))
+>this.z : Symbol(C1.z, Decl(destructuringParameterProperties5.ts, 4, 42))
 >this : Symbol(C1, Decl(destructuringParameterProperties5.ts, 1, 44))
+>z : Symbol(C1.z, Decl(destructuringParameterProperties5.ts, 4, 42))
     }
 }
 
@@ -51,9 +61,19 @@ var [a_x1, a_x2, a_x3, a_y, a_z] = [a.x1, a.x2, a.x3, a.y, a.z];
 >a_x3 : Symbol(a_x3, Decl(destructuringParameterProperties5.ts, 11, 16))
 >a_y : Symbol(a_y, Decl(destructuringParameterProperties5.ts, 11, 22))
 >a_z : Symbol(a_z, Decl(destructuringParameterProperties5.ts, 11, 27))
+>a.x1 : Symbol(C1.x1, Decl(destructuringParameterProperties5.ts, 4, 25))
 >a : Symbol(a, Decl(destructuringParameterProperties5.ts, 10, 3))
+>x1 : Symbol(C1.x1, Decl(destructuringParameterProperties5.ts, 4, 25))
+>a.x2 : Symbol(C1.x2, Decl(destructuringParameterProperties5.ts, 4, 29))
 >a : Symbol(a, Decl(destructuringParameterProperties5.ts, 10, 3))
+>x2 : Symbol(C1.x2, Decl(destructuringParameterProperties5.ts, 4, 29))
+>a.x3 : Symbol(C1.x3, Decl(destructuringParameterProperties5.ts, 4, 33))
 >a : Symbol(a, Decl(destructuringParameterProperties5.ts, 10, 3))
+>x3 : Symbol(C1.x3, Decl(destructuringParameterProperties5.ts, 4, 33))
+>a.y : Symbol(C1.y, Decl(destructuringParameterProperties5.ts, 4, 39))
 >a : Symbol(a, Decl(destructuringParameterProperties5.ts, 10, 3))
+>y : Symbol(C1.y, Decl(destructuringParameterProperties5.ts, 4, 39))
+>a.z : Symbol(C1.z, Decl(destructuringParameterProperties5.ts, 4, 42))
 >a : Symbol(a, Decl(destructuringParameterProperties5.ts, 10, 3))
+>z : Symbol(C1.z, Decl(destructuringParameterProperties5.ts, 4, 42))
 
