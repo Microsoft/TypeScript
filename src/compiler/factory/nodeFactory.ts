@@ -5099,6 +5099,11 @@ namespace ts {
             node.transformFlags |=
                 propagateChildrenFlags(node.statements) |
                 propagateChildFlags(node.endOfFileToken);
+            node.referencedFiles = [];
+            node.typeReferenceDirectives = [];
+            node.libReferenceDirectives = [];
+            node.amdDependencies = [];
+            node.pragmas = new Map() as ReadonlyPragmaMap;
             return node;
         }
 
