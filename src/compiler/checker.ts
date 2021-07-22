@@ -633,6 +633,7 @@ namespace ts {
             isTupleType,
             isArrayLikeType,
             isTypeInvalidDueToUnionDiscriminant,
+            getExactOptionalUnassignableProperties,
             getAllPossiblePropertiesOfTypes,
             getSuggestedSymbolForNonexistentProperty,
             getSuggestionForNonexistentProperty,
@@ -17658,9 +17659,17 @@ namespace ts {
                     else if (sourceType === targetType) {
                         message = Diagnostics.Type_0_is_not_assignable_to_type_1_Two_different_types_with_this_name_exist_but_they_are_unrelated;
                     }
+                    else if (exactOptionalPropertyTypes && getExactOptionalUnassignableProperties(source, target).length) {
+                        message = Diagnostics.Type_0_is_not_assignable_to_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_types_of_the_target_s_properties;
+                    }
                     else {
                         message = Diagnostics.Type_0_is_not_assignable_to_type_1;
                     }
+                }
+                else if (message === Diagnostics.Argument_of_type_0_is_not_assignable_to_parameter_of_type_1
+                    && exactOptionalPropertyTypes
+                    && getExactOptionalUnassignableProperties(source, target).length) {
+                    message = Diagnostics.Argument_of_type_0_is_not_assignable_to_parameter_of_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_types_of_the_target_s_properties;
                 }
 
                 reportError(message, generalizedSourceType, targetType);
@@ -19575,6 +19584,16 @@ namespace ts {
             }
 
             return isUnitType(type) || !!(type.flags & TypeFlags.TemplateLiteral);
+        }
+
+        function getExactOptionalUnassignableProperties(source: Type, target: Type) {
+            return checker.getPropertiesOfType(target).filter(targetProp => {
+                const sourceProp = getPropertyOfType(source, targetProp.escapedName);
+                return sourceProp && targetProp.valueDeclaration
+                    && maybeTypeOfKind(getTypeOfSymbol(sourceProp), TypeFlags.Undefined)
+                    && hasQuestionToken(targetProp.valueDeclaration)
+                    && containsMissingType(getTypeOfSymbol(targetProp));
+});
         }
 
         function getBestMatchingType(source: Type, target: UnionOrIntersectionType, isRelatedTo = compareTypesAssignable) {
